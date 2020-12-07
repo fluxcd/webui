@@ -1,0 +1,27 @@
+{
+  "name": "webui",
+  "version": "0.0.1",
+  "main": "index.js",
+  "repository": "git@github.com:fluxcd/webui.git",
+  "author": "Flux Maintainers",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "parcel build ui/index.html -d static",
+    "start": "nodemon dev-server.js --watch dev-server.js"
+  },
+  "dependencies": {
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-router-dom": "^5.2.0"
+  },
+  "devDependencies": {
+    "express": "^4.17.1",
+    "http-proxy": "^1.18.1",
+    "morgan": "^1.10.0",
+    "parcel-bundler": "^1.12.4",
+    "parcel": "^1.12.4",
+    "prettier": "^2.2.1",
+    "tslint": "^6.1.3",
+    "typescript": "^4.1.2"
+  }
+}
