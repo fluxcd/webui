@@ -10,3 +10,17 @@ To set up a development environment
 4. `npm install --silent` to install UI dependencies
 5. `make dev` to compile and run the app
 6. `npm start` to start the frontend dev server (with hot-reloading)
+
+To generate protobuf files natively on your OS, install [protoc](https://grpc.io/docs/protoc-installation/), then install these packages:
+
+```shell
+go get -u github.com/golang/protobuf/protoc-gen-go
+go get -u github.com/twitchtv/twirp/protoc-gen-twirp
+go get -u go.larrymyers.com/protoc-gen-twirp_typescript
+```
+
+Then run:
+
+```shell
+make proto-native
+```
