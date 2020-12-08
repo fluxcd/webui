@@ -1,12 +1,14 @@
 package main
 
 import (
-	"encoding/json"
 	"net/http"
 	"os"
 
 	"github.com/fluxcd/pkg/runtime/logger"
 	"github.com/fluxcd/webui/pkg/assets"
+	"github.com/fluxcd/webui/pkg/clustersserver"
+	clustersRpc "github.com/fluxcd/webui/pkg/rpc/clusters"
+	"k8s.io/client-go/tools/clientcmd"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -27,31 +29,28 @@ func main() {
 
 	mux := http.NewServeMux()
 
+	clientCfg, err := clientcmd.NewDefaultClientConfigLoadingRules().Load()
+	if err != nil {
+		log.Error(err, "could not get kubeconfig")
+		os.Exit(1)
+	}
+
 	mux.Handle("/metrics/", promhttp.Handler())
 
-	mux.Handle("/api/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		res := &struct {
-			Ok bool `json:"ok"`
-		}{Ok: true}
-
-		b, err := json.Marshal(res)
-
-		if err != nil {
-			log.Error(err, "could not marshal response")
-		}
-
-		if _, err := w.Write(b); err != nil {
-			log.Error(err, "could not write response")
-		}
-
+	mux.Handle("/health/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
 	}))
+
+	clusters := clustersserver.Server{ClientConfig: clientCfg}
+	clustersHandler := clustersRpc.NewClustersServer(&clusters, nil)
+	mux.Handle("/api/clusters/", http.StripPrefix("/api/clusters", clustersHandler))
 
 	mux.Handle("/", http.FileServer(assets.Assets))
 
 	log.Info("Serving on port 9000")
 
 	if err := http.ListenAndServe(":9000", mux); err != nil {
-		log.Error(err, "Server exited")
+		log.Error(err, "server exited")
 		os.Exit(1)
 	}
 }
