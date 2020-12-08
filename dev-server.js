@@ -7,7 +7,7 @@ const server = httpProxy.createProxyServer({});
 
 const app = express();
 
-const API_BACKEND = "http://localhost:9000/api/";
+const API_BACKEND = "http://localhost:3000/api/";
 
 const port = 1234;
 
