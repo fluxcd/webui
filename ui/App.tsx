@@ -1,53 +1,52 @@
 import * as React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { DefaultClusters } from "./lib/rpc/clusters";
+import {
+  Box,
+  Container,
+  ThemeProvider as MuiThemeProvider,
+} from "@material-ui/core";
+import styled, { ThemeProvider } from "styled-components";
 
-type Props = {
-  className?: string;
-};
+import theme, { GlobalStyle } from "./lib/theme";
+import LeftNav from "./components/LeftNav";
 
-const wrappedFetch = (url, opts: RequestInit = {}) => {
-  return fetch(url, {
-    ...opts,
-    credentials: "same-origin",
-    headers: {
-      "content-type": "application/json",
-      ...(opts.headers || {}),
-    },
-  });
-};
+const AppContainer = styled.div`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0;
+`;
+
+const NavContainer = styled.div`
+  min-width: 200px;
+`;
+
+const ContentCotainer = styled.div`
+  width: 100%;
+`;
 
 export default function App() {
-  const [status, setStatus] = React.useState("");
-  React.useEffect(() => {
-    const client = new DefaultClusters("/api/clusters", wrappedFetch);
-
-    client
-      .listContexts({})
-      .then((res) => {
-        setStatus(res);
-      })
-
-      .catch((e) => console.error(e));
-  }, []);
   return (
-    <div>
-      <Router>
-        <Switch>
-          <Route
-            exact
-            path="/"
-            component={() => (
-              <div>
-                <p>Hello!!!!!</p>
-                API response:
-                <pre>{JSON.stringify(status, null, 2)}</pre>
-              </div>
-            )}
-          />
-          <Route exact path="*" component={() => <p>404</p>} />
-        </Switch>
-      </Router>
-    </div>
+    <MuiThemeProvider theme={theme}>
+      <ThemeProvider theme={theme}>
+        <GlobalStyle />
+        <Router>
+          <AppContainer>
+            <NavContainer>
+              <Container>
+                <LeftNav />
+              </Container>
+            </NavContainer>
+            <ContentCotainer>
+              <Switch>
+                <Route exact path="/" component={() => <div>some page </div>} />
+                <Route exact path="*" component={() => <p>404</p>} />
+              </Switch>
+            </ContentCotainer>
+          </AppContainer>
+        </Router>
+      </ThemeProvider>
+    </MuiThemeProvider>
   );
 }
