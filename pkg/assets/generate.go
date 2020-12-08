@@ -13,7 +13,7 @@ func main() {
 	err := vfsgen.Generate(assets.Assets, vfsgen.Options{
 		Filename:     "pkg/assets/assets.go",
 		PackageName:  "assets",
-		BuildTags:    "!dev",
+		BuildTags:    "!generate",
 		VariableName: "Assets",
 	})
 	if err != nil {

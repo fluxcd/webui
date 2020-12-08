@@ -7,7 +7,7 @@ test:
 	go test ./..
 
 assets: ui
-	go run -tags=dev pkg/assets/generate.go
+	go run -tags=generate pkg/assets/generate.go
 
 build: assets
 	CGO_ENABLED=0 go build -o ./bin/webui .
