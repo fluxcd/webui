@@ -1,6 +1,6 @@
 all: test build
 
-ui: static/dev/index.html
+ui:
 	npm run build
 
 test:
