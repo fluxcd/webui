@@ -1,6 +1,6 @@
 all: test build
 
-ui: static/index.html
+ui: static/dev/index.html
 	npm run build
 
 test:
@@ -14,3 +14,6 @@ build: assets
 
 dev: assets
 	gin -a 9000 -b ./bin/gin-bin
+
+proto-native: pkg/rpc/clusters/clusters.proto
+	protoc pkg/rpc/clusters/clusters.proto --twirp_out=./ --go_out=. --twirp_typescript_out=./ui/lib/rpc

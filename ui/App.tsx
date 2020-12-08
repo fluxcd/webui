@@ -1,16 +1,33 @@
 import * as React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { DefaultClusters } from "./lib/rpc/clusters";
 
 type Props = {
   className?: string;
 };
 
+const wrappedFetch = (url, opts: RequestInit = {}) => {
+  return fetch(url, {
+    ...opts,
+    credentials: "same-origin",
+    headers: {
+      "content-type": "application/json",
+      ...(opts.headers || {}),
+    },
+  });
+};
+
 export default function App() {
   const [status, setStatus] = React.useState("");
   React.useEffect(() => {
-    fetch("/api/")
-      .then((res) => res.json())
-      .then((args) => setStatus(args))
+    const client = new DefaultClusters("/api/clusters", wrappedFetch);
+
+    client
+      .listContexts({})
+      .then((res) => {
+        setStatus(res);
+      })
+
       .catch((e) => console.error(e));
   }, []);
   return (
