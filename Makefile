@@ -1,10 +1,16 @@
 all: test build
 
+ui: ui/index.html ui/main.js
+	yarn build
+
 test:
 	go test ./..
 
-build:
-	CGO_ENABLED=0 go build -o ./bin/webui ./cmd/webui
+assets: ui
+	go run -tags=dev pkg/assets/generate.go
 
-dev:
-	cd cmd/webui/ && gin -a 9000 -b ./../../bin/gin-bin
+build: assets
+	CGO_ENABLED=0 go build -o ./bin/webui .
+
+dev: assets
+	gin -a 9000 -b ./bin/gin-bin
