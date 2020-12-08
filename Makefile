@@ -1,7 +1,7 @@
 all: test build
 
-ui: ui/index.html ui/main.js
-	yarn build
+ui: static/index.html
+	npm run build
 
 test:
 	go test ./..
