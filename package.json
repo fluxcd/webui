@@ -6,7 +6,7 @@
   "author": "Flux Maintainers",
   "license": "Apache-2.0",
   "scripts": {
-    "build": "parcel build ui/index.html -d static",
+    "build": "parcel build ui/index.html",
     "start": "nodemon dev-server.js --watch dev-server.js"
   },
   "dependencies": {
