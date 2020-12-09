@@ -67,7 +67,7 @@ func (s *Server) ListContexts(ctx context.Context, msg *pb.ListContextsReq) (*pb
 		ctxs = append(ctxs, &pb.Context{Name: c.Cluster})
 	}
 
-	return &pb.ListContextsRes{Contexts: ctxs}, nil
+	return &pb.ListContextsRes{Contexts: ctxs, CurrentContext: cfg.CurrentContext}, nil
 }
 
 func (s *Server) ListKustomizations(ctx context.Context, msg *pb.ListKustomizationsReq) (*pb.ListKustomizationsRes, error) {
