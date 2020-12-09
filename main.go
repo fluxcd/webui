@@ -29,19 +29,14 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	clientCfg, err := clientcmd.NewDefaultClientConfigLoadingRules().Load()
-	if err != nil {
-		log.Error(err, "could not get kubeconfig")
-		os.Exit(1)
-	}
-
 	mux.Handle("/metrics/", promhttp.Handler())
 
 	mux.Handle("/health/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
-	clusters := clustersserver.Server{ClientConfig: clientCfg}
+	cfgLoadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
+	clusters := clustersserver.Server{LoadingRules: cfgLoadingRules}
 	clustersHandler := clustersRpc.NewClustersServer(&clusters, nil)
 	mux.Handle("/api/clusters/", http.StripPrefix("/api/clusters", clustersHandler))
 
