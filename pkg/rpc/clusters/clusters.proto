@@ -18,7 +18,8 @@ message ListContextsReq {
 }
 
 message ListContextsRes {
-    repeated Context contexts = 1;
+    string currentContext = 1;
+    repeated Context contexts = 2;
 }
 
 message Condition {

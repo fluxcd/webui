@@ -9,10 +9,12 @@ import {
 import _ from "lodash";
 import * as React from "react";
 import styled from "styled-components";
-import { useLocation } from "react-router-dom";
+import { useHistory, useLocation, useParams } from "react-router-dom";
 
 import { useKubernetesContexts } from "../lib/hooks";
 import Logo from "./Logo";
+import Link from "./Link";
+import { normalizePath } from "../lib/util";
 
 type Props = {
   className?: string;
@@ -24,7 +26,14 @@ const navItems = [
   { value: "helm_releases", label: "Helm Releases" },
 ];
 
-const LinkTab = styled((props) => <Tab component="a" {...props} />)`
+const LinkTab = styled((props) => (
+  <Tab
+    component={React.forwardRef((p, ref) => (
+      <Link innerRef={ref} {...p} />
+    ))}
+    {...props}
+  />
+))`
   span {
     align-items: flex-start;
   }
@@ -37,16 +46,22 @@ const Styled = (cmp) => styled(cmp)`
 `;
 
 function LeftNav({ className }: Props) {
-  const [selectedContext, setSelectedContext] = React.useState("");
-  const contexts = useKubernetesContexts();
+  const {
+    contexts,
+    currentContext,
+    setCurrentContext,
+  } = useKubernetesContexts();
 
   const location = useLocation();
-  const normalizedPath = (location.pathname || "").replace("/", "");
+  const history = useHistory();
+  const [, pageName] = normalizePath(location.pathname);
 
   return (
     <div className={className}>
       <div>
-        <Logo />
+        <Link to="/">
+          <Logo />
+        </Link>
       </div>
 
       <div>
@@ -54,9 +69,11 @@ function LeftNav({ className }: Props) {
           <InputLabel id="context-selector">Contexts</InputLabel>
           <Select
             onChange={(ev) => {
-              setSelectedContext(ev.target.value as string);
+              const nextCtx = ev.target.value;
+              setCurrentContext(nextCtx as string);
+              history.replace(`/${nextCtx}/${pageName}`);
             }}
-            value={selectedContext}
+            value={currentContext}
             id="context-selector"
             label="Contexts"
           >
@@ -69,13 +86,13 @@ function LeftNav({ className }: Props) {
         </FormControl>
       </div>
       <div>
-        <Tabs centered={false} orientation="vertical" value={normalizedPath}>
+        <Tabs centered={false} orientation="vertical" value={pageName}>
           {_.map(navItems, (n) => (
             <LinkTab
               value={n.value}
               key={n.value}
               label={n.label}
-              href={`/${n.value}`}
+              to={`/${n.value}`}
             />
           ))}
         </Tabs>

@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 export const wrappedFetch = (url, opts: RequestInit = {}) => {
   return fetch(url, {
     ...opts,
@@ -7,4 +9,8 @@ export const wrappedFetch = (url, opts: RequestInit = {}) => {
       ...(opts.headers || {}),
     },
   });
+};
+
+export const normalizePath = (pathname) => {
+  return _.tail(pathname.split("/"));
 };
