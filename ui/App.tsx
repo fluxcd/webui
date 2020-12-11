@@ -12,6 +12,8 @@ import theme, { GlobalStyle } from "./lib/theme";
 import KustomizationDetail from "./pages/KustomizationDetail";
 import Kustomizations from "./pages/Kustomizations";
 import Redirector from "./pages/Redirector";
+import SourceDetail from "./pages/SourceDetail";
+import Sources from "./pages/Sources";
 
 const AppContainer = styled.div`
   display: flex;
@@ -45,6 +47,7 @@ export default function App() {
               <ContentCotainer>
                 <Switch>
                   <Route exact path="/" component={Redirector} />
+                  <Route exact path="/:context" component={Redirector} />
                   <Route
                     exact
                     path="/:context/kustomizations"
@@ -54,6 +57,12 @@ export default function App() {
                     exact
                     path="/:context/kustomizations/:kustomizationId"
                     component={KustomizationDetail}
+                  />
+                  <Route exact path="/:context/sources" component={Sources} />
+                  <Route
+                    exact
+                    path="/:context/sources/:sourceType/:sourceId"
+                    component={SourceDetail}
                   />
                   <Route exact path="*" component={() => <p>404</p>} />
                 </Switch>

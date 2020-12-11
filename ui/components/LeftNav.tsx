@@ -86,7 +86,11 @@ function LeftNav({ className }: Props) {
         </FormControl>
       </div>
       <div>
-        <Tabs centered={false} orientation="vertical" value={pageName}>
+        <Tabs
+          centered={false}
+          orientation="vertical"
+          value={pageName || navItems[0].value}
+        >
           {_.map(navItems, (n) => (
             <LinkTab
               value={n.value}

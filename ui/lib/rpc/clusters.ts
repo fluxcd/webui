@@ -58,13 +58,51 @@ const JSONToListContextsRes = (m: ListContextsRes | ListContextsResJSON): ListCo
     };
 };
 
+export interface Condition {
+    type: string;
+    status: string;
+    reason: string;
+    message: string;
+    
+}
+
+interface ConditionJSON {
+    type: string;
+    status: string;
+    reason: string;
+    message: string;
+    
+}
+
+
+const JSONToCondition = (m: Condition | ConditionJSON): Condition => {
+    
+    return {
+        type: m.type,
+        status: m.status,
+        reason: m.reason,
+        message: m.message,
+        
+    };
+};
+
 export interface Kustomization {
     name: string;
+    namespace: string;
+    targetnamespace: string;
+    path: string;
+    sourceref: string;
+    conditions: Condition[];
     
 }
 
 interface KustomizationJSON {
     name: string;
+    namespace: string;
+    targetNamespace: string;
+    path: string;
+    sourceRef: string;
+    conditions: ConditionJSON[];
     
 }
 
@@ -73,6 +111,11 @@ const JSONToKustomization = (m: Kustomization | KustomizationJSON): Kustomizatio
     
     return {
         name: m.name,
+        namespace: m.namespace,
+        targetnamespace: (((m as Kustomization).targetnamespace) ? (m as Kustomization).targetnamespace : (m as KustomizationJSON).targetNamespace),
+        path: m.path,
+        sourceref: (((m as Kustomization).sourceref) ? (m as Kustomization).sourceref : (m as KustomizationJSON).sourceRef),
+        conditions: (m.conditions as (Condition | ConditionJSON)[]).map(JSONToCondition),
         
     };
 };
@@ -114,10 +157,117 @@ const JSONToListKustomizationsRes = (m: ListKustomizationsRes | ListKustomizatio
     };
 };
 
+export interface GitRepositoryRef {
+    branch: string;
+    tag: string;
+    semver: string;
+    commit: string;
+    
+}
+
+interface GitRepositoryRefJSON {
+    branch: string;
+    tag: string;
+    semver: string;
+    commit: string;
+    
+}
+
+
+const JSONToGitRepositoryRef = (m: GitRepositoryRef | GitRepositoryRefJSON): GitRepositoryRef => {
+    
+    return {
+        branch: m.branch,
+        tag: m.tag,
+        semver: m.semver,
+        commit: m.commit,
+        
+    };
+};
+
+export interface Source {
+    name: string;
+    url: string;
+    reference: GitRepositoryRef;
+    type: string;
+    provider: string;
+    bucketname: string;
+    region: string;
+    
+}
+
+interface SourceJSON {
+    name: string;
+    url: string;
+    reference: GitRepositoryRefJSON;
+    type: string;
+    provider: string;
+    bucketname: string;
+    region: string;
+    
+}
+
+
+const JSONToSource = (m: Source | SourceJSON): Source => {
+    
+    return {
+        name: m.name,
+        url: m.url,
+        reference: JSONToGitRepositoryRef(m.reference),
+        type: m.type,
+        provider: m.provider,
+        bucketname: m.bucketname,
+        region: m.region,
+        
+    };
+};
+
+export interface ListSourcesReq {
+    contextname: string;
+    sourcetype: string;
+    
+}
+
+interface ListSourcesReqJSON {
+    contextName: string;
+    sourceType: string;
+    
+}
+
+
+const ListSourcesReqToJSON = (m: ListSourcesReq): ListSourcesReqJSON => {
+    return {
+        contextName: m.contextname,
+        sourceType: m.sourcetype,
+        
+    };
+};
+
+export interface ListSourcesRes {
+    sources: Source[];
+    
+}
+
+interface ListSourcesResJSON {
+    sources: SourceJSON[];
+    
+}
+
+
+const JSONToListSourcesRes = (m: ListSourcesRes | ListSourcesResJSON): ListSourcesRes => {
+    
+    return {
+        sources: (m.sources as (Source | SourceJSON)[]).map(JSONToSource),
+        
+    };
+};
+
 export interface Clusters {
     listContexts: (listContextsReq: ListContextsReq) => Promise<ListContextsRes>;
     
     listKustomizations: (listKustomizationsReq: ListKustomizationsReq) => Promise<ListKustomizationsRes>;
+    
+    listSources: (listSourcesReq: ListSourcesReq) => Promise<ListSourcesRes>;
     
 }
 
@@ -159,6 +309,21 @@ export class DefaultClusters implements Clusters {
             }
 
             return resp.json().then(JSONToListKustomizationsRes);
+        });
+    }
+    
+    listSources(listSourcesReq: ListSourcesReq): Promise<ListSourcesRes> {
+        const url = this.hostname + this.pathPrefix + "ListSources";
+        let body: ListSourcesReq | ListSourcesReqJSON = listSourcesReq;
+        if (!this.writeCamelCase) {
+            body = ListSourcesReqToJSON(listSourcesReq);
+        }
+        return this.fetch(createTwirpRequest(url, body)).then((resp) => {
+            if (!resp.ok) {
+                return throwTwirpError(resp);
+            }
+
+            return resp.json().then(JSONToListSourcesRes);
         });
     }
     
