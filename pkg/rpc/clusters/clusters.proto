@@ -1,0 +1,19 @@
+syntax = "proto3";
+package clusters;
+option go_package = "pkg/rpc/clusters";
+
+service Clusters {
+    rpc ListContexts(ListContextsReq) returns (ListContextsRes);
+}
+
+message Context {
+    string name = 1;
+}
+
+message ListContextsReq {
+
+}
+
+message ListContextsRes {
+    repeated Context contexts = 1;
+}
