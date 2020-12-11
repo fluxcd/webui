@@ -9,7 +9,7 @@ export default function Redirector() {
 
   React.useEffect(() => {
     if (currentContext) {
-      history.push(`${currentContext}/kustomizations`);
+      history.push(`/${currentContext}/kustomizations`);
     }
   });
 

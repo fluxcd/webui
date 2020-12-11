@@ -10,15 +10,14 @@ type Props = {
 const Styled = (c) => styled(c)``;
 
 function Kustomizations({ className }: Props) {
-  const { currentContext } = useKubernetesContexts();
-  const kustomizations = useKustomizations(currentContext);
+  const kustomizations = useKustomizations();
 
   return (
     <div className={className}>
       <ul>
-        {_.map(kustomizations, (k) => (
-          <li key={k.name}>
-            <Link to={`/kustomizations/${k.name}`}>{k.name}</Link>
+        {_.map(kustomizations, (v, k) => (
+          <li key={v.name}>
+            <Link to={`/kustomizations/${v.name}`}>{v.name}</Link>
           </li>
         ))}
       </ul>
