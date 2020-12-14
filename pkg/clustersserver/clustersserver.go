@@ -4,18 +4,25 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	kustomizev1 "github.com/fluxcd/kustomize-controller/api/v1beta1"
+	"github.com/fluxcd/pkg/apis/meta"
 	sourcev1 "github.com/fluxcd/source-controller/api/v1beta1"
 	pb "github.com/fluxcd/webui/pkg/rpc/clusters"
 	"github.com/fluxcd/webui/pkg/util"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
 type clientCache map[string]client.Client
+
+var k8sPollInterval = 2 * time.Second
+var k8sTimeout = 1 * time.Minute
 
 type Server struct {
 	ClientCache       clientCache
@@ -157,4 +164,113 @@ func (s *Server) ListSources(ctx context.Context, msg *pb.ListSourcesReq) (*pb.L
 	appendSources(msg.SourceType, k8sList, res)
 
 	return res, nil
+}
+
+func reconcileSourceGit(ctx context.Context, c client.Client, spec kustomizev1.KustomizationSpec) error {
+	repository := &sourcev1.GitRepository{}
+
+	name := types.NamespacedName{
+		Name:      spec.SourceRef.Name,
+		Namespace: spec.SourceRef.Namespace,
+	}
+
+	if err := c.Get(ctx, name, repository); err != nil {
+		return err
+	}
+
+	if repository.Annotations == nil {
+		repository.Annotations = map[string]string{
+			meta.ReconcileAtAnnotation: time.Now().Format(time.RFC3339Nano),
+		}
+	} else {
+		repository.Annotations[meta.ReconcileAtAnnotation] = time.Now().Format(time.RFC3339Nano)
+	}
+
+	return c.Update(ctx, repository)
+}
+
+func reconcileSourceBucket(ctx context.Context, c client.Client, spec kustomizev1.KustomizationSpec) error {
+	bucket := &sourcev1.Bucket{}
+
+	name := types.NamespacedName{
+		Name:      spec.SourceRef.Name,
+		Namespace: spec.SourceRef.Namespace,
+	}
+
+	if err := c.Get(ctx, name, bucket); err != nil {
+		return err
+	}
+
+	if bucket.Annotations == nil {
+		bucket.Annotations = map[string]string{
+			meta.ReconcileAtAnnotation: time.Now().Format(time.RFC3339Nano),
+		}
+	} else {
+		bucket.Annotations[meta.ReconcileAtAnnotation] = time.Now().Format(time.RFC3339Nano)
+	}
+
+	return c.Update(ctx, bucket)
+}
+
+func checkKustomizationSync(ctx context.Context, c client.Client, name types.NamespacedName, lastReconcile string) func() (bool, error) {
+	return func() (bool, error) {
+		kustomization := kustomizev1.Kustomization{}
+		err := c.Get(ctx, name, &kustomization)
+		if err != nil {
+			return false, err
+		}
+		return kustomization.Status.LastHandledReconcileAt != lastReconcile, nil
+	}
+}
+
+func (s *Server) SyncKustomization(ctx context.Context, msg *pb.SyncKustomizationReq) (*pb.SyncKustomizationRes, error) {
+	client, err := s.getClient(msg.ContextName)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not create client: %w", err)
+	}
+
+	name := types.NamespacedName{
+		Name:      msg.KustomizationName,
+		Namespace: msg.KustomizationNamespace,
+	}
+	kustomization := kustomizev1.Kustomization{}
+
+	if err := client.Get(ctx, name, &kustomization); err != nil {
+		return nil, fmt.Errorf("could not list kustomizations: %w", err)
+	}
+
+	if msg.WithSource {
+		switch kustomization.Spec.SourceRef.Kind {
+		case sourcev1.GitRepositoryKind:
+			err = reconcileSourceGit(ctx, client, kustomization.Spec)
+		case sourcev1.BucketKind:
+			err = reconcileSourceBucket(ctx, client, kustomization.Spec)
+		}
+		if err != nil {
+			return nil, fmt.Errorf("could not reconcile source: %w", err)
+		}
+	}
+
+	if kustomization.Annotations == nil {
+		kustomization.Annotations = map[string]string{
+			meta.ReconcileAtAnnotation: time.Now().Format(time.RFC3339Nano),
+		}
+	} else {
+		kustomization.Annotations[meta.ReconcileAtAnnotation] = time.Now().Format(time.RFC3339Nano)
+	}
+
+	if err := client.Update(ctx, &kustomization); err != nil {
+		return nil, fmt.Errorf("could not update kustomization: %w", err)
+	}
+
+	if err := wait.PollImmediate(
+		k8sPollInterval,
+		k8sTimeout,
+		checkKustomizationSync(ctx, client, name, kustomization.Status.LastHandledReconcileAt),
+	); err != nil {
+		return nil, err
+	}
+
+	return &pb.SyncKustomizationRes{Ok: true}, nil
 }
