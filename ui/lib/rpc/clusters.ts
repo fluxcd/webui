@@ -262,12 +262,60 @@ const JSONToListSourcesRes = (m: ListSourcesRes | ListSourcesResJSON): ListSourc
     };
 };
 
+export interface SyncKustomizationReq {
+    contextname: string;
+    kustomizationname: string;
+    kustomizationnamespace: string;
+    withsource: boolean;
+    
+}
+
+interface SyncKustomizationReqJSON {
+    contextName: string;
+    kustomizationName: string;
+    kustomizationNamespace: string;
+    withSource: boolean;
+    
+}
+
+
+const SyncKustomizationReqToJSON = (m: SyncKustomizationReq): SyncKustomizationReqJSON => {
+    return {
+        contextName: m.contextname,
+        kustomizationName: m.kustomizationname,
+        kustomizationNamespace: m.kustomizationnamespace,
+        withSource: m.withsource,
+        
+    };
+};
+
+export interface SyncKustomizationRes {
+    ok: boolean;
+    
+}
+
+interface SyncKustomizationResJSON {
+    ok: boolean;
+    
+}
+
+
+const JSONToSyncKustomizationRes = (m: SyncKustomizationRes | SyncKustomizationResJSON): SyncKustomizationRes => {
+    
+    return {
+        ok: m.ok,
+        
+    };
+};
+
 export interface Clusters {
     listContexts: (listContextsReq: ListContextsReq) => Promise<ListContextsRes>;
     
     listKustomizations: (listKustomizationsReq: ListKustomizationsReq) => Promise<ListKustomizationsRes>;
     
     listSources: (listSourcesReq: ListSourcesReq) => Promise<ListSourcesRes>;
+    
+    syncKustomization: (syncKustomizationReq: SyncKustomizationReq) => Promise<SyncKustomizationRes>;
     
 }
 
@@ -324,6 +372,21 @@ export class DefaultClusters implements Clusters {
             }
 
             return resp.json().then(JSONToListSourcesRes);
+        });
+    }
+    
+    syncKustomization(syncKustomizationReq: SyncKustomizationReq): Promise<SyncKustomizationRes> {
+        const url = this.hostname + this.pathPrefix + "SyncKustomization";
+        let body: SyncKustomizationReq | SyncKustomizationReqJSON = syncKustomizationReq;
+        if (!this.writeCamelCase) {
+            body = SyncKustomizationReqToJSON(syncKustomizationReq);
+        }
+        return this.fetch(createTwirpRequest(url, body)).then((resp) => {
+            if (!resp.ok) {
+                return throwTwirpError(resp);
+            }
+
+            return resp.json().then(JSONToSyncKustomizationRes);
         });
     }
     
