@@ -8,10 +8,12 @@ import (
 	"github.com/fluxcd/webui/pkg/assets"
 	"github.com/fluxcd/webui/pkg/clustersserver"
 	clustersRpc "github.com/fluxcd/webui/pkg/rpc/clusters"
+
 	"k8s.io/client-go/tools/clientcmd"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func init() {
@@ -22,6 +24,22 @@ func init() {
 	}, []string{"service", "method", "status"})
 
 	prometheus.MustRegister(durations)
+}
+
+func initialContexts() (contexts []string, currentCtx string, err error) {
+	cfgLoadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
+
+	rules, err := cfgLoadingRules.Load()
+
+	if err != nil {
+		return contexts, currentCtx, err
+	}
+
+	for _, c := range rules.Contexts {
+		contexts = append(contexts, c.Cluster)
+	}
+
+	return contexts, rules.CurrentContext, nil
 }
 
 func main() {
@@ -35,8 +53,19 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 	}))
 
-	cfgLoadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
-	clusters := clustersserver.Server{LoadingRules: cfgLoadingRules}
+	kubeContexts, currentKubeContext, err := initialContexts()
+
+	if err != nil {
+		log.Error(err, "could not get k8s contexts")
+		os.Exit(1)
+	}
+
+	clusters := clustersserver.Server{
+		AvailableContexts: kubeContexts,
+		InitialContext:    currentKubeContext,
+		ClientCache:       map[string]client.Client{},
+	}
+
 	clustersHandler := clustersRpc.NewClustersServer(&clusters, nil)
 	mux.Handle("/api/clusters/", http.StripPrefix("/api/clusters", clustersHandler))
 
