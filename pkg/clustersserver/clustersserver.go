@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"time"
 
 	kustomizev1 "github.com/fluxcd/kustomize-controller/api/v1beta1"
@@ -28,6 +29,24 @@ type Server struct {
 	ClientCache       clientCache
 	AvailableContexts []string
 	InitialContext    string
+	CreateClient      func(string) (client.Client, error)
+}
+
+func NewServer(kubeContexts []string, currentKubeContext string) http.Handler {
+	clusters := Server{
+		AvailableContexts: kubeContexts,
+		InitialContext:    currentKubeContext,
+		ClientCache:       map[string]client.Client{},
+		CreateClient:      defaultCreateClient,
+	}
+
+	clustersHandler := pb.NewClustersServer(&clusters, nil)
+
+	return clustersHandler
+}
+
+func defaultCreateClient(kubeContext string) (client.Client, error) {
+	return util.NewKubeClient(kubeContext)
 }
 
 func (s *Server) getClient(kubeContext string) (client.Client, error) {
@@ -35,7 +54,7 @@ func (s *Server) getClient(kubeContext string) (client.Client, error) {
 		return s.ClientCache[kubeContext], nil
 	}
 
-	client, err := util.NewKubeClient(kubeContext)
+	client, err := s.CreateClient(kubeContext)
 
 	if err != nil {
 		return nil, err
