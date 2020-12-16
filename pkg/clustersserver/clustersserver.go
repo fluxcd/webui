@@ -179,12 +179,9 @@ func reconcileSourceGit(ctx context.Context, c client.Client, spec kustomizev1.K
 	}
 
 	if repository.Annotations == nil {
-		repository.Annotations = map[string]string{
-			meta.ReconcileAtAnnotation: time.Now().Format(time.RFC3339Nano),
-		}
-	} else {
-		repository.Annotations[meta.ReconcileAtAnnotation] = time.Now().Format(time.RFC3339Nano)
+		repository.Annotations = map[string]string{}
 	}
+	repository.Annotations[meta.ReconcileAtAnnotation] = time.Now().Format(time.RFC3339Nano)
 
 	return c.Update(ctx, repository)
 }
@@ -202,12 +199,9 @@ func reconcileSourceBucket(ctx context.Context, c client.Client, spec kustomizev
 	}
 
 	if bucket.Annotations == nil {
-		bucket.Annotations = map[string]string{
-			meta.ReconcileAtAnnotation: time.Now().Format(time.RFC3339Nano),
-		}
-	} else {
-		bucket.Annotations[meta.ReconcileAtAnnotation] = time.Now().Format(time.RFC3339Nano)
+		bucket.Annotations = map[string]string{}
 	}
+	bucket.Annotations[meta.ReconcileAtAnnotation] = time.Now().Format(time.RFC3339Nano)
 
 	return c.Update(ctx, bucket)
 }
