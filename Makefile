@@ -4,7 +4,7 @@ ui:
 	npm run build
 
 test:
-	go test ./..
+	go test ./...
 
 assets: ui
 	go run -tags=generate pkg/assets/generate.go
