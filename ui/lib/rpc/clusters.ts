@@ -58,11 +58,49 @@ const JSONToListContextsRes = (m: ListContextsRes | ListContextsResJSON): ListCo
     };
 };
 
+export interface ListNamespacesForContextReq {
+    contextname: string;
+    
+}
+
+interface ListNamespacesForContextReqJSON {
+    contextName: string;
+    
+}
+
+
+const ListNamespacesForContextReqToJSON = (m: ListNamespacesForContextReq): ListNamespacesForContextReqJSON => {
+    return {
+        contextName: m.contextname,
+        
+    };
+};
+
+export interface ListNamespacesForContextRes {
+    namespaces: string[];
+    
+}
+
+interface ListNamespacesForContextResJSON {
+    namespaces: string[];
+    
+}
+
+
+const JSONToListNamespacesForContextRes = (m: ListNamespacesForContextRes | ListNamespacesForContextResJSON): ListNamespacesForContextRes => {
+    
+    return {
+        namespaces: m.namespaces,
+        
+    };
+};
+
 export interface Condition {
     type: string;
     status: string;
     reason: string;
     message: string;
+    timestamp: string;
     
 }
 
@@ -71,6 +109,7 @@ interface ConditionJSON {
     status: string;
     reason: string;
     message: string;
+    timestamp: string;
     
 }
 
@@ -82,6 +121,7 @@ const JSONToCondition = (m: Condition | ConditionJSON): Condition => {
         status: m.status,
         reason: m.reason,
         message: m.message,
+        timestamp: m.timestamp,
         
     };
 };
@@ -93,6 +133,11 @@ export interface Kustomization {
     path: string;
     sourceref: string;
     conditions: Condition[];
+    interval: string;
+    prune: boolean;
+    reconcilerequestat: string;
+    reconcileat: string;
+    sourcerefkind: string;
     
 }
 
@@ -103,6 +148,11 @@ interface KustomizationJSON {
     path: string;
     sourceRef: string;
     conditions: ConditionJSON[];
+    interval: string;
+    prune: boolean;
+    reconcileRequestAt: string;
+    reconcileAt: string;
+    sourceRefKind: string;
     
 }
 
@@ -116,17 +166,24 @@ const JSONToKustomization = (m: Kustomization | KustomizationJSON): Kustomizatio
         path: m.path,
         sourceref: (((m as Kustomization).sourceref) ? (m as Kustomization).sourceref : (m as KustomizationJSON).sourceRef),
         conditions: (m.conditions as (Condition | ConditionJSON)[]).map(JSONToCondition),
+        interval: m.interval,
+        prune: m.prune,
+        reconcilerequestat: (((m as Kustomization).reconcilerequestat) ? (m as Kustomization).reconcilerequestat : (m as KustomizationJSON).reconcileRequestAt),
+        reconcileat: (((m as Kustomization).reconcileat) ? (m as Kustomization).reconcileat : (m as KustomizationJSON).reconcileAt),
+        sourcerefkind: (((m as Kustomization).sourcerefkind) ? (m as Kustomization).sourcerefkind : (m as KustomizationJSON).sourceRefKind),
         
     };
 };
 
 export interface ListKustomizationsReq {
     contextname: string;
+    namespace: string;
     
 }
 
 interface ListKustomizationsReqJSON {
     contextName: string;
+    namespace: string;
     
 }
 
@@ -134,6 +191,7 @@ interface ListKustomizationsReqJSON {
 const ListKustomizationsReqToJSON = (m: ListKustomizationsReq): ListKustomizationsReqJSON => {
     return {
         contextName: m.contextname,
+        namespace: m.namespace,
         
     };
 };
@@ -185,6 +243,37 @@ const JSONToGitRepositoryRef = (m: GitRepositoryRef | GitRepositoryRefJSON): Git
     };
 };
 
+export interface Artifact {
+    checksum: string;
+    lastupdateat: number;
+    path: string;
+    revision: string;
+    url: string;
+    
+}
+
+interface ArtifactJSON {
+    checksum: string;
+    lastupdateat: number;
+    path: string;
+    revision: string;
+    url: string;
+    
+}
+
+
+const JSONToArtifact = (m: Artifact | ArtifactJSON): Artifact => {
+    
+    return {
+        checksum: m.checksum,
+        lastupdateat: m.lastupdateat,
+        path: m.path,
+        revision: m.revision,
+        url: m.url,
+        
+    };
+};
+
 export interface Source {
     name: string;
     url: string;
@@ -193,6 +282,12 @@ export interface Source {
     provider: string;
     bucketname: string;
     region: string;
+    namespace: string;
+    gitimplementation: string;
+    timeout: string;
+    secretrefname: string;
+    conditions: Condition[];
+    artifact: Artifact;
     
 }
 
@@ -204,6 +299,12 @@ interface SourceJSON {
     provider: string;
     bucketname: string;
     region: string;
+    namespace: string;
+    gitimplementation: string;
+    timeout: string;
+    secretRefName: string;
+    conditions: ConditionJSON[];
+    artifact: ArtifactJSON;
     
 }
 
@@ -218,18 +319,26 @@ const JSONToSource = (m: Source | SourceJSON): Source => {
         provider: m.provider,
         bucketname: m.bucketname,
         region: m.region,
+        namespace: m.namespace,
+        gitimplementation: m.gitimplementation,
+        timeout: m.timeout,
+        secretrefname: (((m as Source).secretrefname) ? (m as Source).secretrefname : (m as SourceJSON).secretRefName),
+        conditions: (m.conditions as (Condition | ConditionJSON)[]).map(JSONToCondition),
+        artifact: JSONToArtifact(m.artifact),
         
     };
 };
 
 export interface ListSourcesReq {
     contextname: string;
+    namespace: string;
     sourcetype: string;
     
 }
 
 interface ListSourcesReqJSON {
     contextName: string;
+    namespace: string;
     sourceType: string;
     
 }
@@ -238,6 +347,7 @@ interface ListSourcesReqJSON {
 const ListSourcesReqToJSON = (m: ListSourcesReq): ListSourcesReqJSON => {
     return {
         contextName: m.contextname,
+        namespace: m.namespace,
         sourceType: m.sourcetype,
         
     };
@@ -264,16 +374,16 @@ const JSONToListSourcesRes = (m: ListSourcesRes | ListSourcesResJSON): ListSourc
 
 export interface SyncKustomizationReq {
     contextname: string;
+    namespace: string;
     kustomizationname: string;
-    kustomizationnamespace: string;
     withsource: boolean;
     
 }
 
 interface SyncKustomizationReqJSON {
     contextName: string;
+    namespace: string;
     kustomizationName: string;
-    kustomizationNamespace: string;
     withSource: boolean;
     
 }
@@ -282,20 +392,20 @@ interface SyncKustomizationReqJSON {
 const SyncKustomizationReqToJSON = (m: SyncKustomizationReq): SyncKustomizationReqJSON => {
     return {
         contextName: m.contextname,
+        namespace: m.namespace,
         kustomizationName: m.kustomizationname,
-        kustomizationNamespace: m.kustomizationnamespace,
         withSource: m.withsource,
         
     };
 };
 
 export interface SyncKustomizationRes {
-    ok: boolean;
+    kustomization: Kustomization;
     
 }
 
 interface SyncKustomizationResJSON {
-    ok: boolean;
+    kustomization: KustomizationJSON;
     
 }
 
@@ -303,7 +413,87 @@ interface SyncKustomizationResJSON {
 const JSONToSyncKustomizationRes = (m: SyncKustomizationRes | SyncKustomizationResJSON): SyncKustomizationRes => {
     
     return {
-        ok: m.ok,
+        kustomization: JSONToKustomization(m.kustomization),
+        
+    };
+};
+
+export interface HelmRelease {
+    name: string;
+    namespace: string;
+    interval: string;
+    chartname: string;
+    version: string;
+    sourcekind: string;
+    sourcename: string;
+    sourcenamespace: string;
+    
+}
+
+interface HelmReleaseJSON {
+    name: string;
+    namespace: string;
+    interval: string;
+    chartName: string;
+    version: string;
+    sourceKind: string;
+    sourceName: string;
+    sourceNamespace: string;
+    
+}
+
+
+const JSONToHelmRelease = (m: HelmRelease | HelmReleaseJSON): HelmRelease => {
+    
+    return {
+        name: m.name,
+        namespace: m.namespace,
+        interval: m.interval,
+        chartname: (((m as HelmRelease).chartname) ? (m as HelmRelease).chartname : (m as HelmReleaseJSON).chartName),
+        version: m.version,
+        sourcekind: (((m as HelmRelease).sourcekind) ? (m as HelmRelease).sourcekind : (m as HelmReleaseJSON).sourceKind),
+        sourcename: (((m as HelmRelease).sourcename) ? (m as HelmRelease).sourcename : (m as HelmReleaseJSON).sourceName),
+        sourcenamespace: (((m as HelmRelease).sourcenamespace) ? (m as HelmRelease).sourcenamespace : (m as HelmReleaseJSON).sourceNamespace),
+        
+    };
+};
+
+export interface ListHelmReleasesReq {
+    contextname: string;
+    namespace: string;
+    
+}
+
+interface ListHelmReleasesReqJSON {
+    contextName: string;
+    namespace: string;
+    
+}
+
+
+const ListHelmReleasesReqToJSON = (m: ListHelmReleasesReq): ListHelmReleasesReqJSON => {
+    return {
+        contextName: m.contextname,
+        namespace: m.namespace,
+        
+    };
+};
+
+export interface ListHelmReleasesRes {
+    helmReleases: HelmRelease[];
+    
+}
+
+interface ListHelmReleasesResJSON {
+    helm_releases: HelmReleaseJSON[];
+    
+}
+
+
+const JSONToListHelmReleasesRes = (m: ListHelmReleasesRes | ListHelmReleasesResJSON): ListHelmReleasesRes => {
+    
+    return {
+        helmReleases: ((((m as ListHelmReleasesRes).helmReleases) ? (m as ListHelmReleasesRes).helmReleases : (m as ListHelmReleasesResJSON).helm_releases) as (HelmRelease | HelmReleaseJSON)[]).map(JSONToHelmRelease),
         
     };
 };
@@ -311,11 +501,15 @@ const JSONToSyncKustomizationRes = (m: SyncKustomizationRes | SyncKustomizationR
 export interface Clusters {
     listContexts: (listContextsReq: ListContextsReq) => Promise<ListContextsRes>;
     
+    listNamespacesForContext: (listNamespacesForContextReq: ListNamespacesForContextReq) => Promise<ListNamespacesForContextRes>;
+    
     listKustomizations: (listKustomizationsReq: ListKustomizationsReq) => Promise<ListKustomizationsRes>;
     
     listSources: (listSourcesReq: ListSourcesReq) => Promise<ListSourcesRes>;
     
     syncKustomization: (syncKustomizationReq: SyncKustomizationReq) => Promise<SyncKustomizationRes>;
+    
+    listHelmReleases: (listHelmReleasesReq: ListHelmReleasesReq) => Promise<ListHelmReleasesRes>;
     
 }
 
@@ -342,6 +536,21 @@ export class DefaultClusters implements Clusters {
             }
 
             return resp.json().then(JSONToListContextsRes);
+        });
+    }
+    
+    listNamespacesForContext(listNamespacesForContextReq: ListNamespacesForContextReq): Promise<ListNamespacesForContextRes> {
+        const url = this.hostname + this.pathPrefix + "ListNamespacesForContext";
+        let body: ListNamespacesForContextReq | ListNamespacesForContextReqJSON = listNamespacesForContextReq;
+        if (!this.writeCamelCase) {
+            body = ListNamespacesForContextReqToJSON(listNamespacesForContextReq);
+        }
+        return this.fetch(createTwirpRequest(url, body)).then((resp) => {
+            if (!resp.ok) {
+                return throwTwirpError(resp);
+            }
+
+            return resp.json().then(JSONToListNamespacesForContextRes);
         });
     }
     
@@ -387,6 +596,21 @@ export class DefaultClusters implements Clusters {
             }
 
             return resp.json().then(JSONToSyncKustomizationRes);
+        });
+    }
+    
+    listHelmReleases(listHelmReleasesReq: ListHelmReleasesReq): Promise<ListHelmReleasesRes> {
+        const url = this.hostname + this.pathPrefix + "ListHelmReleases";
+        let body: ListHelmReleasesReq | ListHelmReleasesReqJSON = listHelmReleasesReq;
+        if (!this.writeCamelCase) {
+            body = ListHelmReleasesReqToJSON(listHelmReleasesReq);
+        }
+        return this.fetch(createTwirpRequest(url, body)).then((resp) => {
+            if (!resp.ok) {
+                return throwTwirpError(resp);
+            }
+
+            return resp.json().then(JSONToListHelmReleasesRes);
         });
     }
     

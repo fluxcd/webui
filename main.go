@@ -7,13 +7,11 @@ import (
 	"github.com/fluxcd/pkg/runtime/logger"
 	"github.com/fluxcd/webui/pkg/assets"
 	"github.com/fluxcd/webui/pkg/clustersserver"
-	clustersRpc "github.com/fluxcd/webui/pkg/rpc/clusters"
 
 	"k8s.io/client-go/tools/clientcmd"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func init() {
@@ -60,14 +58,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	clusters := clustersserver.Server{
-		AvailableContexts: kubeContexts,
-		InitialContext:    currentKubeContext,
-		ClientCache:       map[string]client.Client{},
-	}
+	clusters := clustersserver.NewServer(kubeContexts, currentKubeContext)
 
-	clustersHandler := clustersRpc.NewClustersServer(&clusters, nil)
-	mux.Handle("/api/clusters/", http.StripPrefix("/api/clusters", clustersHandler))
+	mux.Handle("/api/clusters/", http.StripPrefix("/api/clusters", clusters))
 
 	mux.Handle("/", http.FileServer(assets.Assets))
 

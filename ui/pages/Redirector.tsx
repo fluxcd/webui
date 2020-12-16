@@ -1,15 +1,14 @@
 import * as React from "react";
-import { useHistory } from "react-router";
-import styled from "styled-components";
-import { useKubernetesContexts } from "../lib/hooks";
+import { useKubernetesContexts, useNavigation } from "../lib/hooks";
+import { PageRoute } from "../lib/util";
 
 export default function Redirector() {
-  const { currentContext } = useKubernetesContexts();
-  const history = useHistory();
+  const { currentContext, currentNamespace } = useKubernetesContexts();
+  const { navigate } = useNavigation();
 
   React.useEffect(() => {
     if (currentContext) {
-      history.push(`/${currentContext}/kustomizations`);
+      navigate(PageRoute.Home, currentContext, currentNamespace);
     }
   });
 

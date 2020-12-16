@@ -1,25 +1,20 @@
 import * as React from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link as RouterLink } from "react-router-dom";
 import styled from "styled-components";
-import { normalizePath } from "../lib/util";
 
 type Props = {
   className?: string;
-  to: string;
   children: any;
-  query?: object;
+  to?: string;
 };
 
 const Styled = (c) => styled(c)``;
 
-function Link({ className, to, children, query }: Props) {
-  const location = useLocation();
-  const [context] = normalizePath(location.pathname);
-
+function Link({ className, children, to }: Props) {
   return (
-    <a href={`/${context}${to}`} className={className}>
+    <RouterLink to={to} className={className}>
       {children}
-    </a>
+    </RouterLink>
   );
 }
 

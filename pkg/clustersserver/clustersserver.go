@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	helmv2 "github.com/fluxcd/helm-controller/api/v2beta1"
 	kustomizev1 "github.com/fluxcd/kustomize-controller/api/v1beta1"
 	"github.com/fluxcd/pkg/apis/meta"
 	sourcev1 "github.com/fluxcd/source-controller/api/v1beta1"
@@ -18,6 +19,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
@@ -79,40 +81,110 @@ func (s *Server) ListContexts(ctx context.Context, msg *pb.ListContextsReq) (*pb
 	return &pb.ListContextsRes{Contexts: ctxs, CurrentContext: s.InitialContext}, nil
 }
 
+func (s *Server) ListNamespacesForContext(ctx context.Context, msg *pb.ListNamespacesForContextReq) (*pb.ListNamespacesForContextRes, error) {
+	c, err := s.getClient(msg.ContextName)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not create client: %w", err)
+	}
+
+	result := corev1.NamespaceList{}
+	if err := c.List(ctx, &result); err != nil {
+		return nil, fmt.Errorf("could not list namespaces: %w", err)
+	}
+
+	res := pb.ListNamespacesForContextRes{
+		Namespaces: []string{},
+	}
+
+	for _, ns := range result.Items {
+		res.Namespaces = append(res.Namespaces, ns.Name)
+	}
+
+	return &res, nil
+}
+
+func namespaceOpts(ns string) *client.ListOptions {
+	opts := client.ListOptions{}
+	if ns != "" {
+		opts.Namespace = ns
+	}
+
+	return &opts
+}
+
+func getSourceTypeEnum(kind string) pb.Source_Type {
+	switch kind {
+	case sourcev1.GitRepositoryKind:
+		return pb.Source_Git
+	}
+
+	return pb.Source_Git
+}
+
+func convertKustomization(kustomization kustomizev1.Kustomization) (*pb.Kustomization, error) {
+	reconcileRequestAt := kustomization.Annotations[meta.ReconcileRequestAnnotation]
+
+	reconcileAt := kustomization.Annotations[meta.ReconcileAtAnnotation]
+
+	k := &pb.Kustomization{
+		Name:               kustomization.Name,
+		Namespace:          kustomization.Namespace,
+		TargetNamespace:    kustomization.Spec.TargetNamespace,
+		Path:               kustomization.Spec.Path,
+		SourceRef:          kustomization.Spec.SourceRef.Name,
+		SourceRefKind:      getSourceTypeEnum(kustomization.Spec.SourceRef.Kind),
+		Conditions:         []*pb.Condition{},
+		Interval:           kustomization.Spec.Interval.Duration.String(),
+		Prune:              kustomization.Spec.Prune,
+		ReconcileRequestAt: reconcileRequestAt,
+		ReconcileAt:        reconcileAt,
+	}
+
+	for _, c := range kustomization.Status.Conditions {
+		k.Conditions = append(k.Conditions, &pb.Condition{
+			Type:      c.Type,
+			Status:    string(c.Status),
+			Reason:    c.Reason,
+			Message:   c.Message,
+			Timestamp: c.LastTransitionTime.String(),
+		})
+	}
+
+	for _, c := range kustomization.Status.Conditions {
+		k.Conditions = append(k.Conditions, &pb.Condition{
+			Type:    c.Type,
+			Status:  string(c.Status),
+			Reason:  c.Reason,
+			Message: c.Message,
+		})
+	}
+
+	return k, nil
+
+}
+
 func (s *Server) ListKustomizations(ctx context.Context, msg *pb.ListKustomizationsReq) (*pb.ListKustomizationsRes, error) {
-	client, err := s.getClient(msg.ContextName)
+	c, err := s.getClient(msg.ContextName)
 
 	if err != nil {
 		return nil, fmt.Errorf("could not create client: %w", err)
 	}
 
 	result := kustomizev1.KustomizationList{}
-	if err := client.List(ctx, &result); err != nil {
+
+	if err := c.List(ctx, &result, namespaceOpts(msg.Namespace)); err != nil {
 		return nil, fmt.Errorf("could not list kustomizations: %w", err)
 	}
 
 	k := []*pb.Kustomization{}
 	for _, kustomization := range result.Items {
-
-		m := pb.Kustomization{
-			Name:            kustomization.Name,
-			Namespace:       kustomization.Namespace,
-			TargetNamespace: kustomization.Spec.TargetNamespace,
-			Path:            kustomization.Spec.Path,
-			SourceRef:       kustomization.Spec.SourceRef.Name,
-			Conditions:      []*pb.Condition{},
+		m, err := convertKustomization(kustomization)
+		if err != nil {
+			return nil, err
 		}
 
-		for _, c := range kustomization.Status.Conditions {
-			m.Conditions = append(m.Conditions, &pb.Condition{
-				Type:    c.Type,
-				Status:  string(c.Status),
-				Reason:  c.Reason,
-				Message: c.Message,
-			})
-		}
-
-		k = append(k, &m)
+		k = append(k, m)
 	}
 
 	return &pb.ListKustomizationsRes{Kustomizations: k}, nil
@@ -138,6 +210,8 @@ func appendSources(sourceType string, k8sObj runtime.Object, res *pb.ListSources
 	switch list := k8sObj.(type) {
 	case *sourcev1.GitRepositoryList:
 		for _, i := range list.Items {
+			artifact := i.Status.Artifact
+
 			res.Sources = append(res.Sources, &pb.Source{
 				Name: i.Name, Type: pb.Source_Git,
 				Url: i.Spec.URL,
@@ -146,6 +220,13 @@ func appendSources(sourceType string, k8sObj runtime.Object, res *pb.ListSources
 					Tag:    i.Spec.Reference.Tag,
 					Semver: i.Spec.Reference.SemVer,
 					Commit: i.Spec.Reference.Commit,
+				},
+				Artifact: &pb.Artifact{
+					Checksum:     artifact.Checksum,
+					Lastupdateat: int32(artifact.LastUpdateTime.Unix()),
+					Path:         artifact.Path,
+					Revision:     artifact.Revision,
+					Url:          artifact.URL,
 				},
 			})
 		}
@@ -170,6 +251,7 @@ func (s *Server) ListSources(ctx context.Context, msg *pb.ListSourcesReq) (*pb.L
 	if err != nil {
 		return nil, fmt.Errorf("could not create client: %w", err)
 	}
+
 	res := &pb.ListSourcesRes{Sources: []*pb.Source{}}
 
 	k8sList, err := getSourceType(msg.SourceType)
@@ -178,7 +260,7 @@ func (s *Server) ListSources(ctx context.Context, msg *pb.ListSourcesReq) (*pb.L
 		return nil, fmt.Errorf("could not get source type: %w", err)
 	}
 
-	if err := client.List(ctx, k8sList); err != nil {
+	if err := client.List(ctx, k8sList, namespaceOpts(msg.Namespace)); err != nil {
 		if apierrors.IsNotFound(err) {
 			return res, nil
 		}
@@ -239,7 +321,7 @@ func (s *Server) SyncKustomization(ctx context.Context, msg *pb.SyncKustomizatio
 
 	name := types.NamespacedName{
 		Name:      msg.KustomizationName,
-		Namespace: msg.KustomizationNamespace,
+		Namespace: msg.Namespace,
 	}
 	kustomization := kustomizev1.Kustomization{}
 
@@ -279,5 +361,49 @@ func (s *Server) SyncKustomization(ctx context.Context, msg *pb.SyncKustomizatio
 		return nil, err
 	}
 
-	return &pb.SyncKustomizationRes{Ok: true}, nil
+	k, err := convertKustomization(kustomization)
+
+	if err != nil {
+		return nil, err
+	}
+	return &pb.SyncKustomizationRes{Kustomization: k}, nil
+
+}
+
+func (s *Server) ListHelmReleases(ctx context.Context, msg *pb.ListHelmReleasesReq) (*pb.ListHelmReleasesRes, error) {
+	c, err := s.getClient(msg.ContextName)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not create client: %w", err)
+	}
+
+	res := &pb.ListHelmReleasesRes{HelmReleases: []*pb.HelmRelease{}}
+
+	list := helmv2.HelmReleaseList{}
+
+	if err := c.List(ctx, &list, &client.ListOptions{Namespace: msg.Namespace}); err != nil {
+		if apierrors.IsNotFound(err) {
+			return res, nil
+		}
+
+		return nil, fmt.Errorf("could not list helm releases: %w", err)
+	}
+
+	for _, r := range list.Items {
+		spec := r.Spec
+		chartSpec := r.Spec.Chart.Spec
+
+		res.HelmReleases = append(res.HelmReleases, &pb.HelmRelease{
+			Name:            r.Name,
+			Namespace:       r.Namespace,
+			Interval:        spec.Interval.Duration.String(),
+			ChartName:       chartSpec.Chart,
+			Version:         chartSpec.Version,
+			SourceKind:      chartSpec.SourceRef.Kind,
+			SourceName:      chartSpec.SourceRef.Name,
+			SourceNamespace: chartSpec.SourceRef.Namespace,
+		})
+	}
+
+	return res, nil
 }

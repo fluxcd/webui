@@ -1,14 +1,16 @@
 import * as React from "react";
 import styled from "styled-components";
 // @ts-ignore
-import imgSrc from "../../static/img/flux-horizontal-black.png";
+import imgSrc from "../../static/img/flux-horizontal-white.png";
 
 type Props = {
   className?: string;
 };
 const Styled = (c) => styled(c)`
+  padding: 8px;
+
   img {
-    max-height: 48px;
+    max-height: 40px;
   }
 `;
 

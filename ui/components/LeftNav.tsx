@@ -1,30 +1,23 @@
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Tab,
-  Tabs,
-} from "@material-ui/core";
+import { Tab, Tabs } from "@material-ui/core";
 import _ from "lodash";
 import * as React from "react";
 import styled from "styled-components";
-import { useHistory, useLocation, useParams } from "react-router-dom";
-
-import { useKubernetesContexts } from "../lib/hooks";
-import Logo from "./Logo";
+import { useKubernetesContexts, useNavigation } from "../lib/hooks";
+import { formatURL, getNavValue, PageRoute } from "../lib/util";
 import Link from "./Link";
-import { normalizePath } from "../lib/util";
+import qs from "query-string";
 
 type Props = {
   className?: string;
 };
 
 const navItems = [
-  { value: "sources", label: "Sources" },
-  { value: "kustomizations", label: "Kustomizations" },
-  { value: "helm_releases", label: "Helm Releases" },
+  { value: PageRoute.Sources, label: "Sources" },
+  { value: PageRoute.Kustomizations, label: "Kustomizations" },
+  { value: PageRoute.HelmReleases, label: "Helm Releases" },
 ];
+
+const allNamespaces = "All Namespaces";
 
 const LinkTab = styled((props) => (
   <Tab
@@ -43,60 +36,31 @@ const Styled = (cmp) => styled(cmp)`
   #context-selector {
     min-width: 120px;
   }
+
+  background-color: #f5f5f5;
+  height: 100vh;
+  padding-left: 8px;
 `;
 
 function LeftNav({ className }: Props) {
-  const {
-    contexts,
-    currentContext,
-    setCurrentContext,
-  } = useKubernetesContexts();
-
-  const location = useLocation();
-  const history = useHistory();
-  const [, pageName] = normalizePath(location.pathname);
+  const query = qs.parse(location.search);
+  const { currentContext, currentNamespace } = useKubernetesContexts(query);
+  const { currentPage } = useNavigation();
 
   return (
     <div className={className}>
       <div>
-        <Link to="/">
-          <Logo />
-        </Link>
-      </div>
-
-      <div>
-        <FormControl>
-          <InputLabel id="context-selector">Contexts</InputLabel>
-          <Select
-            onChange={(ev) => {
-              const nextCtx = ev.target.value;
-              setCurrentContext(nextCtx as string);
-              history.replace(`/${nextCtx}/${pageName}`);
-            }}
-            value={currentContext}
-            id="context-selector"
-            label="Contexts"
-          >
-            {_.map(contexts, (c) => (
-              <MenuItem value={c.name} key={c.name}>
-                {c.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </div>
-      <div>
         <Tabs
           centered={false}
           orientation="vertical"
-          value={pageName || navItems[0].value}
+          value={getNavValue(currentPage)}
         >
           {_.map(navItems, (n) => (
             <LinkTab
               value={n.value}
               key={n.value}
               label={n.label}
-              to={`/${n.value}`}
+              to={formatURL(n.value, currentContext, currentNamespace)}
             />
           ))}
         </Tabs>

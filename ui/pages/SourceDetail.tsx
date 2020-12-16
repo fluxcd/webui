@@ -1,8 +1,13 @@
-import * as React from "react";
+import { Box } from "@material-ui/core";
 import _ from "lodash";
-import { useParams } from "react-router";
+import qs from "query-string";
+import * as React from "react";
 import styled from "styled-components";
-import { SourceType, useSources } from "../lib/hooks";
+import ConditionsTable from "../components/ConditionsTable";
+import Flex from "../components/Flex";
+import KeyValueTable from "../components/KeyValueTable";
+import Panel from "../components/Panel";
+import { useKubernetesContexts, useSources } from "../lib/hooks";
 
 type Props = {
   className?: string;
@@ -22,15 +27,32 @@ function convertRefURLToGitProvider(uri: string) {
   return `https://${provider}/${org}/${repo}`;
 }
 
+const LayoutBox = styled(Box)`
+  width: 100%;
+
+  /* Override more specific MUI rules */
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+
+  &:last-child {
+    margin-left: 16px !important;
+  }
+
+  .MuiCard-root {
+    height: 205px;
+  }
+`;
+
 const Styled = (c) => styled(c)``;
 
 function SourceDetail({ className }: Props) {
-  const { sourceType, sourceId } = useParams<{
-    sourceType: SourceType;
-    sourceId: string;
-  }>();
-  const sources = useSources(sourceType);
-  const sourceDetail = _.find(sources, { name: sourceId });
+  const { sourceType, sourceId } = qs.parse(location.search);
+  const { currentContext, currentNamespace } = useKubernetesContexts();
+  const sources = useSources(currentContext, currentNamespace);
+
+  const sourceDetail = _.find(sources[sourceType as string], {
+    name: sourceId,
+  });
 
   if (!sourceDetail) {
     return null;
@@ -40,11 +62,56 @@ function SourceDetail({ className }: Props) {
 
   return (
     <div className={className}>
-      <h2>{sourceDetail.name}</h2>
-      <p>{sourceDetail.url}</p>
-      <p>
-        <a href={providerUrl}>Provider Link</a>
-      </p>
+      <Box m={2}>
+        <Flex wide>
+          <h2>{sourceDetail.name}</h2>
+        </Flex>
+        <Panel title="Info">
+          <KeyValueTable
+            columns={2}
+            pairs={[
+              { key: "Type", value: sourceDetail.type },
+              {
+                key: "Url",
+                value: <a href={providerUrl}>{providerUrl}</a>,
+              },
+            ]}
+          />
+        </Panel>
+      </Box>
+      <Box m={2}>
+        <Flex wide>
+          <LayoutBox m={1}>
+            <Panel title="Git Reference">
+              <KeyValueTable
+                columns={2}
+                pairs={[
+                  { key: "Branch", value: sourceDetail.reference.branch },
+                  { key: "Tag", value: sourceDetail.reference.tag },
+                  { key: "Semver", value: sourceDetail.reference.semver },
+                  { key: "Commit", value: sourceDetail.reference.commit },
+                ]}
+              />
+            </Panel>
+          </LayoutBox>
+          <LayoutBox m={1}>
+            <Panel title="Artifact">
+              <KeyValueTable
+                columns={1}
+                pairs={[
+                  { key: "Checksum", value: sourceDetail.artifact.checksum },
+                  { key: "Revision", value: sourceDetail.artifact.revision },
+                ]}
+              />
+            </Panel>
+          </LayoutBox>
+        </Flex>
+      </Box>
+      <Box m={2}>
+        <Panel title="Conditions">
+          <ConditionsTable conditions={sourceDetail.conditions} />
+        </Panel>
+      </Box>
     </div>
   );
 }
