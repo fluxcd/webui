@@ -1,9 +1,12 @@
 syntax = "proto3";
 package clusters;
+
 option go_package = "pkg/rpc/clusters";
 
 service Clusters {
     rpc ListContexts(ListContextsReq) returns (ListContextsRes);
+    rpc ListKustomizations(ListKustomizationsReq) returns (ListKustomizationsRes);
+    rpc ListSources (ListSourcesReq) returns (ListSourcesRes);
 }
 
 message Context {
@@ -15,5 +18,63 @@ message ListContextsReq {
 }
 
 message ListContextsRes {
-    repeated Context contexts = 1;
+    string currentContext = 1;
+    repeated Context contexts = 2;
 }
+
+message Condition {
+    string type = 1;
+    string status = 2;
+    string reason = 3;
+    string message = 4;
+}
+
+message Kustomization {
+    string name = 1;
+    string namespace = 2;
+    string targetNamespace = 3;
+    string path = 4;
+    string sourceRef = 5;
+    repeated Condition conditions = 6;
+}
+
+message ListKustomizationsReq {
+    string contextName = 1;
+}
+
+message ListKustomizationsRes {
+    repeated Kustomization kustomizations = 1;
+}
+
+
+message GitRepositoryRef {
+    string branch = 1;
+    string tag = 2;
+    string semver = 3;
+    string commit = 4;
+}
+
+message Source {
+    string name = 1;
+    string url = 2;
+    GitRepositoryRef reference = 3;
+    enum Type {
+        Git = 0;
+        Bucket = 1;
+        Helm = 2;
+    };
+    Type type = 4;
+    string provider = 5;
+    string bucketname = 6;
+    string region = 7;
+}
+
+message ListSourcesReq {
+    string contextName = 1;
+    string sourceType = 2;
+}
+
+message ListSourcesRes {
+    repeated Source sources  = 1;
+}
+
