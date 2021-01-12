@@ -166,44 +166,33 @@ func (s *Server) ListSources(ctx context.Context, msg *pb.ListSourcesReq) (*pb.L
 	return res, nil
 }
 
-func reconcileSourceGit(ctx context.Context, c client.Client, spec kustomizev1.KustomizationSpec) error {
-	repository := &sourcev1.GitRepository{}
-
-	name := types.NamespacedName{
-		Name:      spec.SourceRef.Name,
-		Namespace: spec.SourceRef.Namespace,
-	}
-
-	if err := c.Get(ctx, name, repository); err != nil {
-		return err
-	}
-
-	if repository.Annotations == nil {
-		repository.Annotations = map[string]string{}
-	}
-	repository.Annotations[meta.ReconcileAtAnnotation] = time.Now().Format(time.RFC3339Nano)
-
-	return c.Update(ctx, repository)
+type reconcilable interface {
+	runtime.Object
+	GetAnnotations() map[string]string
+	SetAnnotations(map[string]string)
 }
 
-func reconcileSourceBucket(ctx context.Context, c client.Client, spec kustomizev1.KustomizationSpec) error {
-	bucket := &sourcev1.Bucket{}
-
+func reconcileSource(ctx context.Context, c client.Client, spec kustomizev1.KustomizationSpec, obj reconcilable) error {
 	name := types.NamespacedName{
 		Name:      spec.SourceRef.Name,
 		Namespace: spec.SourceRef.Namespace,
 	}
 
-	if err := c.Get(ctx, name, bucket); err != nil {
+	if err := c.Get(ctx, name, obj); err != nil {
 		return err
 	}
 
-	if bucket.Annotations == nil {
-		bucket.Annotations = map[string]string{}
-	}
-	bucket.Annotations[meta.ReconcileAtAnnotation] = time.Now().Format(time.RFC3339Nano)
+	if annotations := obj.GetAnnotations(); obj.GetAnnotations() == nil {
+		obj.SetAnnotations(map[string]string{
+			meta.ReconcileAtAnnotation: time.Now().Format(time.RFC3339Nano),
+		})
 
-	return c.Update(ctx, bucket)
+	} else {
+		annotations[meta.ReconcileAtAnnotation] = time.Now().Format(time.RFC3339Nano)
+		obj.SetAnnotations(annotations)
+	}
+
+	return c.Update(ctx, obj)
 }
 
 func checkKustomizationSync(ctx context.Context, c client.Client, name types.NamespacedName, lastReconcile string) func() (bool, error) {
@@ -237,9 +226,9 @@ func (s *Server) SyncKustomization(ctx context.Context, msg *pb.SyncKustomizatio
 	if msg.WithSource {
 		switch kustomization.Spec.SourceRef.Kind {
 		case sourcev1.GitRepositoryKind:
-			err = reconcileSourceGit(ctx, client, kustomization.Spec)
+			err = reconcileSource(ctx, client, kustomization.Spec, &sourcev1.GitRepository{})
 		case sourcev1.BucketKind:
-			err = reconcileSourceBucket(ctx, client, kustomization.Spec)
+			err = reconcileSource(ctx, client, kustomization.Spec, &sourcev1.Bucket{})
 		}
 		if err != nil {
 			return nil, fmt.Errorf("could not reconcile source: %w", err)
