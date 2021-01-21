@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"sync"
 	"time"
 
 	kustomizev1 "github.com/fluxcd/kustomize-controller/api/v1beta1"
@@ -30,6 +31,7 @@ type Server struct {
 	AvailableContexts []string
 	InitialContext    string
 	CreateClient      func(string) (client.Client, error)
+	mu                sync.Mutex
 }
 
 func NewServer(kubeContexts []string, currentKubeContext string) http.Handler {
@@ -54,6 +56,8 @@ func (s *Server) getClient(kubeContext string) (client.Client, error) {
 		return s.ClientCache[kubeContext], nil
 	}
 
+	s.mu.Lock()
+
 	client, err := s.CreateClient(kubeContext)
 
 	if err != nil {
@@ -61,6 +65,8 @@ func (s *Server) getClient(kubeContext string) (client.Client, error) {
 	}
 
 	s.ClientCache[kubeContext] = client
+
+	s.mu.Unlock()
 
 	return client, nil
 }
