@@ -52,11 +52,12 @@ func defaultCreateClient(kubeContext string) (client.Client, error) {
 }
 
 func (s *Server) getClient(kubeContext string) (client.Client, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	if s.ClientCache[kubeContext] != nil {
 		return s.ClientCache[kubeContext], nil
 	}
-
-	s.mu.Lock()
 
 	client, err := s.CreateClient(kubeContext)
 
@@ -65,8 +66,6 @@ func (s *Server) getClient(kubeContext string) (client.Client, error) {
 	}
 
 	s.ClientCache[kubeContext] = client
-
-	s.mu.Unlock()
 
 	return client, nil
 }
