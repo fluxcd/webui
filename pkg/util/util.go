@@ -16,6 +16,19 @@ import (
 	apiruntime "k8s.io/apimachinery/pkg/runtime"
 )
 
+func CreateScheme() *apiruntime.Scheme {
+	scheme := apiruntime.NewScheme()
+	_ = appsv1.AddToScheme(scheme)
+	_ = corev1.AddToScheme(scheme)
+	_ = rbacv1.AddToScheme(scheme)
+	_ = sourcev1.AddToScheme(scheme)
+	_ = kustomizev1.AddToScheme(scheme)
+	_ = helmv2.AddToScheme(scheme)
+	_ = notificationv1.AddToScheme(scheme)
+
+	return scheme
+}
+
 func NewKubeClient(kubeContext string) (client.Client, error) {
 	cfgLoadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
 	configOverrides := clientcmd.ConfigOverrides{CurrentContext: kubeContext}
@@ -29,14 +42,7 @@ func NewKubeClient(kubeContext string) (client.Client, error) {
 		return nil, fmt.Errorf("could not create rest config: %w", err)
 	}
 
-	scheme := apiruntime.NewScheme()
-	_ = appsv1.AddToScheme(scheme)
-	_ = corev1.AddToScheme(scheme)
-	_ = rbacv1.AddToScheme(scheme)
-	_ = sourcev1.AddToScheme(scheme)
-	_ = kustomizev1.AddToScheme(scheme)
-	_ = helmv2.AddToScheme(scheme)
-	_ = notificationv1.AddToScheme(scheme)
+	scheme := CreateScheme()
 
 	kubeClient, err := client.New(restCfg, client.Options{
 		Scheme: scheme,
