@@ -10,6 +10,7 @@ service Clusters {
     rpc ListSources (ListSourcesReq) returns (ListSourcesRes);
     rpc SyncKustomization (SyncKustomizationReq) returns (SyncKustomizationRes);
     rpc ListHelmReleases (ListHelmReleasesReq) returns (ListHelmReleasesRes);
+    rpc ListWorkloads (ListWorkloadsReq) returns (ListWorkloadsRes);
 }
 
 message Context {
@@ -140,4 +141,40 @@ message ListHelmReleasesReq {
 
 message ListHelmReleasesRes {
     repeated HelmRelease helm_releases = 1;
+}
+
+message Container {
+    string name = 1;
+    string image = 2;
+}
+
+message PodTemplate {
+    repeated Container containers = 1;
+}
+
+message Workload {
+    string name = 1;
+    string namespace = 2;
+    string kustomizationRefName = 3;
+    string kustomizationRefNamespace = 4;
+    PodTemplate podTemplate = 5;
+}
+
+message ListWorkloadsReq {
+    string contextName = 1;
+    string namespace = 2;
+}
+
+message ListWorkloadsRes {
+    repeated Workload workloads = 1;
+}
+
+message ListKustomizationChildrenReq {
+    string contextName = 1;
+    string kustomizationName = 2;
+    string KustomizationNamespace = 3;
+}
+
+message ListKustomizationChildrenRes {
+    repeated Workload workloads = 1;
 }

@@ -498,6 +498,144 @@ const JSONToListHelmReleasesRes = (m: ListHelmReleasesRes | ListHelmReleasesResJ
     };
 };
 
+export interface Container {
+    name: string;
+    image: string;
+    
+}
+
+interface ContainerJSON {
+    name: string;
+    image: string;
+    
+}
+
+
+const JSONToContainer = (m: Container | ContainerJSON): Container => {
+    
+    return {
+        name: m.name,
+        image: m.image,
+        
+    };
+};
+
+export interface PodTemplate {
+    containers: Container[];
+    
+}
+
+interface PodTemplateJSON {
+    containers: ContainerJSON[];
+    
+}
+
+
+const JSONToPodTemplate = (m: PodTemplate | PodTemplateJSON): PodTemplate => {
+    
+    return {
+        containers: (m.containers as (Container | ContainerJSON)[]).map(JSONToContainer),
+        
+    };
+};
+
+export interface Workload {
+    name: string;
+    namespace: string;
+    kustomizationrefname: string;
+    kustomizationrefnamespace: string;
+    podtemplate: PodTemplate;
+    
+}
+
+interface WorkloadJSON {
+    name: string;
+    namespace: string;
+    kustomizationRefName: string;
+    kustomizationRefNamespace: string;
+    podTemplate: PodTemplateJSON;
+    
+}
+
+
+const JSONToWorkload = (m: Workload | WorkloadJSON): Workload => {
+    
+    return {
+        name: m.name,
+        namespace: m.namespace,
+        kustomizationrefname: (((m as Workload).kustomizationrefname) ? (m as Workload).kustomizationrefname : (m as WorkloadJSON).kustomizationRefName),
+        kustomizationrefnamespace: (((m as Workload).kustomizationrefnamespace) ? (m as Workload).kustomizationrefnamespace : (m as WorkloadJSON).kustomizationRefNamespace),
+        podtemplate: JSONToPodTemplate((((m as Workload).podtemplate) ? (m as Workload).podtemplate : (m as WorkloadJSON).podTemplate)),
+        
+    };
+};
+
+export interface ListWorkloadsReq {
+    contextname: string;
+    namespace: string;
+    
+}
+
+interface ListWorkloadsReqJSON {
+    contextName: string;
+    namespace: string;
+    
+}
+
+
+const ListWorkloadsReqToJSON = (m: ListWorkloadsReq): ListWorkloadsReqJSON => {
+    return {
+        contextName: m.contextname,
+        namespace: m.namespace,
+        
+    };
+};
+
+export interface ListWorkloadsRes {
+    workloads: Workload[];
+    
+}
+
+interface ListWorkloadsResJSON {
+    workloads: WorkloadJSON[];
+    
+}
+
+
+const JSONToListWorkloadsRes = (m: ListWorkloadsRes | ListWorkloadsResJSON): ListWorkloadsRes => {
+    
+    return {
+        workloads: (m.workloads as (Workload | WorkloadJSON)[]).map(JSONToWorkload),
+        
+    };
+};
+
+export interface ListKustomizationChildrenReq {
+    contextname: string;
+    kustomizationname: string;
+    kustomizationnamespace: string;
+    
+}
+
+interface ListKustomizationChildrenReqJSON {
+    contextName: string;
+    kustomizationName: string;
+    KustomizationNamespace: string;
+    
+}
+
+
+export interface ListKustomizationChildrenRes {
+    workloads: Workload[];
+    
+}
+
+interface ListKustomizationChildrenResJSON {
+    workloads: WorkloadJSON[];
+    
+}
+
+
 export interface Clusters {
     listContexts: (listContextsReq: ListContextsReq) => Promise<ListContextsRes>;
     
@@ -510,6 +648,8 @@ export interface Clusters {
     syncKustomization: (syncKustomizationReq: SyncKustomizationReq) => Promise<SyncKustomizationRes>;
     
     listHelmReleases: (listHelmReleasesReq: ListHelmReleasesReq) => Promise<ListHelmReleasesRes>;
+    
+    listWorkloads: (listWorkloadsReq: ListWorkloadsReq) => Promise<ListWorkloadsRes>;
     
 }
 
@@ -611,6 +751,21 @@ export class DefaultClusters implements Clusters {
             }
 
             return resp.json().then(JSONToListHelmReleasesRes);
+        });
+    }
+    
+    listWorkloads(listWorkloadsReq: ListWorkloadsReq): Promise<ListWorkloadsRes> {
+        const url = this.hostname + this.pathPrefix + "ListWorkloads";
+        let body: ListWorkloadsReq | ListWorkloadsReqJSON = listWorkloadsReq;
+        if (!this.writeCamelCase) {
+            body = ListWorkloadsReqToJSON(listWorkloadsReq);
+        }
+        return this.fetch(createTwirpRequest(url, body)).then((resp) => {
+            if (!resp.ok) {
+                return throwTwirpError(resp);
+            }
+
+            return resp.json().then(JSONToListWorkloadsRes);
         });
     }
     
