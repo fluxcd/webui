@@ -1,11 +1,14 @@
 import { Box } from "@material-ui/core";
-import qs from "query-string";
 import * as React from "react";
 import styled from "styled-components";
 import Flex from "../components/Flex";
 import KeyValueTable from "../components/KeyValueTable";
 import Panel from "../components/Panel";
-import { useHelmReleases, useKubernetesContexts } from "../lib/hooks";
+import {
+  useHelmReleases,
+  useKubernetesContexts,
+  useNavigation,
+} from "../lib/hooks";
 
 type Props = {
   className?: string;
@@ -22,7 +25,7 @@ const Styled = (c) => styled(c)`
 `;
 
 function HelmReleaseDetail({ className }: Props) {
-  const query = qs.parse(location.search);
+  const { query } = useNavigation();
   const { currentContext, currentNamespace } = useKubernetesContexts();
   const helmReleases = useHelmReleases(currentContext, currentNamespace);
   const helmRelease = helmReleases[query.helmReleaseId as string];

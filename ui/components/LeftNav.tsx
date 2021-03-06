@@ -5,7 +5,6 @@ import styled from "styled-components";
 import { useKubernetesContexts, useNavigation } from "../lib/hooks";
 import { formatURL, getNavValue, PageRoute } from "../lib/util";
 import Link from "./Link";
-import qs from "query-string";
 
 type Props = {
   className?: string;
@@ -44,8 +43,7 @@ const Styled = (cmp) => styled(cmp)`
 `;
 
 function LeftNav({ className }: Props) {
-  const query = qs.parse(location.search);
-  const { currentContext, currentNamespace } = useKubernetesContexts(query);
+  const { currentContext, currentNamespace } = useKubernetesContexts();
   const { currentPage } = useNavigation();
 
   return (

@@ -1,13 +1,12 @@
 import { Box } from "@material-ui/core";
 import _ from "lodash";
-import qs from "query-string";
 import * as React from "react";
 import styled from "styled-components";
 import ConditionsTable from "../components/ConditionsTable";
 import Flex from "../components/Flex";
 import KeyValueTable from "../components/KeyValueTable";
 import Panel from "../components/Panel";
-import { useKubernetesContexts, useSources } from "../lib/hooks";
+import { useKubernetesContexts, useNavigation, useSources } from "../lib/hooks";
 
 type Props = {
   className?: string;
@@ -46,7 +45,8 @@ const LayoutBox = styled(Box)`
 const Styled = (c) => styled(c)``;
 
 function SourceDetail({ className }: Props) {
-  const { sourceType, sourceId } = qs.parse(location.search);
+  const { query } = useNavigation();
+  const { sourceType, sourceId } = query;
   const { currentContext, currentNamespace } = useKubernetesContexts();
   const sources = useSources(currentContext, currentNamespace);
 

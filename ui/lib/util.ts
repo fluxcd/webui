@@ -42,6 +42,7 @@ export const formatURL = (
 };
 
 export enum PageRoute {
+  Redirector = "/",
   Home = "/kustomizations",
   Sources = "/sources",
   SourceDetail = "/sources_detail",

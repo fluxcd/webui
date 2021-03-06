@@ -74,15 +74,13 @@ function TopNav({ className }: Props) {
     namespaces,
     currentContext,
     currentNamespace,
-    setCurrentContext,
-    setCurrentNamespace,
   } = useKubernetesContexts();
   const { navigate, currentPage } = useNavigation();
 
   return (
     <header className={className}>
       <Flex>
-        <div style={{ marginLeft: 8 }}>
+        <div>
           <Link
             to={formatURL(PageRoute.Home, currentContext, currentNamespace)}
           >
@@ -93,11 +91,11 @@ function TopNav({ className }: Props) {
           <Flex center>
             <FormControl variant="outlined">
               <InputLabel id="context-selector">Context</InputLabel>
-              {contexts.length > 0 && (
+              {currentContext && contexts.length > 0 && (
                 <Select
                   onChange={(ev) => {
                     const nextCtx = ev.target.value as string;
-                    setCurrentContext(nextCtx);
+                    // setCurrentContext(nextCtx);
                     navigate(
                       getNavValue(currentPage) as PageRoute,
                       nextCtx,
@@ -118,15 +116,13 @@ function TopNav({ className }: Props) {
             </FormControl>
             <FormControl variant="outlined">
               <InputLabel id="namespaces-selector">Namespace</InputLabel>
-              {namespaces && (
+              {currentNamespace && namespaces && (
                 <Select
                   onChange={(ev) => {
                     const nextNs = (ev.target.value === allNamespaces
                       ? AllNamespacesOption
                       : ev.target.value) as string;
 
-                    setCurrentNamespace(nextNs);
-                    console.log(getNavValue(currentPage));
                     navigate(
                       getNavValue(currentPage) as PageRoute,
                       currentContext,

@@ -61,7 +61,11 @@ export default function App() {
                   </NavContainer>
                   <ContentCotainer>
                     <Switch>
-                      <Route exact path="/" component={Redirector} />
+                      <Route
+                        exact
+                        path={PageRoute.Redirector}
+                        component={Redirector}
+                      />
                       <Route exact path="/error" component={Error} />
                       <Route
                         exact

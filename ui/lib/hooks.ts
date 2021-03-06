@@ -1,19 +1,17 @@
 import _ from "lodash";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import qs from "query-string";
+import { useContext, useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { AppContext } from "../components/AppStateProvider";
 import {
   Context,
-  DefaultClusters,
   HelmRelease,
   Kustomization,
   Source,
+  Workload,
 } from "./rpc/clusters";
-import { AllNamespacesOption, NamespaceLabel } from "./types";
-import { formatURL, normalizePath, PageRoute, wrappedFetch } from "./util";
-import qs, { stringify } from "query-string";
-
-const clusters = new DefaultClusters("/api/clusters", wrappedFetch);
+import { AllNamespacesOption } from "./types";
+import { clustersClient, formatURL, normalizePath, PageRoute } from "./util";
 
 // The backend doesn't like the word "all". Instead, it wants an empty string.
 // Navigation might get weird if we use an empty string on the front-end.
@@ -26,25 +24,25 @@ export function useKubernetesContexts(): {
   namespaces: string[];
   currentContext: string;
   currentNamespace: string;
-  setCurrentContext: (context: string) => void;
-  setCurrentNamespace: (namespace: string) => void;
 } {
-  const {
-    contexts,
-    namespaces,
-    currentContext,
-    currentNamespace,
-    setCurrentContext,
-    setCurrentNamespace,
-  } = useContext(AppContext);
+  const { navigate } = useNavigation();
+  const { context, namespace } = qs.parse(location.search) as {
+    context: string;
+    namespace: string;
+  };
+  const { contexts, namespaces } = useContext(AppContext);
+
+  useEffect(() => {
+    if (!context) {
+      navigate(PageRoute.Redirector, null, null);
+    }
+  }, []);
 
   return {
     contexts,
-    namespaces: namespaces[currentContext] || [],
-    currentContext,
-    currentNamespace,
-    setCurrentContext,
-    setCurrentNamespace,
+    namespaces: namespaces[context] || [],
+    currentContext: context,
+    currentNamespace: namespace,
   };
 }
 
@@ -62,7 +60,7 @@ export function useKustomizations(
       return;
     }
 
-    clusters
+    clustersClient
       .listKustomizations({
         contextname: currentContext,
         namespace: formatAPINamespace(currentNamespace),
@@ -81,7 +79,7 @@ export function useKustomizations(
   }, [currentContext, currentNamespace]);
 
   const syncKustomization = (k: Kustomization) =>
-    clusters
+    clustersClient
       .syncKustomization({
         contextname: currentContext,
         namespace: k.namespace,
@@ -127,7 +125,7 @@ export function useSources(
     }
 
     const p = _.map(SourceType, (s) =>
-      clusters.listSources({
+      clustersClient.listSources({
         contextname: currentContext,
         namespace: formatAPINamespace(currentNamespace),
         sourcetype: s,
@@ -169,7 +167,7 @@ export function useHelmReleases(
       return;
     }
 
-    clusters
+    clustersClient
       .listHelmReleases({
         contextname: currentContext,
         namespace: formatAPINamespace(currentNamespace),
@@ -203,6 +201,7 @@ export function useNavigation() {
 
   return {
     currentPage,
+    query: qs.parse(location.search),
     navigate: (
       page: PageRoute | null,
       context: string,
@@ -218,4 +217,24 @@ export function useNavigation() {
       history.push(formatURL(nextPage as string, context, namespace, query));
     },
   };
+}
+
+export function useWorkloads(currentContext: string, currentNamespace: string) {
+  const [workloads, setWorkloads] = useState([] as Workload[]);
+
+  useEffect(() => {
+    if (!currentContext || !currentNamespace) {
+      return;
+    }
+
+    clustersClient
+      .listWorkloads({
+        contextname: currentContext,
+        namespace: currentNamespace,
+      })
+      .then((res) => {
+        setWorkloads(res.workloads);
+      });
+  }, [currentContext, currentNamespace]);
+  return workloads;
 }

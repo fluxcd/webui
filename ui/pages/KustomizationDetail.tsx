@@ -10,14 +10,18 @@ import {
   TableRow,
 } from "@material-ui/core";
 import _ from "lodash";
-import qs from "query-string";
 import * as React from "react";
 import styled from "styled-components";
 import Flex from "../components/Flex";
 import KeyValueTable from "../components/KeyValueTable";
 import Link from "../components/Link";
 import Panel from "../components/Panel";
-import { useKubernetesContexts, useKustomizations } from "../lib/hooks";
+import {
+  useKubernetesContexts,
+  useKustomizations,
+  useNavigation,
+  useWorkloads,
+} from "../lib/hooks";
 import { Kustomization } from "../lib/rpc/clusters";
 import { formatURL, PageRoute } from "../lib/util";
 
@@ -45,8 +49,9 @@ const formatInfo = (detail: Kustomization) =>
 
 function KustomizationDetail({ className }: Props) {
   const [syncing, setSyncing] = React.useState(false);
-  const query = qs.parse(location.search);
+  const { query } = useNavigation();
   const { currentContext, currentNamespace } = useKubernetesContexts();
+  const workloads = useWorkloads(currentContext, currentNamespace);
 
   const { kustomizations, syncKustomization } = useKustomizations(
     currentContext,
@@ -154,6 +159,26 @@ function KustomizationDetail({ className }: Props) {
               </TableBody>
             </Table>
           </TableContainer>
+        </Panel>
+      </Box>
+      <Box m={2}>
+        <Panel title="Related Workloads">
+          {_.map(workloads, (w) => {
+            return (
+              <div key={w.name}>
+                <Link
+                  to={formatURL(
+                    PageRoute.WorkloadDetail,
+                    currentContext,
+                    w.namespace,
+                    { workloadId: w.name }
+                  )}
+                >
+                  {w.name}
+                </Link>
+              </div>
+            );
+          })}
         </Panel>
       </Box>
     </div>
