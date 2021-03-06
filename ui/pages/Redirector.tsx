@@ -1,17 +1,36 @@
 import * as React from "react";
-import { useHistory } from "react-router";
-import styled from "styled-components";
-import { useKubernetesContexts } from "../lib/hooks";
+import { AppContext } from "../components/AppStateProvider";
+import { useKubernetesContexts, useNavigation } from "../lib/hooks";
+import { AllNamespacesOption } from "../lib/types";
+import { clustersClient, PageRoute } from "../lib/util";
 
 export default function Redirector() {
-  const { currentContext } = useKubernetesContexts();
-  const history = useHistory();
+  const { doError, setContexts } = React.useContext(AppContext);
+  const { currentContext, currentNamespace } = useKubernetesContexts();
+  const { navigate } = useNavigation();
 
   React.useEffect(() => {
     if (currentContext) {
-      history.push(`/${currentContext}/kustomizations`);
+      navigate(PageRoute.Home, currentContext, currentNamespace);
+      return;
     }
-  });
+
+    // Runs once on app startup.
+    clustersClient.listContexts({}).then(
+      (res) => {
+        setContexts(res.contexts);
+
+        navigate(
+          PageRoute.Home,
+          res.currentcontext,
+          currentNamespace || AllNamespacesOption
+        );
+      },
+      (err) => {
+        doError("Error getting contexts", true, err);
+      }
+    );
+  }, []);
 
   return null;
 }

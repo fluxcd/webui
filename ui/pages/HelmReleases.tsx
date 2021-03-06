@@ -10,8 +10,8 @@ import _ from "lodash";
 import * as React from "react";
 import styled from "styled-components";
 import Link from "../components/Link";
-import { useKubernetesContexts, useKustomizations } from "../lib/hooks";
-import { Kustomization } from "../lib/rpc/clusters";
+import { useHelmReleases, useKubernetesContexts } from "../lib/hooks";
+import { HelmRelease } from "../lib/rpc/clusters";
 import { formatURL, PageRoute } from "../lib/util";
 
 type Props = {
@@ -19,53 +19,31 @@ type Props = {
 };
 const Styled = (c) => styled(c)``;
 
-function Kustomizations({ className }: Props) {
+function HelmRelease({ className }: Props) {
   const { currentContext, currentNamespace } = useKubernetesContexts();
-  const { kustomizations } = useKustomizations(
-    currentContext,
-    currentNamespace
-  );
+  const helmReleases = useHelmReleases(currentContext, currentNamespace);
 
   const fields: { value: string | Function; label: string }[] = [
     {
-      value: (k: Kustomization) => (
+      value: (h: HelmRelease) => (
         <Link
           to={formatURL(
-            PageRoute.KustomizationDetail,
+            PageRoute.HelmReleaseDetail,
             currentContext,
             currentNamespace,
-            { kustomizationId: k.name }
+            { helmReleaseId: h.name }
           )}
         >
-          {k.name}
+          {h.name}
         </Link>
       ),
       label: "Name",
-    },
-    {
-      label: "Ready",
-      value: (k: Kustomization) => {
-        const readyCondition = _.find(k.conditions, (c) => c.type === "Ready");
-        if (readyCondition) {
-          return readyCondition.status;
-        }
-      },
-    },
-    {
-      label: "Message",
-      value: (k: Kustomization) => {
-        const readyCondition = _.find(k.conditions, (c) => c.type === "Ready");
-
-        if (readyCondition && readyCondition.status === "False") {
-          return readyCondition.message;
-        }
-      },
     },
   ];
 
   return (
     <div className={className}>
-      <h2>Kustomizations</h2>
+      <h2>Helm Releases</h2>
       <TableContainer>
         <Table aria-label="simple table">
           <TableHead>
@@ -76,7 +54,7 @@ function Kustomizations({ className }: Props) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {_.map(kustomizations, (k) => (
+            {_.map(helmReleases, (k) => (
               <TableRow key={k.name}>
                 {_.map(fields, (f) => (
                   <TableCell key={f.label}>
@@ -92,4 +70,4 @@ function Kustomizations({ className }: Props) {
   );
 }
 
-export default Styled(Kustomizations);
+export default Styled(HelmRelease);

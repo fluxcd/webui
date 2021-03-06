@@ -3,6 +3,7 @@ package clustersserver_test
 import (
 	"context"
 
+	helmv2 "github.com/fluxcd/helm-controller/api/v2beta1"
 	kustomizev1 "github.com/fluxcd/kustomize-controller/api/v1beta1"
 	pb "github.com/fluxcd/webui/pkg/rpc/clusters"
 	. "github.com/onsi/ginkgo"
@@ -46,6 +47,37 @@ var _ = Describe("clustersserver", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(k.Kustomizations[0].Name).To(Equal(name))
+
+	})
+
+	It("ListHelmReleases", func() {
+		name := "my-helmrelease"
+
+		hr := &helmv2.HelmRelease{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      name,
+				Namespace: "default",
+			},
+			Spec: helmv2.HelmReleaseSpec{
+				Chart: helmv2.HelmChartTemplate{
+					Spec: helmv2.HelmChartTemplateSpec{
+						SourceRef: helmv2.CrossNamespaceObjectReference{
+							Name: name,
+						},
+					},
+				},
+			},
+		}
+
+		err = testclient.Create(context.Background(), hr)
+
+		Expect(err).NotTo(HaveOccurred())
+
+		res, err := c.ListHelmReleases(context.Background(), &pb.ListHelmReleasesReq{})
+
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(len(res.HelmReleases)).To(Equal(1))
 
 	})
 

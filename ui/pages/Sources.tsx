@@ -1,53 +1,66 @@
-import { Tab, Tabs } from "@material-ui/core";
-import * as React from "react";
+import { Box } from "@material-ui/core";
 import _ from "lodash";
+import * as React from "react";
 import styled from "styled-components";
-import { useSources, SourceType } from "../lib/hooks";
 import Link from "../components/Link";
+import Panel from "../components/Panel";
+import { SourceType, useKubernetesContexts, useSources } from "../lib/hooks";
+import { formatURL, PageRoute } from "../lib/util";
 
 type Props = {
   className?: string;
 };
-const Styled = (c) => styled(c)``;
+const Styled = (c) => styled(c)`
+  ul {
+    list-style: none;
+    padding-left: 0;
+  }
 
-const tabs = [
+  .MuiBox-root {
+    margin-left: 0;
+  }
+
+  .MuiCardContent-root {
+    padding-bottom: 16px !important;
+  }
+`;
+
+const sections = [
   { value: SourceType.Git, label: "Git Repos" },
   { value: SourceType.Bucket, label: "Buckets" },
   { value: SourceType.Helm, label: "Helm Repos" },
 ];
 
-const TabPanel = ({ value, children, index }) => (
-  <div> {value === index && <div>{children}</div>} </div>
-);
-
 function Sources({ className }: Props) {
-  const [selectedTab, setTab] = React.useState(SourceType.Git);
-  const sources = useSources(selectedTab);
+  const { currentContext, currentNamespace } = useKubernetesContexts();
+  const sources = useSources(currentContext, currentNamespace);
 
   return (
     <div className={className}>
       <h2>Sources</h2>
       <div>
-        <Tabs
-          onChange={(_, val) => {
-            setTab(val);
-          }}
-          value={selectedTab}
-        >
-          {_.map(tabs, (t) => (
-            <Tab label={t.label} key={t.value} value={t.value} />
-          ))}
-        </Tabs>
-        {_.map(tabs, (t) => (
-          <TabPanel key={t.value} value={selectedTab} index={t.value}>
-            <ul>
-              {_.map(sources, (s) => (
-                <li key={s.name}>
-                  <Link to={`/sources/${selectedTab}/${s.name}`}>{s.name}</Link>
-                </li>
-              ))}
-            </ul>
-          </TabPanel>
+        {_.map(sections, (t) => (
+          <Box key={t.value} m={2}>
+            <Panel title={t.label}>
+              <ul>
+                {_.map(sources[t.value], (s) => (
+                  <li key={s.name}>
+                    <Link
+                      to={formatURL(
+                        PageRoute.SourceDetail,
+                        currentContext,
+                        currentNamespace,
+                        { sourceId: s.name, sourceType: s.type.toLowerCase() }
+                      )}
+                      params={[t.value, s.name]}
+                    >
+                      {s.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </Panel>
+          </Box>
         ))}
       </div>
     </div>

@@ -42,11 +42,17 @@ const _ = twirp.TwirpPackageIsVersion7
 type Clusters interface {
 	ListContexts(context.Context, *ListContextsReq) (*ListContextsRes, error)
 
+	ListNamespacesForContext(context.Context, *ListNamespacesForContextReq) (*ListNamespacesForContextRes, error)
+
 	ListKustomizations(context.Context, *ListKustomizationsReq) (*ListKustomizationsRes, error)
 
 	ListSources(context.Context, *ListSourcesReq) (*ListSourcesRes, error)
 
 	SyncKustomization(context.Context, *SyncKustomizationReq) (*SyncKustomizationRes, error)
+
+	ListHelmReleases(context.Context, *ListHelmReleasesReq) (*ListHelmReleasesRes, error)
+
+	ListWorkloads(context.Context, *ListWorkloadsReq) (*ListWorkloadsRes, error)
 }
 
 // ========================
@@ -55,7 +61,7 @@ type Clusters interface {
 
 type clustersProtobufClient struct {
 	client      HTTPClient
-	urls        [4]string
+	urls        [7]string
 	interceptor twirp.Interceptor
 	opts        twirp.ClientOptions
 }
@@ -75,11 +81,14 @@ func NewClustersProtobufClient(baseURL string, client HTTPClient, opts ...twirp.
 	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
 	serviceURL := sanitizeBaseURL(baseURL)
 	serviceURL += baseServicePath(clientOpts.PathPrefix(), "clusters", "Clusters")
-	urls := [4]string{
+	urls := [7]string{
 		serviceURL + "ListContexts",
+		serviceURL + "ListNamespacesForContext",
 		serviceURL + "ListKustomizations",
 		serviceURL + "ListSources",
 		serviceURL + "SyncKustomization",
+		serviceURL + "ListHelmReleases",
+		serviceURL + "ListWorkloads",
 	}
 
 	return &clustersProtobufClient{
@@ -136,6 +145,52 @@ func (c *clustersProtobufClient) callListContexts(ctx context.Context, in *ListC
 	return out, nil
 }
 
+func (c *clustersProtobufClient) ListNamespacesForContext(ctx context.Context, in *ListNamespacesForContextReq) (*ListNamespacesForContextRes, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "clusters")
+	ctx = ctxsetters.WithServiceName(ctx, "Clusters")
+	ctx = ctxsetters.WithMethodName(ctx, "ListNamespacesForContext")
+	caller := c.callListNamespacesForContext
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ListNamespacesForContextReq) (*ListNamespacesForContextRes, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListNamespacesForContextReq)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListNamespacesForContextReq) when calling interceptor")
+					}
+					return c.callListNamespacesForContext(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListNamespacesForContextRes)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListNamespacesForContextRes) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *clustersProtobufClient) callListNamespacesForContext(ctx context.Context, in *ListNamespacesForContextReq) (*ListNamespacesForContextRes, error) {
+	out := new(ListNamespacesForContextRes)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[1], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
 func (c *clustersProtobufClient) ListKustomizations(ctx context.Context, in *ListKustomizationsReq) (*ListKustomizationsRes, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "clusters")
 	ctx = ctxsetters.WithServiceName(ctx, "Clusters")
@@ -167,7 +222,7 @@ func (c *clustersProtobufClient) ListKustomizations(ctx context.Context, in *Lis
 
 func (c *clustersProtobufClient) callListKustomizations(ctx context.Context, in *ListKustomizationsReq) (*ListKustomizationsRes, error) {
 	out := new(ListKustomizationsRes)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[1], in, out)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[2], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -213,7 +268,7 @@ func (c *clustersProtobufClient) ListSources(ctx context.Context, in *ListSource
 
 func (c *clustersProtobufClient) callListSources(ctx context.Context, in *ListSourcesReq) (*ListSourcesRes, error) {
 	out := new(ListSourcesRes)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[2], in, out)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[3], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -259,7 +314,99 @@ func (c *clustersProtobufClient) SyncKustomization(ctx context.Context, in *Sync
 
 func (c *clustersProtobufClient) callSyncKustomization(ctx context.Context, in *SyncKustomizationReq) (*SyncKustomizationRes, error) {
 	out := new(SyncKustomizationRes)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[3], in, out)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[4], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *clustersProtobufClient) ListHelmReleases(ctx context.Context, in *ListHelmReleasesReq) (*ListHelmReleasesRes, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "clusters")
+	ctx = ctxsetters.WithServiceName(ctx, "Clusters")
+	ctx = ctxsetters.WithMethodName(ctx, "ListHelmReleases")
+	caller := c.callListHelmReleases
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ListHelmReleasesReq) (*ListHelmReleasesRes, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListHelmReleasesReq)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListHelmReleasesReq) when calling interceptor")
+					}
+					return c.callListHelmReleases(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListHelmReleasesRes)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListHelmReleasesRes) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *clustersProtobufClient) callListHelmReleases(ctx context.Context, in *ListHelmReleasesReq) (*ListHelmReleasesRes, error) {
+	out := new(ListHelmReleasesRes)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[5], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *clustersProtobufClient) ListWorkloads(ctx context.Context, in *ListWorkloadsReq) (*ListWorkloadsRes, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "clusters")
+	ctx = ctxsetters.WithServiceName(ctx, "Clusters")
+	ctx = ctxsetters.WithMethodName(ctx, "ListWorkloads")
+	caller := c.callListWorkloads
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ListWorkloadsReq) (*ListWorkloadsRes, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListWorkloadsReq)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListWorkloadsReq) when calling interceptor")
+					}
+					return c.callListWorkloads(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListWorkloadsRes)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListWorkloadsRes) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *clustersProtobufClient) callListWorkloads(ctx context.Context, in *ListWorkloadsReq) (*ListWorkloadsRes, error) {
+	out := new(ListWorkloadsRes)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[6], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -280,7 +427,7 @@ func (c *clustersProtobufClient) callSyncKustomization(ctx context.Context, in *
 
 type clustersJSONClient struct {
 	client      HTTPClient
-	urls        [4]string
+	urls        [7]string
 	interceptor twirp.Interceptor
 	opts        twirp.ClientOptions
 }
@@ -300,11 +447,14 @@ func NewClustersJSONClient(baseURL string, client HTTPClient, opts ...twirp.Clie
 	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
 	serviceURL := sanitizeBaseURL(baseURL)
 	serviceURL += baseServicePath(clientOpts.PathPrefix(), "clusters", "Clusters")
-	urls := [4]string{
+	urls := [7]string{
 		serviceURL + "ListContexts",
+		serviceURL + "ListNamespacesForContext",
 		serviceURL + "ListKustomizations",
 		serviceURL + "ListSources",
 		serviceURL + "SyncKustomization",
+		serviceURL + "ListHelmReleases",
+		serviceURL + "ListWorkloads",
 	}
 
 	return &clustersJSONClient{
@@ -361,6 +511,52 @@ func (c *clustersJSONClient) callListContexts(ctx context.Context, in *ListConte
 	return out, nil
 }
 
+func (c *clustersJSONClient) ListNamespacesForContext(ctx context.Context, in *ListNamespacesForContextReq) (*ListNamespacesForContextRes, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "clusters")
+	ctx = ctxsetters.WithServiceName(ctx, "Clusters")
+	ctx = ctxsetters.WithMethodName(ctx, "ListNamespacesForContext")
+	caller := c.callListNamespacesForContext
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ListNamespacesForContextReq) (*ListNamespacesForContextRes, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListNamespacesForContextReq)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListNamespacesForContextReq) when calling interceptor")
+					}
+					return c.callListNamespacesForContext(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListNamespacesForContextRes)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListNamespacesForContextRes) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *clustersJSONClient) callListNamespacesForContext(ctx context.Context, in *ListNamespacesForContextReq) (*ListNamespacesForContextRes, error) {
+	out := new(ListNamespacesForContextRes)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[1], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
 func (c *clustersJSONClient) ListKustomizations(ctx context.Context, in *ListKustomizationsReq) (*ListKustomizationsRes, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "clusters")
 	ctx = ctxsetters.WithServiceName(ctx, "Clusters")
@@ -392,7 +588,7 @@ func (c *clustersJSONClient) ListKustomizations(ctx context.Context, in *ListKus
 
 func (c *clustersJSONClient) callListKustomizations(ctx context.Context, in *ListKustomizationsReq) (*ListKustomizationsRes, error) {
 	out := new(ListKustomizationsRes)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[1], in, out)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[2], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -438,7 +634,7 @@ func (c *clustersJSONClient) ListSources(ctx context.Context, in *ListSourcesReq
 
 func (c *clustersJSONClient) callListSources(ctx context.Context, in *ListSourcesReq) (*ListSourcesRes, error) {
 	out := new(ListSourcesRes)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[2], in, out)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[3], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -484,7 +680,99 @@ func (c *clustersJSONClient) SyncKustomization(ctx context.Context, in *SyncKust
 
 func (c *clustersJSONClient) callSyncKustomization(ctx context.Context, in *SyncKustomizationReq) (*SyncKustomizationRes, error) {
 	out := new(SyncKustomizationRes)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[3], in, out)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[4], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *clustersJSONClient) ListHelmReleases(ctx context.Context, in *ListHelmReleasesReq) (*ListHelmReleasesRes, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "clusters")
+	ctx = ctxsetters.WithServiceName(ctx, "Clusters")
+	ctx = ctxsetters.WithMethodName(ctx, "ListHelmReleases")
+	caller := c.callListHelmReleases
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ListHelmReleasesReq) (*ListHelmReleasesRes, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListHelmReleasesReq)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListHelmReleasesReq) when calling interceptor")
+					}
+					return c.callListHelmReleases(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListHelmReleasesRes)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListHelmReleasesRes) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *clustersJSONClient) callListHelmReleases(ctx context.Context, in *ListHelmReleasesReq) (*ListHelmReleasesRes, error) {
+	out := new(ListHelmReleasesRes)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[5], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *clustersJSONClient) ListWorkloads(ctx context.Context, in *ListWorkloadsReq) (*ListWorkloadsRes, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "clusters")
+	ctx = ctxsetters.WithServiceName(ctx, "Clusters")
+	ctx = ctxsetters.WithMethodName(ctx, "ListWorkloads")
+	caller := c.callListWorkloads
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ListWorkloadsReq) (*ListWorkloadsRes, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListWorkloadsReq)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListWorkloadsReq) when calling interceptor")
+					}
+					return c.callListWorkloads(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListWorkloadsRes)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListWorkloadsRes) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *clustersJSONClient) callListWorkloads(ctx context.Context, in *ListWorkloadsReq) (*ListWorkloadsRes, error) {
+	out := new(ListWorkloadsRes)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[6], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -586,6 +874,9 @@ func (s *clustersServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) 
 	case "ListContexts":
 		s.serveListContexts(ctx, resp, req)
 		return
+	case "ListNamespacesForContext":
+		s.serveListNamespacesForContext(ctx, resp, req)
+		return
 	case "ListKustomizations":
 		s.serveListKustomizations(ctx, resp, req)
 		return
@@ -594,6 +885,12 @@ func (s *clustersServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) 
 		return
 	case "SyncKustomization":
 		s.serveSyncKustomization(ctx, resp, req)
+		return
+	case "ListHelmReleases":
+		s.serveListHelmReleases(ctx, resp, req)
+		return
+	case "ListWorkloads":
+		s.serveListWorkloads(ctx, resp, req)
 		return
 	default:
 		msg := fmt.Sprintf("no handler for path %q", req.URL.Path)
@@ -754,6 +1051,181 @@ func (s *clustersServer) serveListContextsProtobuf(ctx context.Context, resp htt
 	}
 	if respContent == nil {
 		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListContextsRes and nil error while calling ListContexts. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *clustersServer) serveListNamespacesForContext(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveListNamespacesForContextJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveListNamespacesForContextProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *clustersServer) serveListNamespacesForContextJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ListNamespacesForContext")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	reqContent := new(ListNamespacesForContextReq)
+	unmarshaler := jsonpb.Unmarshaler{AllowUnknownFields: true}
+	if err = unmarshaler.Unmarshal(req.Body, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the json request could not be decoded"))
+		return
+	}
+
+	handler := s.Clusters.ListNamespacesForContext
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ListNamespacesForContextReq) (*ListNamespacesForContextRes, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListNamespacesForContextReq)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListNamespacesForContextReq) when calling interceptor")
+					}
+					return s.Clusters.ListNamespacesForContext(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListNamespacesForContextRes)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListNamespacesForContextRes) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ListNamespacesForContextRes
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListNamespacesForContextRes and nil error while calling ListNamespacesForContext. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	var buf bytes.Buffer
+	marshaler := &jsonpb.Marshaler{OrigName: true, EmitDefaults: !s.jsonSkipDefaults}
+	if err = marshaler.Marshal(&buf, respContent); err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	respBytes := buf.Bytes()
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *clustersServer) serveListNamespacesForContextProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ListNamespacesForContext")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to read request body"))
+		return
+	}
+	reqContent := new(ListNamespacesForContextReq)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.Clusters.ListNamespacesForContext
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ListNamespacesForContextReq) (*ListNamespacesForContextRes, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListNamespacesForContextReq)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListNamespacesForContextReq) when calling interceptor")
+					}
+					return s.Clusters.ListNamespacesForContext(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListNamespacesForContextRes)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListNamespacesForContextRes) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ListNamespacesForContextRes
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListNamespacesForContextRes and nil error while calling ListNamespacesForContext. nil responses are not supported"))
 		return
 	}
 
@@ -1279,6 +1751,356 @@ func (s *clustersServer) serveSyncKustomizationProtobuf(ctx context.Context, res
 	}
 	if respContent == nil {
 		s.writeError(ctx, resp, twirp.InternalError("received a nil *SyncKustomizationRes and nil error while calling SyncKustomization. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *clustersServer) serveListHelmReleases(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveListHelmReleasesJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveListHelmReleasesProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *clustersServer) serveListHelmReleasesJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ListHelmReleases")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	reqContent := new(ListHelmReleasesReq)
+	unmarshaler := jsonpb.Unmarshaler{AllowUnknownFields: true}
+	if err = unmarshaler.Unmarshal(req.Body, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the json request could not be decoded"))
+		return
+	}
+
+	handler := s.Clusters.ListHelmReleases
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ListHelmReleasesReq) (*ListHelmReleasesRes, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListHelmReleasesReq)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListHelmReleasesReq) when calling interceptor")
+					}
+					return s.Clusters.ListHelmReleases(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListHelmReleasesRes)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListHelmReleasesRes) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ListHelmReleasesRes
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListHelmReleasesRes and nil error while calling ListHelmReleases. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	var buf bytes.Buffer
+	marshaler := &jsonpb.Marshaler{OrigName: true, EmitDefaults: !s.jsonSkipDefaults}
+	if err = marshaler.Marshal(&buf, respContent); err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	respBytes := buf.Bytes()
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *clustersServer) serveListHelmReleasesProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ListHelmReleases")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to read request body"))
+		return
+	}
+	reqContent := new(ListHelmReleasesReq)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.Clusters.ListHelmReleases
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ListHelmReleasesReq) (*ListHelmReleasesRes, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListHelmReleasesReq)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListHelmReleasesReq) when calling interceptor")
+					}
+					return s.Clusters.ListHelmReleases(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListHelmReleasesRes)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListHelmReleasesRes) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ListHelmReleasesRes
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListHelmReleasesRes and nil error while calling ListHelmReleases. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *clustersServer) serveListWorkloads(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveListWorkloadsJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveListWorkloadsProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *clustersServer) serveListWorkloadsJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ListWorkloads")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	reqContent := new(ListWorkloadsReq)
+	unmarshaler := jsonpb.Unmarshaler{AllowUnknownFields: true}
+	if err = unmarshaler.Unmarshal(req.Body, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the json request could not be decoded"))
+		return
+	}
+
+	handler := s.Clusters.ListWorkloads
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ListWorkloadsReq) (*ListWorkloadsRes, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListWorkloadsReq)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListWorkloadsReq) when calling interceptor")
+					}
+					return s.Clusters.ListWorkloads(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListWorkloadsRes)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListWorkloadsRes) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ListWorkloadsRes
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListWorkloadsRes and nil error while calling ListWorkloads. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	var buf bytes.Buffer
+	marshaler := &jsonpb.Marshaler{OrigName: true, EmitDefaults: !s.jsonSkipDefaults}
+	if err = marshaler.Marshal(&buf, respContent); err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	respBytes := buf.Bytes()
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *clustersServer) serveListWorkloadsProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ListWorkloads")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to read request body"))
+		return
+	}
+	reqContent := new(ListWorkloadsReq)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.Clusters.ListWorkloads
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ListWorkloadsReq) (*ListWorkloadsRes, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListWorkloadsReq)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListWorkloadsReq) when calling interceptor")
+					}
+					return s.Clusters.ListWorkloads(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListWorkloadsRes)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListWorkloadsRes) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ListWorkloadsRes
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListWorkloadsRes and nil error while calling ListWorkloads. nil responses are not supported"))
 		return
 	}
 
@@ -1864,49 +2686,85 @@ func callClientError(ctx context.Context, h *twirp.ClientHooks, err twirp.Error)
 }
 
 var twirpFileDescriptor0 = []byte{
-	// 693 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x55, 0xdd, 0x6a, 0x13, 0x41,
-	0x14, 0x36, 0x3f, 0x26, 0x9b, 0x13, 0x4d, 0x37, 0x47, 0x5b, 0xd7, 0xa0, 0x6d, 0x19, 0xb0, 0x54,
-	0xd1, 0x16, 0x52, 0x10, 0x05, 0x41, 0x6c, 0x85, 0x0a, 0x4a, 0x2f, 0xb6, 0x22, 0xe2, 0xdd, 0x76,
-	0x3b, 0x4d, 0x96, 0x64, 0x77, 0xd6, 0x99, 0xd9, 0x6a, 0x7c, 0x08, 0x1f, 0x49, 0x7c, 0x06, 0x9f,
-	0x48, 0x66, 0x76, 0xf6, 0x37, 0xa9, 0xf6, 0x2a, 0x73, 0xbe, 0xf3, 0xf7, 0xcd, 0x77, 0xce, 0x64,
-	0x61, 0x2b, 0x9e, 0x4d, 0xf6, 0x79, 0xec, 0xef, 0xfb, 0xf3, 0x44, 0x48, 0xca, 0x45, 0x7e, 0xd8,
-	0x8b, 0x39, 0x93, 0x0c, 0xad, 0xcc, 0x26, 0x0f, 0xa1, 0x7b, 0xc4, 0x22, 0x49, 0xbf, 0x4b, 0x44,
-	0x68, 0x47, 0x5e, 0x48, 0x9d, 0xc6, 0x76, 0x63, 0xb7, 0xe7, 0xea, 0x33, 0x19, 0xc2, 0xda, 0x87,
-	0x40, 0x48, 0x13, 0x22, 0x5c, 0xfa, 0x95, 0x4c, 0xeb, 0x90, 0xc0, 0x1d, 0x18, 0xf8, 0x09, 0xe7,
-	0x34, 0xca, 0x50, 0x53, 0xa3, 0x86, 0xe2, 0x33, 0xb0, 0x7c, 0x93, 0xe6, 0x34, 0xb7, 0x5b, 0xbb,
-	0xfd, 0xf1, 0x70, 0x2f, 0x67, 0x66, 0x82, 0xdc, 0x3c, 0x84, 0x04, 0xd0, 0x3b, 0x62, 0xd1, 0x79,
-	0x20, 0x03, 0x16, 0x29, 0x76, 0x72, 0x11, 0xe7, 0xec, 0xd4, 0x19, 0x37, 0xa0, 0x23, 0xa4, 0x27,
-	0x13, 0x55, 0x4d, 0xa1, 0xc6, 0x52, 0x38, 0xa7, 0x9e, 0x60, 0x91, 0xd3, 0x4a, 0xf1, 0xd4, 0x42,
-	0x07, 0xba, 0x21, 0x15, 0xc2, 0x9b, 0x50, 0xa7, 0xad, 0x1d, 0x99, 0x49, 0xfe, 0x34, 0xe0, 0xf6,
-	0xfb, 0x44, 0x48, 0x16, 0x06, 0x3f, 0xbc, 0xac, 0x5f, 0x5d, 0x0d, 0x7c, 0x00, 0x3d, 0xf5, 0x2b,
-	0x62, 0xcf, 0xa7, 0xa6, 0x65, 0x01, 0xe0, 0x2e, 0xac, 0x49, 0x8f, 0x4f, 0xa8, 0x3c, 0xc9, 0x63,
-	0xd2, 0xf6, 0x75, 0x58, 0xd5, 0x8e, 0x3d, 0x39, 0x35, 0x24, 0xf4, 0x59, 0xd5, 0x16, 0x2c, 0xe1,
-	0x3e, 0x75, 0xe9, 0x85, 0x73, 0x33, 0xad, 0x9d, 0x03, 0x78, 0x00, 0xe0, 0x67, 0x52, 0x08, 0xa7,
-	0xa3, 0xb5, 0xbb, 0x53, 0xd1, 0x2e, 0xf5, 0xb9, 0xa5, 0x30, 0xf2, 0x12, 0xd6, 0xd5, 0xa4, 0x2a,
-	0xf7, 0x52, 0x23, 0xc4, 0x6d, 0xe8, 0x1b, 0x91, 0x4f, 0x8a, 0x2b, 0x96, 0x21, 0xf2, 0x79, 0x75,
-	0xaa, 0xc0, 0xd7, 0x30, 0x98, 0x55, 0x40, 0xa7, 0xa1, 0xc9, 0xdc, 0x2b, 0xc8, 0x54, 0x92, 0xdc,
-	0x5a, 0x38, 0x99, 0x83, 0x7d, 0x1c, 0x48, 0x97, 0xc6, 0x4c, 0x04, 0x92, 0xf1, 0x85, 0xba, 0xdd,
-	0x06, 0x74, 0xce, 0xb8, 0x17, 0xf9, 0x53, 0x43, 0xc5, 0x58, 0x68, 0x43, 0x4b, 0x7a, 0x13, 0xa3,
-	0xb4, 0x3a, 0xea, 0x89, 0xd3, 0xf0, 0x92, 0xf2, 0x6c, 0xb2, 0xa9, 0xa5, 0x70, 0x9f, 0x85, 0x61,
-	0x20, 0x8d, 0xa6, 0xc6, 0x22, 0x3f, 0x9b, 0xd0, 0x39, 0xd5, 0x2a, 0xae, 0x1c, 0xa8, 0x0d, 0xad,
-	0x84, 0xcf, 0xb3, 0x06, 0x09, 0x9f, 0xe3, 0x0b, 0xe8, 0x71, 0x7a, 0x41, 0x39, 0x8d, 0xcc, 0xf8,
-	0xfa, 0xe3, 0x51, 0x71, 0xb5, 0x3a, 0x73, 0xb7, 0x08, 0xc6, 0xc7, 0x66, 0x41, 0x15, 0x81, 0xc1,
-	0x78, 0xbd, 0x48, 0x4a, 0xfb, 0xef, 0x7d, 0x5c, 0xc4, 0xd4, 0xec, 0xed, 0x08, 0xac, 0x98, 0xb3,
-	0xcb, 0xe0, 0x9c, 0x72, 0x33, 0xea, 0xdc, 0xc6, 0x4d, 0x80, 0xb3, 0xc4, 0x9f, 0x51, 0xa9, 0xc9,
-	0x76, 0xb4, 0xb7, 0x84, 0xa4, 0xbb, 0x3d, 0x09, 0x58, 0xe4, 0x74, 0xb3, 0xdd, 0x56, 0x16, 0x79,
-	0x04, 0x6d, 0xd5, 0x01, 0xbb, 0xd0, 0x3a, 0x0e, 0xa4, 0x7d, 0x03, 0x01, 0x3a, 0x87, 0x3a, 0xcd,
-	0x6e, 0xa0, 0x05, 0xed, 0x77, 0x74, 0x1e, 0xda, 0x4d, 0xe2, 0xc2, 0x40, 0x0d, 0x36, 0xe5, 0x74,
-	0xbd, 0x65, 0x50, 0x94, 0xd2, 0x4d, 0x54, 0x0d, 0x8c, 0x58, 0x25, 0x84, 0xbc, 0xaa, 0xd5, 0x14,
-	0xf8, 0x04, 0xba, 0xa9, 0x3f, 0x5b, 0x0f, 0xbb, 0x2e, 0x87, 0x9b, 0x05, 0x90, 0x5f, 0x0d, 0xb8,
-	0x7b, 0xba, 0x88, 0xfc, 0xea, 0xda, 0x5c, 0x8b, 0xd8, 0x53, 0x18, 0x56, 0xb6, 0x4b, 0xc7, 0xa5,
-	0xfc, 0x96, 0x1d, 0xf8, 0x1c, 0x36, 0x96, 0xc0, 0xf2, 0x33, 0xbd, 0xc2, 0xab, 0xae, 0xff, 0x2d,
-	0x90, 0xd3, 0x94, 0xb7, 0x1e, 0xaf, 0xe5, 0x96, 0x10, 0xb2, 0xb3, 0x92, 0xbf, 0xc0, 0x01, 0x34,
-	0xd9, 0x4c, 0xd3, 0xb6, 0xdc, 0x26, 0x9b, 0x8d, 0x7f, 0x37, 0xc1, 0x3a, 0x32, 0x2a, 0xe0, 0x5b,
-	0xb8, 0x55, 0xfe, 0x17, 0xc5, 0xfb, 0x85, 0x40, 0xb5, 0x3f, 0xdc, 0xd1, 0x95, 0x2e, 0x81, 0x9f,
-	0x00, 0x97, 0x9f, 0x29, 0x6e, 0x55, 0x13, 0x96, 0xde, 0xff, 0xe8, 0x3f, 0x01, 0x02, 0xdf, 0x40,
-	0xbf, 0x34, 0x51, 0x74, 0xaa, 0xf1, 0xc5, 0xf2, 0x8c, 0xae, 0xf2, 0x08, 0x3c, 0x85, 0xe1, 0x92,
-	0x2a, 0xb8, 0x59, 0x5a, 0x83, 0x15, 0x23, 0x1f, 0xfd, 0xdb, 0x2f, 0x0e, 0xf1, 0x8b, 0x5d, 0xff,
-	0xb4, 0x9d, 0x75, 0xf4, 0x27, 0xed, 0xe0, 0x6f, 0x00, 0x00, 0x00, 0xff, 0xff, 0xf2, 0x36, 0xb1,
-	0xfd, 0xf5, 0x06, 0x00, 0x00,
+	// 1279 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x57, 0x6d, 0x6f, 0x1b, 0x45,
+	0x10, 0xc6, 0x71, 0x62, 0x9f, 0xc7, 0x71, 0xea, 0x4c, 0xd3, 0x70, 0x35, 0x7d, 0x89, 0x56, 0x14,
+	0x19, 0x54, 0x52, 0x94, 0x8a, 0x17, 0x41, 0xab, 0x2a, 0x4d, 0x45, 0x91, 0x8a, 0xaa, 0x72, 0x6d,
+	0x29, 0xe2, 0x0b, 0xba, 0x9e, 0x37, 0xf6, 0xc9, 0xf7, 0xd6, 0xdd, 0x75, 0x4a, 0xf8, 0x03, 0x7c,
+	0xe1, 0x1b, 0x7f, 0x01, 0xf1, 0x4f, 0xf8, 0x2d, 0xfc, 0x0a, 0x04, 0xda, 0x97, 0xbb, 0xdb, 0x3b,
+	0xbf, 0x10, 0x45, 0xf9, 0x76, 0xf3, 0xcc, 0xec, 0xec, 0xec, 0xcc, 0x33, 0xb3, 0xb7, 0x70, 0x33,
+	0x9b, 0x8e, 0xef, 0xb0, 0x2c, 0xb8, 0x13, 0x44, 0x33, 0x2e, 0x28, 0xe3, 0xc5, 0xc7, 0x7e, 0xc6,
+	0x52, 0x91, 0xa2, 0x93, 0xcb, 0xe4, 0x3a, 0xb4, 0x8f, 0xd2, 0x44, 0xd0, 0x9f, 0x05, 0x22, 0xac,
+	0x27, 0x7e, 0x4c, 0xdd, 0xc6, 0x5e, 0x63, 0xd8, 0xf1, 0xd4, 0x37, 0xd9, 0x86, 0x4b, 0xdf, 0x86,
+	0x5c, 0x18, 0x13, 0xee, 0xd1, 0x37, 0x64, 0x52, 0x87, 0x38, 0x7e, 0x00, 0x5b, 0xc1, 0x8c, 0x31,
+	0x9a, 0xe4, 0xa8, 0xf1, 0x51, 0x43, 0xf1, 0x63, 0x70, 0x02, 0xb3, 0xcc, 0x5d, 0xdb, 0x6b, 0x0e,
+	0xbb, 0x07, 0xdb, 0xfb, 0x45, 0x64, 0xc6, 0xc8, 0x2b, 0x4c, 0xc8, 0x03, 0x78, 0x4f, 0xee, 0xf4,
+	0xd4, 0x8f, 0x29, 0xcf, 0xfc, 0x80, 0xf2, 0xaf, 0x53, 0x96, 0x5b, 0xd1, 0x37, 0xb8, 0x07, 0x5d,
+	0x63, 0xfa, 0xb4, 0x0c, 0xdb, 0x86, 0xc8, 0xfd, 0x55, 0x0e, 0x38, 0xde, 0x00, 0x48, 0x0a, 0x95,
+	0xdb, 0xd8, 0x6b, 0x0e, 0x3b, 0x9e, 0x85, 0x90, 0x5f, 0x1b, 0xd0, 0x39, 0x4a, 0x93, 0x51, 0x28,
+	0xc2, 0x34, 0x91, 0xe9, 0x11, 0xa7, 0x59, 0x91, 0x1e, 0xf9, 0x8d, 0xbb, 0xd0, 0xe2, 0xc2, 0x17,
+	0x33, 0x79, 0x1c, 0x89, 0x1a, 0x49, 0xe2, 0x8c, 0xfa, 0x3c, 0x4d, 0xdc, 0xa6, 0xc6, 0xb5, 0x84,
+	0x2e, 0xb4, 0x63, 0xca, 0xb9, 0x3f, 0xa6, 0xee, 0xba, 0x52, 0xe4, 0x22, 0x5e, 0x83, 0x8e, 0x08,
+	0x63, 0xca, 0x85, 0x1f, 0x67, 0xee, 0x86, 0xd2, 0x95, 0x00, 0xf9, 0xbd, 0x09, 0xbd, 0x27, 0x33,
+	0x2e, 0xd2, 0x38, 0xfc, 0xc5, 0xcf, 0xa3, 0xa9, 0x17, 0x4b, 0xfa, 0x28, 0xa2, 0x37, 0x01, 0x95,
+	0x00, 0x0e, 0xe1, 0x92, 0xf0, 0xd9, 0x98, 0x96, 0xe9, 0x30, 0xc1, 0xd5, 0x61, 0xe9, 0x3b, 0xf3,
+	0xc5, 0xc4, 0x84, 0xa8, 0xbe, 0xa5, 0x6f, 0x9e, 0xce, 0x58, 0x40, 0x3d, 0x7a, 0x9c, 0xc7, 0x57,
+	0x00, 0x78, 0x17, 0x20, 0xc8, 0x13, 0xc5, 0xdd, 0x96, 0x2a, 0xed, 0xe5, 0x4a, 0x69, 0xb5, 0xce,
+	0xb3, 0xcc, 0x70, 0x00, 0x4e, 0x98, 0x08, 0xca, 0x4e, 0xfc, 0xc8, 0x6d, 0x2b, 0x8f, 0x85, 0x8c,
+	0x3b, 0xb0, 0x91, 0xb1, 0x59, 0x42, 0x5d, 0x67, 0xaf, 0x31, 0x74, 0x3c, 0x2d, 0xe0, 0x3e, 0x20,
+	0xa3, 0x41, 0x9a, 0x04, 0x61, 0x44, 0x3d, 0xfa, 0x66, 0x46, 0xb9, 0x38, 0x14, 0x6e, 0x47, 0xad,
+	0x5d, 0xa0, 0x91, 0x0c, 0x29, 0xd0, 0x43, 0xe1, 0x82, 0x66, 0x88, 0x05, 0xe1, 0x57, 0xd0, 0x2b,
+	0x4e, 0xf1, 0x24, 0x4c, 0x46, 0x6e, 0x77, 0xaf, 0x31, 0xdc, 0x3a, 0xb8, 0x52, 0xc6, 0xfe, 0x5c,
+	0xa9, 0xf7, 0x5f, 0x9c, 0x66, 0xd4, 0xab, 0xda, 0x92, 0x57, 0x70, 0x45, 0xd2, 0xab, 0x52, 0x18,
+	0x7e, 0x26, 0x66, 0xae, 0x2e, 0x15, 0xf9, 0x61, 0xb1, 0x63, 0x8e, 0x0f, 0x60, 0x6b, 0x5a, 0x01,
+	0x15, 0x6b, 0xbb, 0x07, 0xef, 0x96, 0xf1, 0x56, 0x16, 0x79, 0x35, 0x73, 0x12, 0x41, 0xff, 0x71,
+	0x28, 0x3c, 0x9a, 0xa5, 0x3c, 0x14, 0x29, 0x3b, 0x95, 0xc5, 0xdb, 0x85, 0xd6, 0x6b, 0xe6, 0x27,
+	0xc1, 0xc4, 0x04, 0x6a, 0x24, 0xec, 0x43, 0x53, 0xf8, 0x63, 0x13, 0x9d, 0xfc, 0x54, 0x74, 0xa7,
+	0xf1, 0x09, 0x65, 0x39, 0xad, 0xb5, 0x24, 0xf1, 0x20, 0x8d, 0xe3, 0x50, 0x18, 0xca, 0x18, 0x89,
+	0xfc, 0xd6, 0x00, 0xe7, 0x90, 0x89, 0xf0, 0xd8, 0x0f, 0x84, 0x2c, 0x77, 0x30, 0xa1, 0xc1, 0x94,
+	0xcf, 0x62, 0xb3, 0x51, 0x21, 0x23, 0x81, 0xcd, 0xc8, 0xe7, 0x62, 0x96, 0x8d, 0x7c, 0x41, 0x7d,
+	0xa1, 0xf6, 0xdc, 0xf0, 0x2a, 0x58, 0xc1, 0xca, 0xa6, 0xc5, 0xca, 0x01, 0x38, 0x8c, 0x9e, 0x84,
+	0x3c, 0x4c, 0x13, 0xb3, 0x75, 0x21, 0xcb, 0xf0, 0x67, 0x2c, 0x32, 0x5c, 0x95, 0x9f, 0xe4, 0xdf,
+	0x26, 0xb4, 0x74, 0x39, 0x17, 0xb6, 0x8f, 0x59, 0xb0, 0x56, 0x2c, 0xc0, 0x2f, 0xa0, 0xc3, 0xe8,
+	0x31, 0x65, 0x34, 0x31, 0xcd, 0xd2, 0x3d, 0x18, 0x94, 0x99, 0xae, 0x27, 0xd2, 0x2b, 0x8d, 0xf1,
+	0x43, 0x33, 0x2c, 0xd6, 0x57, 0xd1, 0x49, 0xcf, 0x90, 0x01, 0x38, 0x19, 0x4b, 0x4f, 0xc2, 0x11,
+	0x65, 0x26, 0xd8, 0x42, 0x96, 0x13, 0xea, 0xf5, 0x2c, 0x98, 0x52, 0xa1, 0x82, 0x6d, 0x29, 0xad,
+	0x85, 0xe8, 0x39, 0x33, 0x96, 0xa7, 0x6f, 0xe7, 0x73, 0x46, 0x4a, 0x55, 0x7a, 0x39, 0xf5, 0x49,
+	0x70, 0x1b, 0xb6, 0xc7, 0xa1, 0x08, 0xe3, 0x2c, 0xa2, 0x31, 0x4d, 0x84, 0xa2, 0x86, 0xe9, 0xa2,
+	0x79, 0x85, 0x9c, 0x59, 0x72, 0x10, 0xa5, 0xb3, 0xbc, 0x81, 0x72, 0x11, 0xdf, 0x87, 0x1e, 0xa7,
+	0x01, 0xa3, 0xc2, 0xa3, 0xc7, 0x8a, 0xe8, 0x5d, 0xa5, 0xaf, 0x82, 0xb5, 0xd9, 0xb0, 0x79, 0xb6,
+	0xd9, 0xb0, 0x0f, 0x8e, 0x6f, 0x88, 0xe3, 0xf6, 0x54, 0xe2, 0xb1, 0x5c, 0x92, 0x53, 0xca, 0x2b,
+	0x6c, 0xc8, 0x2d, 0x58, 0x97, 0x29, 0xc5, 0x36, 0x34, 0x1f, 0x87, 0xa2, 0xff, 0x0e, 0x02, 0xb4,
+	0x1e, 0xaa, 0x3c, 0xf5, 0x1b, 0xe8, 0xc0, 0xfa, 0x37, 0x34, 0x8a, 0xfb, 0x6b, 0x24, 0x83, 0x2d,
+	0xd9, 0x58, 0xba, 0x08, 0x17, 0xd1, 0xaa, 0xb2, 0x42, 0x7a, 0x28, 0xc8, 0xed, 0x0d, 0x37, 0x2d,
+	0x84, 0xdc, 0xab, 0xed, 0xc8, 0xf1, 0x23, 0x68, 0x6b, 0x7d, 0xde, 0xbc, 0xfd, 0x3a, 0x3b, 0xbc,
+	0xdc, 0x80, 0xfc, 0xd1, 0x80, 0x9d, 0xe7, 0xa7, 0x49, 0x50, 0x6d, 0xea, 0x0b, 0x08, 0xfb, 0x36,
+	0x6c, 0x57, 0x26, 0x83, 0xf2, 0xa2, 0xa3, 0x9f, 0x57, 0xc8, 0x43, 0xbe, 0x0d, 0xc5, 0x44, 0x47,
+	0xa7, 0x38, 0xed, 0x78, 0x16, 0x42, 0x5e, 0x2e, 0x8c, 0x92, 0xe3, 0x7d, 0xe8, 0x55, 0x9c, 0xa9,
+	0x38, 0x57, 0x4c, 0xab, 0xaa, 0x35, 0xf9, 0xa7, 0x01, 0x5d, 0x59, 0x38, 0x8f, 0x46, 0xd4, 0xe7,
+	0xf4, 0x1c, 0x77, 0x9e, 0x7d, 0xc5, 0x34, 0x6b, 0x57, 0xcc, 0x35, 0xe8, 0x04, 0x13, 0x9f, 0xe9,
+	0x04, 0x9a, 0x1b, 0xad, 0x00, 0x24, 0xeb, 0x4f, 0x28, 0x53, 0x83, 0x45, 0xb7, 0x5d, 0x2e, 0x96,
+	0x15, 0x57, 0xf7, 0x45, 0xdb, 0xae, 0xb8, 0x44, 0x4a, 0xbd, 0x72, 0xec, 0xd8, 0x7a, 0xe5, 0x79,
+	0x08, 0x97, 0x4a, 0x49, 0xc7, 0xad, 0x7b, 0xaf, 0x0e, 0x93, 0x97, 0x70, 0x59, 0x72, 0xc7, 0x4a,
+	0xc1, 0x85, 0xdc, 0x2e, 0xdf, 0x2d, 0x72, 0xcb, 0xf1, 0x4b, 0xe8, 0x4d, 0x68, 0x14, 0xff, 0xc4,
+	0x0c, 0x66, 0xd8, 0x69, 0xcd, 0x2e, 0x6b, 0x85, 0xb7, 0x39, 0xb1, 0x96, 0x93, 0x4f, 0xd5, 0x8f,
+	0x92, 0xf0, 0xc3, 0x84, 0xb2, 0x85, 0x65, 0xda, 0x81, 0x8d, 0x30, 0x96, 0xbf, 0x3d, 0x3a, 0x1a,
+	0x2d, 0x90, 0x87, 0xd0, 0x7d, 0x96, 0x8e, 0x5e, 0xd0, 0x38, 0x8b, 0x7c, 0x91, 0x4f, 0x0a, 0xed,
+	0x25, 0xdf, 0xbe, 0x3a, 0x29, 0xb4, 0xce, 0xb3, 0xcc, 0xc8, 0xdf, 0x0d, 0x70, 0x5e, 0xa5, 0x6c,
+	0x1a, 0xa5, 0xfe, 0xe8, 0x1c, 0x0c, 0x39, 0x80, 0x9d, 0x69, 0x95, 0xb6, 0xc7, 0x56, 0x2f, 0x2c,
+	0xd4, 0xe1, 0x3d, 0xb8, 0xba, 0x08, 0xd7, 0x3b, 0xe8, 0x6b, 0x68, 0xb9, 0x01, 0x7e, 0x0e, 0xdd,
+	0xac, 0x3c, 0xb4, 0x62, 0x5e, 0x25, 0xcb, 0x56, 0x46, 0x3c, 0xdb, 0x92, 0x78, 0xd0, 0x97, 0x75,
+	0xcb, 0x0f, 0x7b, 0x21, 0x5c, 0x78, 0x34, 0xe7, 0x93, 0xe3, 0x27, 0xd0, 0x79, 0x9b, 0xcb, 0xa6,
+	0x0a, 0xd6, 0xf0, 0xcd, 0x4d, 0xbd, 0xd2, 0x88, 0xfc, 0xd9, 0x80, 0x6b, 0x73, 0x3f, 0x2c, 0x47,
+	0x93, 0x30, 0x1a, 0x31, 0x7a, 0xc6, 0x71, 0xb5, 0x70, 0x20, 0xad, 0x2d, 0x1b, 0x48, 0x9f, 0xc1,
+	0xee, 0x93, 0x3a, 0x68, 0xff, 0xd2, 0xee, 0x4e, 0x17, 0x6a, 0xc9, 0xb3, 0x95, 0x71, 0x9e, 0xe3,
+	0xe8, 0x07, 0x7f, 0xad, 0x83, 0x73, 0x64, 0x0c, 0xf0, 0x11, 0x6c, 0xda, 0x4f, 0x23, 0xbc, 0x5a,
+	0xae, 0xad, 0xbd, 0xa2, 0x06, 0x4b, 0x55, 0x1c, 0x27, 0xe0, 0x2e, 0x7b, 0xb5, 0xe0, 0xad, 0xea,
+	0xb2, 0x25, 0x4f, 0xa3, 0xc1, 0x99, 0xcc, 0x38, 0x7e, 0x0f, 0x38, 0xff, 0x9f, 0x89, 0x37, 0xab,
+	0x8b, 0xe7, 0x7e, 0x6f, 0x07, 0xff, 0x63, 0xc0, 0xf1, 0x10, 0xba, 0xd6, 0xa5, 0x87, 0x6e, 0xd5,
+	0xbe, 0xbc, 0x7d, 0x07, 0xcb, 0x34, 0x1c, 0x9f, 0xc3, 0xf6, 0xdc, 0x95, 0x82, 0x37, 0xac, 0x9b,
+	0x72, 0xc1, 0xad, 0x38, 0x58, 0xad, 0xe7, 0xf8, 0x4c, 0xb3, 0xdd, 0x9e, 0x7c, 0x78, 0xbd, 0x1a,
+	0x42, 0x6d, 0xd8, 0x0e, 0x56, 0xaa, 0x39, 0x3e, 0x86, 0x5e, 0xa5, 0x7f, 0x70, 0x50, 0xb5, 0xb7,
+	0x9b, 0x75, 0xb0, 0x5c, 0xc7, 0x1f, 0xe2, 0x8f, 0xfd, 0xfa, 0xa3, 0xfd, 0x75, 0x4b, 0x3d, 0xd6,
+	0xef, 0xfe, 0x17, 0x00, 0x00, 0xff, 0xff, 0x3a, 0x57, 0x58, 0x7b, 0xcf, 0x0f, 0x00, 0x00,
 }

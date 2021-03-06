@@ -5,9 +5,12 @@ option go_package = "pkg/rpc/clusters";
 
 service Clusters {
     rpc ListContexts (ListContextsReq) returns (ListContextsRes);
+    rpc ListNamespacesForContext (ListNamespacesForContextReq) returns (ListNamespacesForContextRes);
     rpc ListKustomizations (ListKustomizationsReq) returns (ListKustomizationsRes);
     rpc ListSources (ListSourcesReq) returns (ListSourcesRes);
     rpc SyncKustomization (SyncKustomizationReq) returns (SyncKustomizationRes);
+    rpc ListHelmReleases (ListHelmReleasesReq) returns (ListHelmReleasesRes);
+    rpc ListWorkloads (ListWorkloadsReq) returns (ListWorkloadsRes);
 }
 
 message Context {
@@ -23,11 +26,20 @@ message ListContextsRes {
     repeated Context contexts = 2;
 }
 
+message ListNamespacesForContextReq {
+    string contextName = 1;
+}
+
+message ListNamespacesForContextRes {
+    repeated string namespaces = 1;
+}
+
 message Condition {
     string type = 1;
     string status = 2;
     string reason = 3;
     string message = 4;
+    string timestamp = 5;
 }
 
 message Kustomization {
@@ -37,10 +49,16 @@ message Kustomization {
     string path = 4;
     string sourceRef = 5;
     repeated Condition conditions = 6;
+    string interval = 7;
+    bool prune = 8;
+    string reconcileRequestAt = 9;
+    string reconcileAt = 10;
+    Source.Type sourceRefKind = 11;
 }
 
 message ListKustomizationsReq {
     string contextName = 1;
+    string namespace = 2;
 }
 
 message ListKustomizationsRes {
@@ -53,6 +71,14 @@ message GitRepositoryRef {
     string tag = 2;
     string semver = 3;
     string commit = 4;
+}
+
+message Artifact {
+    string checksum  = 1;
+    int32 lastupdateat = 2;
+    string path = 3;
+    string revision = 4;
+    string url = 5;
 }
 
 message Source {
@@ -68,11 +94,18 @@ message Source {
     string provider = 5;
     string bucketname = 6;
     string region = 7;
+    string namespace = 8;
+    string gitimplementation = 9;
+    string timeout = 10;
+    string secretRefName = 11;
+    repeated Condition conditions = 12;
+    Artifact artifact = 13;
 }
 
 message ListSourcesReq {
     string contextName = 1;
-    string sourceType = 2;
+    string namespace = 2;
+    string sourceType = 3;
 }
 
 message ListSourcesRes {
@@ -81,11 +114,67 @@ message ListSourcesRes {
 
 message SyncKustomizationReq {
     string contextName = 1;
-    string kustomizationName = 2;
-    string kustomizationNamespace = 3;
+    string namespace = 2;
+    string kustomizationName = 3;
     bool withSource = 4;
 }
 
 message SyncKustomizationRes {
-    bool ok = 1;
+    Kustomization kustomization = 1;
+}
+
+message HelmRelease {
+    string name = 1;
+    string namespace = 2;
+    string interval = 3;
+    string chartName = 5;
+    string version = 6;
+    string sourceKind = 7;
+    string sourceName  = 8;
+    string sourceNamespace = 9;
+}
+
+message ListHelmReleasesReq {
+    string contextName = 1;
+    string namespace = 2;
+}
+
+message ListHelmReleasesRes {
+    repeated HelmRelease helm_releases = 1;
+}
+
+message Container {
+    string name = 1;
+    string image = 2;
+}
+
+message PodTemplate {
+    repeated Container containers = 1;
+}
+
+message Workload {
+    string name = 1;
+    string namespace = 2;
+    string kustomizationRefName = 3;
+    string kustomizationRefNamespace = 4;
+    PodTemplate podTemplate = 5;
+}
+
+message ListWorkloadsReq {
+    string contextName = 1;
+    string namespace = 2;
+}
+
+message ListWorkloadsRes {
+    repeated Workload workloads = 1;
+}
+
+message ListKustomizationChildrenReq {
+    string contextName = 1;
+    string kustomizationName = 2;
+    string KustomizationNamespace = 3;
+}
+
+message ListKustomizationChildrenRes {
+    repeated Workload workloads = 1;
 }

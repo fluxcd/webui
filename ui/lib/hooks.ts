@@ -1,73 +1,99 @@
 import _ from "lodash";
+import qs from "query-string";
 import { useContext, useEffect, useState } from "react";
-import { useHistory, useLocation, useParams } from "react-router-dom";
-import queryString from "query-string";
-
+import { useHistory, useLocation } from "react-router-dom";
 import { AppContext } from "../components/AppStateProvider";
 import {
   Context,
-  DefaultClusters,
+  HelmRelease,
   Kustomization,
   Source,
+  Workload,
 } from "./rpc/clusters";
-import { normalizePath, wrappedFetch } from "./util";
+import { AllNamespacesOption } from "./types";
+import { clustersClient, formatURL, normalizePath, PageRoute } from "./util";
 
-const clusters = new DefaultClusters("/api/clusters", wrappedFetch);
+// The backend doesn't like the word "all". Instead, it wants an empty string.
+// Navigation might get weird if we use an empty string on the front-end.
+// There may also be a naming collision with a namespace named "all".
+const formatAPINamespace = (ns: string) =>
+  ns === AllNamespacesOption ? "" : ns;
 
 export function useKubernetesContexts(): {
   contexts: Context[];
+  namespaces: string[];
   currentContext: string;
-  setCurrentContext: (context: string) => void;
+  currentNamespace: string;
 } {
-  const location = useLocation();
-  const {
-    contexts,
-    currentContext,
-    setContexts,
-    setCurrentContext,
-  } = useContext(AppContext);
+  const { navigate } = useNavigation();
+  const { context, namespace } = qs.parse(location.search) as {
+    context: string;
+    namespace: string;
+  };
+  const { contexts, namespaces } = useContext(AppContext);
 
   useEffect(() => {
-    clusters
-      .listContexts({})
-      .then((res) => {
-        const [pathContext] = normalizePath(location.pathname);
-        setContexts(res.contexts);
-        // If there is a context in the path, use that, else use the one set
-        // in the .kubeconfig file returned by the backend.
-        setCurrentContext(pathContext || res.currentcontext);
-      })
-      .catch((e) => console.error(e));
+    if (!context) {
+      navigate(PageRoute.Redirector, null, null);
+    }
   }, []);
 
   return {
     contexts,
-    currentContext,
-    setCurrentContext,
+    namespaces: namespaces[context] || [],
+    currentContext: context,
+    currentNamespace: namespace,
   };
 }
 
 type KustomizationList = { [name: string]: Kustomization };
 
-export function useKustomizations(): KustomizationList {
+export function useKustomizations(
+  currentContext: string,
+  currentNamespace: string
+) {
+  const { doError } = useContext(AppContext);
   const [kustomizations, setKustomizations] = useState({} as KustomizationList);
-
-  const { currentContext } = useKubernetesContexts();
 
   useEffect(() => {
     if (!currentContext) {
       return;
     }
-    clusters
-      .listKustomizations({ contextname: currentContext })
+
+    clustersClient
+      .listKustomizations({
+        contextname: currentContext,
+        namespace: formatAPINamespace(currentNamespace),
+      })
       .then((res) => {
         const r = _.keyBy(res.kustomizations, "name");
         setKustomizations(r);
       })
-      .catch((e) => console.error(e));
-  }, [currentContext]);
+      .catch((err) => {
+        doError(
+          "There was an error fetching kustomizations",
+          true,
+          err.message
+        );
+      });
+  }, [currentContext, currentNamespace]);
 
-  return kustomizations;
+  const syncKustomization = (k: Kustomization) =>
+    clustersClient
+      .syncKustomization({
+        contextname: currentContext,
+        namespace: k.namespace,
+        withsource: false,
+        kustomizationname: k.name,
+      })
+      .then(() => {
+        setKustomizations({
+          ...kustomizations,
+          [k.name]: k,
+        });
+      });
+
+  return { kustomizations, syncKustomization };
 }
 
 export enum SourceType {
@@ -76,29 +102,139 @@ export enum SourceType {
   Helm = "helm",
 }
 
-export function useSources(sourceType: SourceType): Source[] {
+type SourceData = {
+  [SourceType.Git]: Source[];
+  [SourceType.Bucket]: Source[];
+  [SourceType.Helm]: Source[];
+};
+
+export function useSources(
+  currentContext: string,
+  currentNamespace: string
+): SourceData {
+  const { doError } = useContext(AppContext);
   const [sources, setSources] = useState({
     [SourceType.Git]: [],
     [SourceType.Bucket]: [],
     [SourceType.Helm]: [],
   });
-  const { currentContext } = useKubernetesContexts();
 
   useEffect(() => {
     if (!currentContext) {
       return;
     }
 
-    clusters
-      .listSources({
+    const p = _.map(SourceType, (s) =>
+      clustersClient.listSources({
         contextname: currentContext,
-        sourcetype: sourceType,
+        namespace: formatAPINamespace(currentNamespace),
+        sourcetype: s,
+      })
+    );
+
+    Promise.all(p)
+      .then((arr) => {
+        const d = {};
+        _.each(arr, (a) => {
+          _.each(a.sources, (src) => {
+            const t = _.lowerCase(src.type);
+            if (!d[t]) {
+              d[t] = [];
+            }
+
+            d[t].push(src);
+          });
+        });
+        setSources(d as SourceData);
+      })
+      .catch((err) => {
+        doError("There was an error fetching sources", true, err.message);
+      });
+  }, [currentContext, currentNamespace]);
+
+  return sources;
+}
+
+export function useHelmReleases(
+  currentContext: string,
+  currentNamespace: string
+): { [name: string]: HelmRelease } {
+  const [helmReleases, setHelmReleases] = useState({});
+  const { doError } = useContext(AppContext);
+
+  useEffect(() => {
+    if (!currentContext) {
+      return;
+    }
+
+    clustersClient
+      .listHelmReleases({
+        contextname: currentContext,
+        namespace: formatAPINamespace(currentNamespace),
       })
       .then((res) => {
-        setSources({ ...sources, ...{ [sourceType]: res.sources } });
+        const releases = _.keyBy(res.helmReleases, "name");
+        setHelmReleases(releases);
       })
-      .catch((e) => console.error(e));
-  }, [currentContext, sourceType]);
+      .catch((err) => {
+        doError("There was an error fetching helm releases", true, err.message);
+      });
+  }, [currentContext, currentNamespace]);
 
-  return sources[sourceType];
+  return helmReleases;
+}
+
+export function useAppState() {
+  const { appState } = useContext(AppContext);
+  return appState;
+}
+
+export function useNavigation() {
+  const history = useHistory();
+  const location = useLocation();
+  const [currentPage, setCurrentPage] = useState("");
+
+  useEffect(() => {
+    let [pageName] = normalizePath(location.pathname);
+    setCurrentPage(pageName as string);
+  }, [location.pathname]);
+
+  return {
+    currentPage,
+    query: qs.parse(location.search),
+    navigate: (
+      page: PageRoute | null,
+      context: string,
+      namespace: string,
+      query: object = {}
+    ) => {
+      let nextPage = page || currentPage;
+
+      if (nextPage == "error") {
+        nextPage = PageRoute.Home;
+      }
+
+      history.push(formatURL(nextPage as string, context, namespace, query));
+    },
+  };
+}
+
+export function useWorkloads(currentContext: string, currentNamespace: string) {
+  const [workloads, setWorkloads] = useState([] as Workload[]);
+
+  useEffect(() => {
+    if (!currentContext || !currentNamespace) {
+      return;
+    }
+
+    clustersClient
+      .listWorkloads({
+        contextname: currentContext,
+        namespace: currentNamespace,
+      })
+      .then((res) => {
+        setWorkloads(res.workloads);
+      });
+  }, [currentContext, currentNamespace]);
+  return workloads;
 }
