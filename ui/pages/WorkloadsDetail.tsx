@@ -1,8 +1,11 @@
+import { Box } from "@material-ui/core";
 import _ from "lodash";
 import * as React from "react";
 import styled from "styled-components";
+import KeyValueTable from "../components/KeyValueTable";
 import Link from "../components/Link";
 import Page from "../components/Page";
+import Panel from "../components/Panel";
 import {
   useKubernetesContexts,
   useNavigation,
@@ -33,19 +36,42 @@ function WorkloadsDetail({ className }: Props) {
     <div className={className}>
       <Page>
         <h2>{workloadDetail.name}</h2>
-        <p>
-          Reconciled by:{" "}
-          <Link
-            to={formatURL(
-              PageRoute.KustomizationDetail,
-              currentContext,
-              workloadDetail.kustomizationrefnamespace,
-              { kustomizationId: workloadDetail.kustomizationrefname }
-            )}
-          >
-            {workloadDetail.kustomizationrefname}
-          </Link>
-        </p>
+        <Panel title="Info">
+          <KeyValueTable
+            columns={[2]}
+            pairs={[
+              {
+                key: "Reconciled By",
+                value: (
+                  <Link
+                    to={formatURL(
+                      PageRoute.KustomizationDetail,
+                      currentContext,
+                      workloadDetail.kustomizationrefnamespace,
+                      { kustomizationId: workloadDetail.kustomizationrefname }
+                    )}
+                  >
+                    {workloadDetail.kustomizationrefname}
+                  </Link>
+                ),
+              },
+            ]}
+          ></KeyValueTable>
+        </Panel>
+        <Box paddingTop={2}>
+          <Panel title="Containers">
+            {_.map(workloadDetail.podtemplate.containers, (c) => (
+              <KeyValueTable
+                key={c.name}
+                columns={2}
+                pairs={[
+                  { key: "Name", value: c.name },
+                  { key: "Image", value: c.image },
+                ]}
+              ></KeyValueTable>
+            ))}
+          </Panel>
+        </Box>
       </Page>
     </div>
   );

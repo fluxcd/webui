@@ -1,5 +1,3 @@
-import { Table, TableContainer, TableHead, TableRow } from "@material-ui/core";
-import _ from "lodash";
 import * as React from "react";
 import styled from "styled-components";
 import DataTable from "../components/DataTable";
