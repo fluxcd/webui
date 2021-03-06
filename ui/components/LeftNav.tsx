@@ -12,6 +12,7 @@ type Props = {
 };
 
 const navItems = [
+  { value: PageRoute.Workloads, label: "Workloads" },
   { value: PageRoute.Sources, label: "Sources" },
   { value: PageRoute.Kustomizations, label: "Kustomizations" },
   { value: PageRoute.HelmReleases, label: "Helm Releases" },

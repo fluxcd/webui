@@ -49,6 +49,8 @@ export enum PageRoute {
   KustomizationDetail = "/kustomizations_detail",
   HelmReleases = "/helmreleases",
   HelmReleaseDetail = "/helmreleases_detail",
+  Workloads = "/workloads",
+  WorkloadDetail = "/workloads_detail",
   Error = "/error",
 }
 
@@ -64,6 +66,10 @@ export const getNavValue = (currentPage: any): PageRoute | boolean => {
     case "helmreleases":
     case "helmreleases_detail":
       return PageRoute.HelmReleases;
+
+    case "workloads":
+    case "workloads_detail":
+      return PageRoute.Workloads;
 
     default:
       return false;

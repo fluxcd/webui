@@ -22,6 +22,8 @@ import Sources from "./pages/Sources";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Error from "./pages/Error";
+import Workloads from "./pages/Workloads";
+import WorkloadsDetail from "./pages/WorkloadsDetail";
 
 const AppContainer = styled.div`
   /* display: flex; */
@@ -90,6 +92,16 @@ export default function App() {
                         exact
                         path={PageRoute.HelmReleaseDetail}
                         component={HelmReleaseDetail}
+                      />
+                      <Route
+                        exact
+                        path={PageRoute.Workloads}
+                        component={Workloads}
+                      />
+                      <Route
+                        exact
+                        path={PageRoute.WorkloadDetail}
+                        component={WorkloadsDetail}
                       />
                       <Route exact path="*" component={() => <p>404</p>} />
                     </Switch>
