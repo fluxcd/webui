@@ -62,7 +62,7 @@ function KustomizationDetail({ className }: Props) {
   const handleSyncClicked = () => {
     setSyncing(true);
 
-    syncKustomization(kustomizationDetail).then((res) => {
+    syncKustomization(kustomizationDetail).then(() => {
       setSyncing(false);
     });
   };

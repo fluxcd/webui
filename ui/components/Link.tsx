@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useLocation, Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 import styled from "styled-components";
 
 type Props = {

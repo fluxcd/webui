@@ -6,13 +6,13 @@ import {
   TableHead,
   TableRow,
 } from "@material-ui/core";
-import * as React from "react";
 import _ from "lodash";
+import * as React from "react";
 import styled from "styled-components";
 
 type Props = {
   className?: string;
-  fields: { label: string; value: string | Function }[];
+  fields: { label: string; value: string | ((k: any) => string) }[];
   rows: any[];
 };
 const Styled = (c) => styled(c)``;

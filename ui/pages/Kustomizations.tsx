@@ -26,7 +26,10 @@ function Kustomizations({ className }: Props) {
     currentNamespace
   );
 
-  const fields: { value: string | Function; label: string }[] = [
+  const fields: {
+    value: string | ((v: any) => JSX.Element | string);
+    label: string;
+  }[] = [
     {
       value: (k: Kustomization) => (
         <Link
