@@ -1,16 +1,16 @@
-import {
-  Container,
-  ThemeProvider as MuiThemeProvider,
-} from "@material-ui/core";
+import { ThemeProvider as MuiThemeProvider } from "@material-ui/core";
 import * as React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import styled, { ThemeProvider } from "styled-components";
 import AppStateProvider from "./components/AppStateProvider";
 import Flex from "./components/Flex";
 import LeftNav from "./components/LeftNav";
 import TopNav from "./components/TopNav";
 import theme, { GlobalStyle } from "./lib/theme";
-import { PageRoute, prefixRoute } from "./lib/util";
+import { PageRoute } from "./lib/util";
+import Error from "./pages/Error";
 import HelmReleaseDetail from "./pages/HelmReleaseDetail";
 import HelmReleases from "./pages/HelmReleases";
 import KustomizationDetail from "./pages/KustomizationDetail";
@@ -18,10 +18,6 @@ import Kustomizations from "./pages/Kustomizations";
 import Redirector from "./pages/Redirector";
 import SourceDetail from "./pages/SourceDetail";
 import Sources from "./pages/Sources";
-
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import Error from "./pages/Error";
 import Workloads from "./pages/Workloads";
 import WorkloadsDetail from "./pages/WorkloadsDetail";
 

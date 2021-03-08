@@ -1,5 +1,6 @@
 import _ from "lodash";
 import qs from "query-string";
+import { DefaultClusters } from "./rpc/clusters";
 
 export const wrappedFetch = (url, opts: RequestInit = {}) => {
   return fetch(url, {
@@ -35,7 +36,7 @@ export const formatURL = (
   page: string,
   context: string,
   namespace: string,
-  query: object = {}
+  query: any = {}
 ) => {
   return `${page}?${qs.stringify({ context, namespace, ...query })}`;
 };
@@ -75,3 +76,8 @@ export const getNavValue = (currentPage: any): PageRoute | boolean => {
       return false;
   }
 };
+
+export const clustersClient = new DefaultClusters(
+  "/api/clusters",
+  wrappedFetch
+);

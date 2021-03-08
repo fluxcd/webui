@@ -17,8 +17,6 @@ const navItems = [
   { value: PageRoute.HelmReleases, label: "Helm Releases" },
 ];
 
-const allNamespaces = "All Namespaces";
-
 const LinkTab = styled((props) => (
   <Tab
     component={React.forwardRef((p, ref) => (

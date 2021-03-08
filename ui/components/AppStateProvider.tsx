@@ -31,7 +31,7 @@ export default function AppStateProvider(props) {
 
   const doError = (message: string, fatal: boolean, detail?: string) => {
     setAppState({
-      ...appState,
+      ...(appState as AppState),
       error: { message, fatal, detail },
     });
 

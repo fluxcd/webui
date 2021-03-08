@@ -12,7 +12,6 @@ import {
 } from "./rpc/clusters";
 import { AllNamespacesOption } from "./types";
 import { clustersClient, formatURL, normalizePath, PageRoute } from "./util";
-
 // The backend doesn't like the word "all". Instead, it wants an empty string.
 // Navigation might get weird if we use an empty string on the front-end.
 // There may also be a naming collision with a namespace named "all".
@@ -195,7 +194,7 @@ export function useNavigation() {
   const [currentPage, setCurrentPage] = useState("");
 
   useEffect(() => {
-    let [pageName] = normalizePath(location.pathname);
+    const [pageName] = normalizePath(location.pathname);
     setCurrentPage(pageName as string);
   }, [location.pathname]);
 
@@ -206,7 +205,7 @@ export function useNavigation() {
       page: PageRoute | null,
       context: string,
       namespace: string,
-      query: object = {}
+      query: any = {}
     ) => {
       let nextPage = page || currentPage;
 
@@ -230,7 +229,8 @@ export function useWorkloads(currentContext: string, currentNamespace: string) {
     clustersClient
       .listWorkloads({
         contextname: currentContext,
-        namespace: currentNamespace,
+        namespace:
+          currentNamespace === AllNamespacesOption ? "" : currentNamespace,
       })
       .then((res) => {
         setWorkloads(res.workloads);
