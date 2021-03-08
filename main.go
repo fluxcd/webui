@@ -1,17 +1,24 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"os"
 
+	"github.com/bboreham/kspan/controllers/events"
 	"github.com/fluxcd/pkg/runtime/logger"
 	"github.com/fluxcd/webui/pkg/assets"
 	"github.com/fluxcd/webui/pkg/clustersserver"
-
-	"k8s.io/client-go/tools/clientcmd"
-
+	"github.com/go-logr/logr"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"go.opentelemetry.io/otel/api/global"
+	"go.opentelemetry.io/otel/exporters/otlp"
+	"go.opentelemetry.io/otel/propagators"
+	tracesdk "go.opentelemetry.io/otel/sdk/export/trace"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/clientcmd"
+	ctrl "sigs.k8s.io/controller-runtime"
 )
 
 func init() {
@@ -40,10 +47,50 @@ func initialContexts() (contexts []string, currentCtx string, err error) {
 	return contexts, rules.CurrentContext, nil
 }
 
+func setupOTLP(collectorAddr, serviceName string) (tracesdk.SpanExporter, error) {
+	exp, err := otlp.NewExporter(
+		otlp.WithInsecure(),
+		otlp.WithAddress(collectorAddr),
+	)
+	if err != nil {
+		return nil, err
+	}
+	global.SetTextMapPropagator(propagators.TraceContext{})
+	return exp, err
+}
+
+func initializeKspan(log logr.Logger) {
+	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
+		Scheme:             runtime.NewScheme(),
+		MetricsBindAddress: ":8080",
+		Port:               9443,
+	})
+
+	if err != nil {
+		log.Error(err, "unable to set up controller manager")
+		os.Exit(1)
+	}
+
+	spanExporter, err := setupOTLP("otlp-collector.default:55680", "events")
+	if err != nil {
+		log.Error(err, "unable to set up tracing")
+		os.Exit(1)
+	}
+	defer spanExporter.Shutdown(context.Background())
+
+	(&events.EventWatcher{
+		Client:   mgr.GetClient(),
+		Log:      ctrl.Log,
+		Exporter: spanExporter,
+	}).SetupWithManager(mgr)
+}
+
 func main() {
 	log := logger.NewLogger("debug", false)
 
 	mux := http.NewServeMux()
+
+	initializeKspan(log)
 
 	mux.Handle("/metrics/", promhttp.Handler())
 
