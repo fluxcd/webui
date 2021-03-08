@@ -7,7 +7,9 @@
   "license": "Apache-2.0",
   "scripts": {
     "build": "parcel build ui/index.html",
-    "start": "nodemon dev-server.js --watch dev-server.js"
+    "start": "nodemon dev-server.js --watch dev-server.js",
+    "lint": "eslint ui",
+    "test": "jest"
   },
   "dependencies": {
     "@material-ui/core": "^4.11.2",
@@ -25,10 +27,14 @@
     "styled-components": "^5.2.1"
   },
   "devDependencies": {
-    "nodemon": "^2.0.6",
+    "@typescript-eslint/eslint-plugin": "^4.16.1",
+    "@typescript-eslint/parser": "^4.16.1",
+    "eslint": "^7.21.0",
+    "eslint-plugin-import": "^2.22.1",
     "express": "^4.17.1",
     "http-proxy": "^1.18.1",
     "morgan": "^1.10.0",
+    "nodemon": "^2.0.6",
     "parcel": "^1.12.4",
     "parcel-bundler": "^1.12.4",
     "prettier": "^2.2.1",

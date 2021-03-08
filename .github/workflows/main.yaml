@@ -46,6 +46,7 @@ jobs:
         # - run: ./tools/install-kube-builder.sh
       - run: npm ci
       - run: npm run build
+      - run: npm run lint
       - run: go mod download
       - run: go test -v ./...
         env:
