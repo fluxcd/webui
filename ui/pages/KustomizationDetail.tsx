@@ -181,22 +181,28 @@ function KustomizationDetail({ className }: Props) {
       </Box>
       <Box marginBottom={2}>
         <Panel title="Related Workloads">
-          {_.map(workloads, (w) => {
-            return (
-              <div key={w.name}>
-                <Link
-                  to={formatURL(
-                    PageRoute.WorkloadDetail,
-                    currentContext,
-                    w.namespace,
-                    { workloadId: w.name }
-                  )}
-                >
-                  {w.name}
-                </Link>
-              </div>
-            );
-          })}
+          {_.map(
+            _.filter(workloads, {
+              kustomizationrefname: kustomizationDetail.name,
+              kustomizationrefnamespace: kustomizationDetail.namespace,
+            }),
+            (w) => {
+              return (
+                <div key={w.name}>
+                  <Link
+                    to={formatURL(
+                      PageRoute.WorkloadDetail,
+                      currentContext,
+                      w.namespace,
+                      { workloadId: w.name }
+                    )}
+                  >
+                    {w.name}
+                  </Link>
+                </div>
+              );
+            }
+          )}
         </Panel>
       </Box>
     </Page>

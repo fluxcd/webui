@@ -65,7 +65,19 @@ function Workloads({ className }: Props) {
             ...fields,
             {
               label: "",
-              value: () => <Button>Configure</Button>,
+              value: (w: Workload) => (
+                <Link
+                  style={{ textDecoration: "none" }}
+                  to={formatURL(
+                    PageRoute.WorkloadOnboarding,
+                    currentContext,
+                    currentNamespace,
+                    { workloadId: w.name }
+                  )}
+                >
+                  <Button variant="contained">Add to Flux</Button>
+                </Link>
+              ),
             },
           ]}
           rows={_.filter(workloads, (w) => w.kustomizationrefname === "")}
