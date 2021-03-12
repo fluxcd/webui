@@ -15,6 +15,7 @@ const navItems = [
   { value: PageRoute.Sources, label: "Sources" },
   { value: PageRoute.Kustomizations, label: "Kustomizations" },
   { value: PageRoute.HelmReleases, label: "Helm Releases" },
+  { value: PageRoute.Events, label: "Events" },
 ];
 
 const LinkTab = styled((props) => (

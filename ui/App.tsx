@@ -11,6 +11,7 @@ import TopNav from "./components/TopNav";
 import theme, { GlobalStyle } from "./lib/theme";
 import { PageRoute } from "./lib/util";
 import Error from "./pages/Error";
+import Events from "./pages/Events";
 import HelmReleaseDetail from "./pages/HelmReleaseDetail";
 import HelmReleases from "./pages/HelmReleases";
 import KustomizationDetail from "./pages/KustomizationDetail";
@@ -103,6 +104,7 @@ export default function App() {
                         path={PageRoute.WorkloadDetail}
                         component={WorkloadsDetail}
                       />
+                      <Route exact path={PageRoute.Events} component={Events} />
                       <Route exact path="*" component={() => <p>404</p>} />
                     </Switch>
                   </ContentCotainer>

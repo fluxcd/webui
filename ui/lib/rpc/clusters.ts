@@ -636,6 +636,74 @@ interface ListKustomizationChildrenResJSON {
 }
 
 
+export interface Event {
+    type: string;
+    reason: string;
+    message: string;
+    timestamp: number;
+    
+}
+
+interface EventJSON {
+    type: string;
+    reason: string;
+    message: string;
+    timestamp: number;
+    
+}
+
+
+const JSONToEvent = (m: Event | EventJSON): Event => {
+    
+    return {
+        type: m.type,
+        reason: m.reason,
+        message: m.message,
+        timestamp: m.timestamp,
+        
+    };
+};
+
+export interface ListEventsReq {
+    contextname: string;
+    namespace: string;
+    
+}
+
+interface ListEventsReqJSON {
+    contextName: string;
+    namespace: string;
+    
+}
+
+
+const ListEventsReqToJSON = (m: ListEventsReq): ListEventsReqJSON => {
+    return {
+        contextName: m.contextname,
+        namespace: m.namespace,
+        
+    };
+};
+
+export interface ListEventsRes {
+    events: Event[];
+    
+}
+
+interface ListEventsResJSON {
+    events: EventJSON[];
+    
+}
+
+
+const JSONToListEventsRes = (m: ListEventsRes | ListEventsResJSON): ListEventsRes => {
+    
+    return {
+        events: (m.events as (Event | EventJSON)[]).map(JSONToEvent),
+        
+    };
+};
+
 export interface Clusters {
     listContexts: (listContextsReq: ListContextsReq) => Promise<ListContextsRes>;
     
@@ -650,6 +718,8 @@ export interface Clusters {
     listHelmReleases: (listHelmReleasesReq: ListHelmReleasesReq) => Promise<ListHelmReleasesRes>;
     
     listWorkloads: (listWorkloadsReq: ListWorkloadsReq) => Promise<ListWorkloadsRes>;
+    
+    listEvents: (listEventsReq: ListEventsReq) => Promise<ListEventsRes>;
     
 }
 
@@ -766,6 +836,21 @@ export class DefaultClusters implements Clusters {
             }
 
             return resp.json().then(JSONToListWorkloadsRes);
+        });
+    }
+    
+    listEvents(listEventsReq: ListEventsReq): Promise<ListEventsRes> {
+        const url = this.hostname + this.pathPrefix + "ListEvents";
+        let body: ListEventsReq | ListEventsReqJSON = listEventsReq;
+        if (!this.writeCamelCase) {
+            body = ListEventsReqToJSON(listEventsReq);
+        }
+        return this.fetch(createTwirpRequest(url, body)).then((resp) => {
+            if (!resp.ok) {
+                return throwTwirpError(resp);
+            }
+
+            return resp.json().then(JSONToListEventsRes);
         });
     }
     
