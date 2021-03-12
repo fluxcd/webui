@@ -10,9 +10,9 @@ type Props = {
 
 const Styled = (c) => styled(c)``;
 
-function Link({ className, children, to }: Props) {
+function Link({ className, children, to, ...rest }: Props) {
   return (
-    <RouterLink to={to} className={className}>
+    <RouterLink {...rest} to={to} className={className}>
       {children}
     </RouterLink>
   );
