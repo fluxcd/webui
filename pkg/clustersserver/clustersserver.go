@@ -454,3 +454,29 @@ func (s *Server) ListWorkloads(ctx context.Context, msg *pb.ListWorkloadsReq) (*
 	return &pb.ListWorkloadsRes{Workloads: workloads}, nil
 
 }
+
+func (s *Server) ListEvents(ctx context.Context, msg *pb.ListEventsReq) (*pb.ListEventsRes, error) {
+	c, err := s.getClient(msg.ContextName)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not create client: %w", err)
+	}
+
+	list := corev1.EventList{}
+	if err := c.List(ctx, &list, namespaceOpts(msg.Namespace)); err != nil {
+		return nil, fmt.Errorf("could not get events: %w", err)
+	}
+
+	events := []*pb.Event{}
+
+	for _, e := range list.Items {
+		events = append(events, &pb.Event{
+			Type:      e.Type,
+			Reason:    e.Reason,
+			Message:   e.Message,
+			Timestamp: int32(e.LastTimestamp.Unix()),
+		})
+	}
+
+	return &pb.ListEventsRes{Events: events}, nil
+}
