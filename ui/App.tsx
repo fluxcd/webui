@@ -19,11 +19,11 @@ import Kustomizations from "./pages/Kustomizations";
 import Redirector from "./pages/Redirector";
 import SourceDetail from "./pages/SourceDetail";
 import Sources from "./pages/Sources";
+import WorkloadOnboarding from "./pages/WorkloadOnboarding";
 import Workloads from "./pages/Workloads";
 import WorkloadsDetail from "./pages/WorkloadsDetail";
 
 const AppContainer = styled.div`
-  /* display: flex; */
   width: 100%;
   height: 100%;
   margin: 0 auto;
@@ -40,6 +40,10 @@ const ContentCotainer = styled.div`
   margin: 0 auto;
 `;
 
+const TopNavContainer = styled.div`
+  width: 100%;
+`;
+
 export default function App() {
   return (
     <MuiThemeProvider theme={theme}>
@@ -48,9 +52,9 @@ export default function App() {
         <Router>
           <AppStateProvider>
             <AppContainer>
-              <div style={{ width: "100%" }}>
+              <TopNavContainer>
                 <TopNav />
-              </div>
+              </TopNavContainer>
               <div>
                 <Flex>
                   <NavContainer>
@@ -105,6 +109,11 @@ export default function App() {
                         component={WorkloadsDetail}
                       />
                       <Route exact path={PageRoute.Events} component={Events} />
+                      <Route
+                        exact
+                        path={PageRoute.WorkloadOnboarding}
+                        component={WorkloadOnboarding}
+                      />
                       <Route exact path="*" component={() => <p>404</p>} />
                     </Switch>
                   </ContentCotainer>

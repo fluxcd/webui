@@ -19,6 +19,7 @@ const Styled = (component) => styled(component)`
   ${({ center }) => center && "justify-content: center"};
   ${({ wide }) => wide && "width: 100%"};
   ${({ wrap }) => wrap && "flex-wrap: wrap"};
+  ${({ end }) => end && "justify-content: flex-end"};
 `;
 
 class Flex extends React.PureComponent<Props> {

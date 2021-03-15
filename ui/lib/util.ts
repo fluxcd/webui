@@ -53,6 +53,7 @@ export enum PageRoute {
   Workloads = "/workloads",
   WorkloadDetail = "/workloads_detail",
   Events = "/events",
+  WorkloadOnboarding = "/workloads_onboarding",
   Error = "/error",
 }
 
@@ -71,6 +72,7 @@ export const getNavValue = (currentPage: any): PageRoute | boolean => {
 
     case "workloads":
     case "workloads_detail":
+    case "workloads_onboarding":
       return PageRoute.Workloads;
 
     case "events":

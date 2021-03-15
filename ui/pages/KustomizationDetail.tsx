@@ -1,5 +1,6 @@
 import {
   Box,
+  Breadcrumbs,
   Button,
   CircularProgress,
   Table,
@@ -15,6 +16,7 @@ import styled from "styled-components";
 import Flex from "../components/Flex";
 import KeyValueTable from "../components/KeyValueTable";
 import Link from "../components/Link";
+import Page from "../components/Page";
 import Panel from "../components/Panel";
 import {
   useKubernetesContexts,
@@ -29,7 +31,11 @@ type Props = {
   className?: string;
 };
 
-const Styled = (c) => styled(c)``;
+const Styled = (c) => styled(c)`
+  .MuiBreadcrumbs-root {
+    width: 100%;
+  }
+`;
 
 const infoFields = [
   "sourceref",
@@ -107,21 +113,33 @@ function KustomizationDetail({ className }: Props) {
   };
 
   return (
-    <div className={className}>
-      <Box m={2}>
-        <Flex align center wide>
+    <Page className={className}>
+      <Flex align wide>
+        <Breadcrumbs>
+          <Link
+            to={formatURL(
+              PageRoute.Kustomizations,
+              currentContext,
+              currentNamespace
+            )}
+          >
+            <h2>Kustomizations</h2>
+          </Link>
           <Flex wide>
             <h2>{kustomizationDetail.name}</h2>
           </Flex>
-          <Button
-            onClick={handleSyncClicked}
-            color="primary"
-            disabled={syncing}
-            variant="contained"
-          >
-            {syncing ? <CircularProgress size={24} /> : "Sync"}
-          </Button>
-        </Flex>
+        </Breadcrumbs>
+        <Button
+          onClick={handleSyncClicked}
+          color="primary"
+          disabled={syncing}
+          variant="contained"
+        >
+          {syncing ? <CircularProgress size={24} /> : "Sync"}
+        </Button>
+      </Flex>
+
+      <Box marginBottom={2}>
         <Panel title="Info">
           <KeyValueTable
             columns={4}
@@ -131,7 +149,7 @@ function KustomizationDetail({ className }: Props) {
         </Panel>
       </Box>
 
-      <Box m={2}>
+      <Box marginBottom={2}>
         <Panel title="Conditions">
           <TableContainer>
             <Table>
@@ -161,27 +179,33 @@ function KustomizationDetail({ className }: Props) {
           </TableContainer>
         </Panel>
       </Box>
-      <Box m={2}>
+      <Box marginBottom={2}>
         <Panel title="Related Workloads">
-          {_.map(workloads, (w) => {
-            return (
-              <div key={w.name}>
-                <Link
-                  to={formatURL(
-                    PageRoute.WorkloadDetail,
-                    currentContext,
-                    w.namespace,
-                    { workloadId: w.name }
-                  )}
-                >
-                  {w.name}
-                </Link>
-              </div>
-            );
-          })}
+          {_.map(
+            _.filter(workloads, {
+              kustomizationrefname: kustomizationDetail.name,
+              kustomizationrefnamespace: kustomizationDetail.namespace,
+            }),
+            (w) => {
+              return (
+                <div key={w.name}>
+                  <Link
+                    to={formatURL(
+                      PageRoute.WorkloadDetail,
+                      currentContext,
+                      w.namespace,
+                      { workloadId: w.name }
+                    )}
+                  >
+                    {w.name}
+                  </Link>
+                </div>
+              );
+            }
+          )}
         </Panel>
       </Box>
-    </div>
+    </Page>
   );
 }
 

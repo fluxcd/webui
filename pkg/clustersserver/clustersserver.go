@@ -223,11 +223,10 @@ func appendSources(sourceType string, k8sObj runtime.Object, res *pb.ListSources
 					Commit: i.Spec.Reference.Commit,
 				},
 				Artifact: &pb.Artifact{
-					Checksum:     artifact.Checksum,
-					Lastupdateat: int32(artifact.LastUpdateTime.Unix()),
-					Path:         artifact.Path,
-					Revision:     artifact.Revision,
-					Url:          artifact.URL,
+					Checksum: artifact.Checksum,
+					Path:     artifact.Path,
+					Revision: artifact.Revision,
+					Url:      artifact.URL,
 				},
 			})
 		}

@@ -1,12 +1,15 @@
-import { Box } from "@material-ui/core";
+import { Box, Breadcrumbs } from "@material-ui/core";
 import _ from "lodash";
 import * as React from "react";
 import styled from "styled-components";
 import ConditionsTable from "../components/ConditionsTable";
 import Flex from "../components/Flex";
 import KeyValueTable from "../components/KeyValueTable";
+import Link from "../components/Link";
+import Page from "../components/Page";
 import Panel from "../components/Panel";
 import { useKubernetesContexts, useNavigation, useSources } from "../lib/hooks";
+import { formatURL, PageRoute } from "../lib/util";
 
 type Props = {
   className?: string;
@@ -61,11 +64,18 @@ function SourceDetail({ className }: Props) {
   const providerUrl = convertRefURLToGitProvider(sourceDetail.url);
 
   return (
-    <div className={className}>
+    <Page className={className}>
       <Box m={2}>
-        <Flex wide>
-          <h2>{sourceDetail.name}</h2>
-        </Flex>
+        <Breadcrumbs>
+          <Link
+            to={formatURL(PageRoute.Sources, currentContext, currentNamespace)}
+          >
+            <h2>Sources</h2>
+          </Link>
+          <Flex wide>
+            <h2>{sourceDetail.name}</h2>
+          </Flex>
+        </Breadcrumbs>
         <Panel title="Info">
           <KeyValueTable
             columns={2}
@@ -112,7 +122,7 @@ function SourceDetail({ className }: Props) {
           <ConditionsTable conditions={sourceDetail.conditions} />
         </Panel>
       </Box>
-    </div>
+    </Page>
   );
 }
 
