@@ -1,5 +1,11 @@
 UPTODATE := .uptodate
 
+$(UPTODATE):
+	touch .uptodate
+
+clean:
+	rm $(UPTODATE)
+
 all: test build
 
 ui: $(UPTODATE)
