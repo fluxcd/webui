@@ -1,9 +1,11 @@
+UPTODATE := .uptodate
+
 all: test build
 
-ui:
+ui: $(UPTODATE)
 	npm run build
 
-test:
+test: ui assets
 	go test ./...
 
 assets: ui
