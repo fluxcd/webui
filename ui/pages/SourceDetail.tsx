@@ -9,6 +9,7 @@ import Link from "../components/Link";
 import Page from "../components/Page";
 import Panel from "../components/Panel";
 import { useKubernetesContexts, useNavigation, useSources } from "../lib/hooks";
+import { Source } from "../lib/rpc/clusters";
 import { formatURL, PageRoute } from "../lib/util";
 
 type Props = {
@@ -53,7 +54,7 @@ function SourceDetail({ className }: Props) {
   const { currentContext, currentNamespace } = useKubernetesContexts();
   const sources = useSources(currentContext, currentNamespace);
 
-  const sourceDetail = _.find(sources[sourceType as string], {
+  const sourceDetail: Source = _.find(sources[sourceType as string], {
     name: sourceId,
   });
 
@@ -82,8 +83,8 @@ function SourceDetail({ className }: Props) {
             pairs={[
               { key: "Type", value: sourceDetail.type },
               {
-                key: "Url",
-                value: <a href={providerUrl}>{providerUrl}</a>,
+                key: "URL",
+                value: <a href={providerUrl}>{sourceDetail.url}</a>,
               },
             ]}
           />
