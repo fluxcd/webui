@@ -185,6 +185,7 @@ message Event {
     string reason = 2;
     string message = 3;
     int32 timestamp = 4;
+    string source = 5;
 }
 
 message ListEventsReq {

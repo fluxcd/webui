@@ -35,6 +35,7 @@ function Events({ className }: Props) {
       <DataTable
         fields={[
           { label: "Reason", value: "reason" },
+          { label: "Source", value: "source" },
           { label: "Message", value: "message" },
           {
             label: "Timestamp",

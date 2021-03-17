@@ -218,7 +218,8 @@ func appendSources(sourceType string, k8sObj runtime.Object, res *pb.ListSources
 
 			src := pb.Source{
 				Name: i.Name, Type: pb.Source_Git,
-				Url: i.Spec.URL,
+				Url:      i.Spec.URL,
+				Artifact: &pb.Artifact{},
 				Reference: &pb.GitRepositoryRef{
 					Branch: i.Spec.Reference.Branch,
 					Tag:    i.Spec.Reference.Tag,
@@ -484,6 +485,7 @@ func (s *Server) ListEvents(ctx context.Context, msg *pb.ListEventsReq) (*pb.Lis
 	for _, e := range list.Items {
 		events = append(events, &pb.Event{
 			Type:      e.Type,
+			Source:    fmt.Sprintf("%s/%s", e.Source.Component, e.ObjectMeta.Name),
 			Reason:    e.Reason,
 			Message:   e.Message,
 			Timestamp: int32(e.LastTimestamp.Unix()),
