@@ -187,7 +187,7 @@ function KustomizationDetail({ className }: Props) {
         </Panel>
       </Box>
       <Box marginBottom={2}>
-        <Panel title="Dependency Graph">
+        <Panel title="Graph">
           <DependencyGraph
             nodes={[
               {
