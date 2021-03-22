@@ -34,7 +34,7 @@ const Styled = (c) => styled(c)`
 
 // Stolen from here:
 // https://dagrejs.github.io/project/dagre-d3/latest/demo/sentence-tokenization.html
-function DependencyGraph({ className, nodes, edges }: Props) {
+function Graph({ className, nodes, edges }: Props) {
   const svgRef = React.useRef(null);
   React.useEffect(() => {
     if (!svgRef.current) {
@@ -83,4 +83,4 @@ function DependencyGraph({ className, nodes, edges }: Props) {
   );
 }
 
-export default Styled(DependencyGraph);
+export default Styled(Graph);

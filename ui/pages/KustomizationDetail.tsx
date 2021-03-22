@@ -13,8 +13,8 @@ import {
 import _ from "lodash";
 import * as React from "react";
 import styled from "styled-components";
-import DependencyGraph from "../components/DependencyGraph";
 import Flex from "../components/Flex";
+import DependencyGraph from "../components/Graph";
 import KeyValueTable from "../components/KeyValueTable";
 import Link from "../components/Link";
 import Page from "../components/Page";
