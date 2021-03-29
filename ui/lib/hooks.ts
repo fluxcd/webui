@@ -147,7 +147,7 @@ export function useSources(
         setSources(d as SourceData);
       })
       .catch((err) => {
-        doError("There was an error fetching sources", true, err.message);
+        doError("There was an error fetching sources", true, err);
       });
   }, [currentContext, currentNamespace]);
 

@@ -3,12 +3,12 @@ import {createTwirpRequest, throwTwirpError, Fetch} from './twirp';
 
 
 export interface Context {
-    name: string;
+    name?: string;
     
 }
 
 interface ContextJSON {
-    name: string;
+    name?: string;
     
 }
 
@@ -37,14 +37,14 @@ const ListContextsReqToJSON = (m: ListContextsReq): ListContextsReqJSON => {
 };
 
 export interface ListContextsRes {
-    currentcontext: string;
-    contexts: Context[];
+    currentcontext?: string;
+    contexts?: Context[];
     
 }
 
 interface ListContextsResJSON {
-    currentContext: string;
-    contexts: ContextJSON[];
+    currentContext?: string;
+    contexts?: ContextJSON[];
     
 }
 
@@ -59,12 +59,12 @@ const JSONToListContextsRes = (m: ListContextsRes | ListContextsResJSON): ListCo
 };
 
 export interface ListNamespacesForContextReq {
-    contextname: string;
+    contextname?: string;
     
 }
 
 interface ListNamespacesForContextReqJSON {
-    contextName: string;
+    contextName?: string;
     
 }
 
@@ -77,12 +77,12 @@ const ListNamespacesForContextReqToJSON = (m: ListNamespacesForContextReq): List
 };
 
 export interface ListNamespacesForContextRes {
-    namespaces: string[];
+    namespaces?: string[];
     
 }
 
 interface ListNamespacesForContextResJSON {
-    namespaces: string[];
+    namespaces?: string[];
     
 }
 
@@ -96,20 +96,20 @@ const JSONToListNamespacesForContextRes = (m: ListNamespacesForContextRes | List
 };
 
 export interface Condition {
-    type: string;
-    status: string;
-    reason: string;
-    message: string;
-    timestamp: string;
+    type?: string;
+    status?: string;
+    reason?: string;
+    message?: string;
+    timestamp?: string;
     
 }
 
 interface ConditionJSON {
-    type: string;
-    status: string;
-    reason: string;
-    message: string;
-    timestamp: string;
+    type?: string;
+    status?: string;
+    reason?: string;
+    message?: string;
+    timestamp?: string;
     
 }
 
@@ -127,32 +127,32 @@ const JSONToCondition = (m: Condition | ConditionJSON): Condition => {
 };
 
 export interface Kustomization {
-    name: string;
-    namespace: string;
-    targetnamespace: string;
-    path: string;
-    sourceref: string;
-    conditions: Condition[];
-    interval: string;
-    prune: boolean;
-    reconcilerequestat: string;
-    reconcileat: string;
-    sourcerefkind: string;
+    name?: string;
+    namespace?: string;
+    targetnamespace?: string;
+    path?: string;
+    sourceref?: string;
+    conditions?: Condition[];
+    interval?: string;
+    prune?: boolean;
+    reconcilerequestat?: string;
+    reconcileat?: string;
+    sourcerefkind?: string;
     
 }
 
 interface KustomizationJSON {
-    name: string;
-    namespace: string;
-    targetNamespace: string;
-    path: string;
-    sourceRef: string;
-    conditions: ConditionJSON[];
-    interval: string;
-    prune: boolean;
-    reconcileRequestAt: string;
-    reconcileAt: string;
-    sourceRefKind: string;
+    name?: string;
+    namespace?: string;
+    targetNamespace?: string;
+    path?: string;
+    sourceRef?: string;
+    conditions?: ConditionJSON[];
+    interval?: string;
+    prune?: boolean;
+    reconcileRequestAt?: string;
+    reconcileAt?: string;
+    sourceRefKind?: string;
     
 }
 
@@ -176,14 +176,14 @@ const JSONToKustomization = (m: Kustomization | KustomizationJSON): Kustomizatio
 };
 
 export interface ListKustomizationsReq {
-    contextname: string;
-    namespace: string;
+    contextname?: string;
+    namespace?: string;
     
 }
 
 interface ListKustomizationsReqJSON {
-    contextName: string;
-    namespace: string;
+    contextName?: string;
+    namespace?: string;
     
 }
 
@@ -197,12 +197,12 @@ const ListKustomizationsReqToJSON = (m: ListKustomizationsReq): ListKustomizatio
 };
 
 export interface ListKustomizationsRes {
-    kustomizations: Kustomization[];
+    kustomizations?: Kustomization[];
     
 }
 
 interface ListKustomizationsResJSON {
-    kustomizations: KustomizationJSON[];
+    kustomizations?: KustomizationJSON[];
     
 }
 
@@ -216,18 +216,18 @@ const JSONToListKustomizationsRes = (m: ListKustomizationsRes | ListKustomizatio
 };
 
 export interface GitRepositoryRef {
-    branch: string;
-    tag: string;
-    semver: string;
-    commit: string;
+    branch?: string;
+    tag?: string;
+    semver?: string;
+    commit?: string;
     
 }
 
 interface GitRepositoryRefJSON {
-    branch: string;
-    tag: string;
-    semver: string;
-    commit: string;
+    branch?: string;
+    tag?: string;
+    semver?: string;
+    commit?: string;
     
 }
 
@@ -244,20 +244,20 @@ const JSONToGitRepositoryRef = (m: GitRepositoryRef | GitRepositoryRefJSON): Git
 };
 
 export interface Artifact {
-    checksum: string;
-    lastupdateat: number;
-    path: string;
-    revision: string;
-    url: string;
+    checksum?: string;
+    lastupdateat?: number;
+    path?: string;
+    revision?: string;
+    url?: string;
     
 }
 
 interface ArtifactJSON {
-    checksum: string;
-    lastupdateat: number;
-    path: string;
-    revision: string;
-    url: string;
+    checksum?: string;
+    lastupdateat?: number;
+    path?: string;
+    revision?: string;
+    url?: string;
     
 }
 
@@ -275,36 +275,36 @@ const JSONToArtifact = (m: Artifact | ArtifactJSON): Artifact => {
 };
 
 export interface Source {
-    name: string;
-    url: string;
-    reference: GitRepositoryRef;
-    type: string;
-    provider: string;
-    bucketname: string;
-    region: string;
-    namespace: string;
-    gitimplementation: string;
-    timeout: string;
-    secretrefname: string;
-    conditions: Condition[];
-    artifact: Artifact;
+    name?: string;
+    url?: string;
+    reference?: GitRepositoryRef;
+    type?: string;
+    provider?: string;
+    bucketname?: string;
+    region?: string;
+    namespace?: string;
+    gitimplementation?: string;
+    timeout?: string;
+    secretrefname?: string;
+    conditions?: Condition[];
+    artifact?: Artifact;
     
 }
 
 interface SourceJSON {
-    name: string;
-    url: string;
-    reference: GitRepositoryRefJSON;
-    type: string;
-    provider: string;
-    bucketname: string;
-    region: string;
-    namespace: string;
-    gitimplementation: string;
-    timeout: string;
-    secretRefName: string;
-    conditions: ConditionJSON[];
-    artifact: ArtifactJSON;
+    name?: string;
+    url?: string;
+    reference?: GitRepositoryRefJSON;
+    type?: string;
+    provider?: string;
+    bucketname?: string;
+    region?: string;
+    namespace?: string;
+    gitimplementation?: string;
+    timeout?: string;
+    secretRefName?: string;
+    conditions?: ConditionJSON[];
+    artifact?: ArtifactJSON;
     
 }
 
@@ -330,16 +330,16 @@ const JSONToSource = (m: Source | SourceJSON): Source => {
 };
 
 export interface ListSourcesReq {
-    contextname: string;
-    namespace: string;
-    sourcetype: string;
+    contextname?: string;
+    namespace?: string;
+    sourcetype?: string;
     
 }
 
 interface ListSourcesReqJSON {
-    contextName: string;
-    namespace: string;
-    sourceType: string;
+    contextName?: string;
+    namespace?: string;
+    sourceType?: string;
     
 }
 
@@ -354,12 +354,12 @@ const ListSourcesReqToJSON = (m: ListSourcesReq): ListSourcesReqJSON => {
 };
 
 export interface ListSourcesRes {
-    sources: Source[];
+    sources?: Source[];
     
 }
 
 interface ListSourcesResJSON {
-    sources: SourceJSON[];
+    sources?: SourceJSON[];
     
 }
 
@@ -373,18 +373,18 @@ const JSONToListSourcesRes = (m: ListSourcesRes | ListSourcesResJSON): ListSourc
 };
 
 export interface SyncKustomizationReq {
-    contextname: string;
-    namespace: string;
-    kustomizationname: string;
-    withsource: boolean;
+    contextname?: string;
+    namespace?: string;
+    kustomizationname?: string;
+    withsource?: boolean;
     
 }
 
 interface SyncKustomizationReqJSON {
-    contextName: string;
-    namespace: string;
-    kustomizationName: string;
-    withSource: boolean;
+    contextName?: string;
+    namespace?: string;
+    kustomizationName?: string;
+    withSource?: boolean;
     
 }
 
@@ -400,12 +400,12 @@ const SyncKustomizationReqToJSON = (m: SyncKustomizationReq): SyncKustomizationR
 };
 
 export interface SyncKustomizationRes {
-    kustomization: Kustomization;
+    kustomization?: Kustomization;
     
 }
 
 interface SyncKustomizationResJSON {
-    kustomization: KustomizationJSON;
+    kustomization?: KustomizationJSON;
     
 }
 
@@ -419,26 +419,26 @@ const JSONToSyncKustomizationRes = (m: SyncKustomizationRes | SyncKustomizationR
 };
 
 export interface HelmRelease {
-    name: string;
-    namespace: string;
-    interval: string;
-    chartname: string;
-    version: string;
-    sourcekind: string;
-    sourcename: string;
-    sourcenamespace: string;
+    name?: string;
+    namespace?: string;
+    interval?: string;
+    chartname?: string;
+    version?: string;
+    sourcekind?: string;
+    sourcename?: string;
+    sourcenamespace?: string;
     
 }
 
 interface HelmReleaseJSON {
-    name: string;
-    namespace: string;
-    interval: string;
-    chartName: string;
-    version: string;
-    sourceKind: string;
-    sourceName: string;
-    sourceNamespace: string;
+    name?: string;
+    namespace?: string;
+    interval?: string;
+    chartName?: string;
+    version?: string;
+    sourceKind?: string;
+    sourceName?: string;
+    sourceNamespace?: string;
     
 }
 
@@ -459,14 +459,14 @@ const JSONToHelmRelease = (m: HelmRelease | HelmReleaseJSON): HelmRelease => {
 };
 
 export interface ListHelmReleasesReq {
-    contextname: string;
-    namespace: string;
+    contextname?: string;
+    namespace?: string;
     
 }
 
 interface ListHelmReleasesReqJSON {
-    contextName: string;
-    namespace: string;
+    contextName?: string;
+    namespace?: string;
     
 }
 
@@ -480,12 +480,12 @@ const ListHelmReleasesReqToJSON = (m: ListHelmReleasesReq): ListHelmReleasesReqJ
 };
 
 export interface ListHelmReleasesRes {
-    helmReleases: HelmRelease[];
+    helmReleases?: HelmRelease[];
     
 }
 
 interface ListHelmReleasesResJSON {
-    helm_releases: HelmReleaseJSON[];
+    helm_releases?: HelmReleaseJSON[];
     
 }
 
@@ -499,14 +499,14 @@ const JSONToListHelmReleasesRes = (m: ListHelmReleasesRes | ListHelmReleasesResJ
 };
 
 export interface Container {
-    name: string;
-    image: string;
+    name?: string;
+    image?: string;
     
 }
 
 interface ContainerJSON {
-    name: string;
-    image: string;
+    name?: string;
+    image?: string;
     
 }
 
@@ -521,12 +521,12 @@ const JSONToContainer = (m: Container | ContainerJSON): Container => {
 };
 
 export interface PodTemplate {
-    containers: Container[];
+    containers?: Container[];
     
 }
 
 interface PodTemplateJSON {
-    containers: ContainerJSON[];
+    containers?: ContainerJSON[];
     
 }
 
@@ -540,20 +540,20 @@ const JSONToPodTemplate = (m: PodTemplate | PodTemplateJSON): PodTemplate => {
 };
 
 export interface Workload {
-    name: string;
-    namespace: string;
-    kustomizationrefname: string;
-    kustomizationrefnamespace: string;
-    podtemplate: PodTemplate;
+    name?: string;
+    namespace?: string;
+    kustomizationrefname?: string;
+    kustomizationrefnamespace?: string;
+    podtemplate?: PodTemplate;
     
 }
 
 interface WorkloadJSON {
-    name: string;
-    namespace: string;
-    kustomizationRefName: string;
-    kustomizationRefNamespace: string;
-    podTemplate: PodTemplateJSON;
+    name?: string;
+    namespace?: string;
+    kustomizationRefName?: string;
+    kustomizationRefNamespace?: string;
+    podTemplate?: PodTemplateJSON;
     
 }
 
@@ -571,14 +571,14 @@ const JSONToWorkload = (m: Workload | WorkloadJSON): Workload => {
 };
 
 export interface ListWorkloadsReq {
-    contextname: string;
-    namespace: string;
+    contextname?: string;
+    namespace?: string;
     
 }
 
 interface ListWorkloadsReqJSON {
-    contextName: string;
-    namespace: string;
+    contextName?: string;
+    namespace?: string;
     
 }
 
@@ -592,12 +592,12 @@ const ListWorkloadsReqToJSON = (m: ListWorkloadsReq): ListWorkloadsReqJSON => {
 };
 
 export interface ListWorkloadsRes {
-    workloads: Workload[];
+    workloads?: Workload[];
     
 }
 
 interface ListWorkloadsResJSON {
-    workloads: WorkloadJSON[];
+    workloads?: WorkloadJSON[];
     
 }
 
@@ -611,44 +611,46 @@ const JSONToListWorkloadsRes = (m: ListWorkloadsRes | ListWorkloadsResJSON): Lis
 };
 
 export interface ListKustomizationChildrenReq {
-    contextname: string;
-    kustomizationname: string;
-    kustomizationnamespace: string;
+    contextname?: string;
+    kustomizationname?: string;
+    kustomizationnamespace?: string;
     
 }
 
 interface ListKustomizationChildrenReqJSON {
-    contextName: string;
-    kustomizationName: string;
-    KustomizationNamespace: string;
+    contextName?: string;
+    kustomizationName?: string;
+    KustomizationNamespace?: string;
     
 }
 
 
 export interface ListKustomizationChildrenRes {
-    workloads: Workload[];
+    workloads?: Workload[];
     
 }
 
 interface ListKustomizationChildrenResJSON {
-    workloads: WorkloadJSON[];
+    workloads?: WorkloadJSON[];
     
 }
 
 
 export interface Event {
-    type: string;
-    reason: string;
-    message: string;
-    timestamp: number;
+    type?: string;
+    reason?: string;
+    message?: string;
+    timestamp?: number;
+    source?: string;
     
 }
 
 interface EventJSON {
-    type: string;
-    reason: string;
-    message: string;
-    timestamp: number;
+    type?: string;
+    reason?: string;
+    message?: string;
+    timestamp?: number;
+    source?: string;
     
 }
 
@@ -660,19 +662,20 @@ const JSONToEvent = (m: Event | EventJSON): Event => {
         reason: m.reason,
         message: m.message,
         timestamp: m.timestamp,
+        source: m.source,
         
     };
 };
 
 export interface ListEventsReq {
-    contextname: string;
-    namespace: string;
+    contextname?: string;
+    namespace?: string;
     
 }
 
 interface ListEventsReqJSON {
-    contextName: string;
-    namespace: string;
+    contextName?: string;
+    namespace?: string;
     
 }
 
@@ -686,12 +689,12 @@ const ListEventsReqToJSON = (m: ListEventsReq): ListEventsReqJSON => {
 };
 
 export interface ListEventsRes {
-    events: Event[];
+    events?: Event[];
     
 }
 
 interface ListEventsResJSON {
-    events: EventJSON[];
+    events?: EventJSON[];
     
 }
 

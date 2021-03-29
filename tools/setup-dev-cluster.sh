@@ -2,6 +2,6 @@ flux bootstrap github \
   --personal \
   --private \
   --owner=${GITHUB_USER} \
-  --repository=flux-dev \
+  --repository=fleet-infra \
   --branch=main \
-  --path=cluster
+  --path=./clusters

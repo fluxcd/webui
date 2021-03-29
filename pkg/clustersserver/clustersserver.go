@@ -202,6 +202,9 @@ func getSourceType(sourceType string) (runtime.Object, error) {
 
 	case "helm":
 		return &sourcev1.HelmRepositoryList{}, nil
+
+	case "chart":
+		return &sourcev1.HelmChartList{}, nil
 	}
 
 	return nil, errors.New("could not find source type")
@@ -213,22 +216,27 @@ func appendSources(sourceType string, k8sObj runtime.Object, res *pb.ListSources
 		for _, i := range list.Items {
 			artifact := i.Status.Artifact
 
-			res.Sources = append(res.Sources, &pb.Source{
+			src := pb.Source{
 				Name: i.Name, Type: pb.Source_Git,
-				Url: i.Spec.URL,
+				Url:      i.Spec.URL,
+				Artifact: &pb.Artifact{},
 				Reference: &pb.GitRepositoryRef{
 					Branch: i.Spec.Reference.Branch,
 					Tag:    i.Spec.Reference.Tag,
 					Semver: i.Spec.Reference.SemVer,
 					Commit: i.Spec.Reference.Commit,
 				},
-				Artifact: &pb.Artifact{
+			}
+			if artifact != nil {
+				src.Artifact = &pb.Artifact{
 					Checksum: artifact.Checksum,
 					Path:     artifact.Path,
 					Revision: artifact.Revision,
 					Url:      artifact.URL,
-				},
-			})
+				}
+			}
+
+			res.Sources = append(res.Sources, &src)
 		}
 
 	case *sourcev1.BucketList:
@@ -240,9 +248,13 @@ func appendSources(sourceType string, k8sObj runtime.Object, res *pb.ListSources
 		for _, i := range list.Items {
 			res.Sources = append(res.Sources, &pb.Source{Name: i.Name})
 		}
+	case *sourcev1.HelmChartList:
+		for _, i := range list.Items {
+			res.Sources = append(res.Sources, &pb.Source{Name: i.Name})
+		}
 	}
 
-	return errors.New("could not append sources; invalid type")
+	return nil
 }
 
 func (s *Server) ListSources(ctx context.Context, msg *pb.ListSourcesReq) (*pb.ListSourcesRes, error) {
@@ -267,7 +279,9 @@ func (s *Server) ListSources(ctx context.Context, msg *pb.ListSourcesReq) (*pb.L
 		return nil, fmt.Errorf("could not list sources: %w", err)
 	}
 
-	appendSources(msg.SourceType, k8sList, res)
+	if err := appendSources(msg.SourceType, k8sList, res); err != nil {
+		return nil, fmt.Errorf("could not append source: %w", err)
+	}
 
 	return res, nil
 }
@@ -471,6 +485,7 @@ func (s *Server) ListEvents(ctx context.Context, msg *pb.ListEventsReq) (*pb.Lis
 	for _, e := range list.Items {
 		events = append(events, &pb.Event{
 			Type:      e.Type,
+			Source:    fmt.Sprintf("%s/%s", e.Source.Component, e.ObjectMeta.Name),
 			Reason:    e.Reason,
 			Message:   e.Message,
 			Timestamp: int32(e.LastTimestamp.Unix()),

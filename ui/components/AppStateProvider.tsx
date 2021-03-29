@@ -29,7 +29,9 @@ export default function AppStateProvider(props) {
 
   const history = useHistory();
 
-  const doError = (message: string, fatal: boolean, detail?: string) => {
+  const doError = (message: string, fatal: boolean, detail?: Error) => {
+    console.error(message);
+    console.error(detail);
     setAppState({
       ...(appState as AppState),
       error: { message, fatal, detail },
