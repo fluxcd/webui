@@ -192,25 +192,25 @@ func (s *Server) ListKustomizations(ctx context.Context, msg *pb.ListKustomizati
 
 }
 
-func getSourceType(sourceType string) (runtime.Object, error) {
+func getSourceType(sourceType pb.Source_Type) (runtime.Object, error) {
 	switch sourceType {
-	case "git":
+	case pb.Source_Git:
 		return &sourcev1.GitRepositoryList{}, nil
 
-	case "bucket":
+	case pb.Source_Bucket:
 		return &sourcev1.BucketList{}, nil
 
-	case "helm":
+	case pb.Source_Helm:
 		return &sourcev1.HelmRepositoryList{}, nil
 
-	case "chart":
+	case pb.Source_Chart:
 		return &sourcev1.HelmChartList{}, nil
 	}
 
 	return nil, errors.New("could not find source type")
 }
 
-func appendSources(sourceType string, k8sObj runtime.Object, res *pb.ListSourcesRes) error {
+func appendSources(k8sObj runtime.Object, res *pb.ListSourcesRes) error {
 	switch list := k8sObj.(type) {
 	case *sourcev1.GitRepositoryList:
 		for _, i := range list.Items {
@@ -279,7 +279,7 @@ func (s *Server) ListSources(ctx context.Context, msg *pb.ListSourcesReq) (*pb.L
 		return nil, fmt.Errorf("could not list sources: %w", err)
 	}
 
-	if err := appendSources(msg.SourceType, k8sList, res); err != nil {
+	if err := appendSources(k8sList, res); err != nil {
 		return nil, fmt.Errorf("could not append source: %w", err)
 	}
 
