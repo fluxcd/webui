@@ -90,6 +90,7 @@ message Source {
         Git = 0;
         Bucket = 1;
         Helm = 2;
+        Chart = 3;
     };
     Type type = 4;
     string provider = 5;
@@ -106,7 +107,7 @@ message Source {
 message ListSourcesReq {
     string contextName = 1;
     string namespace = 2;
-    string sourceType = 3;
+    Source.Type sourceType = 3;
 }
 
 message ListSourcesRes {
