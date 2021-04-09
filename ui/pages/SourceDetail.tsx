@@ -36,14 +36,6 @@ const LayoutBox = styled(Box)`
   /* Override more specific MUI rules */
   margin-right: 0 !important;
   margin-left: 0 !important;
-
-  &:last-child {
-    margin-left: 16px !important;
-  }
-
-  .MuiCard-root {
-    height: 205px;
-  }
 `;
 
 const Styled = (c) => styled(c)``;
@@ -62,21 +54,27 @@ function SourceDetail({ className }: Props) {
     return null;
   }
 
-  const providerUrl = convertRefURLToGitProvider(sourceDetail.url);
+  const providerUrl = sourceDetail.reference ? (
+    <a href={convertRefURLToGitProvider(sourceDetail.url)}>
+      {sourceDetail.url}
+    </a>
+  ) : (
+    sourceDetail.url
+  );
 
   return (
     <Page className={className}>
-      <Box m={2}>
-        <Breadcrumbs>
-          <Link
-            to={formatURL(PageRoute.Sources, currentContext, currentNamespace)}
-          >
-            <h2>Sources</h2>
-          </Link>
-          <Flex wide>
-            <h2>{sourceDetail.name}</h2>
-          </Flex>
-        </Breadcrumbs>
+      <Breadcrumbs>
+        <Link
+          to={formatURL(PageRoute.Sources, currentContext, currentNamespace)}
+        >
+          <h2>Sources</h2>
+        </Link>
+        <Flex wide>
+          <h2>{sourceDetail.name}</h2>
+        </Flex>
+      </Breadcrumbs>
+      <LayoutBox m={2}>
         <Panel title="Info">
           <KeyValueTable
             columns={2}
@@ -84,45 +82,47 @@ function SourceDetail({ className }: Props) {
               { key: "Type", value: sourceDetail.type },
               {
                 key: "URL",
-                value: <a href={providerUrl}>{sourceDetail.url}</a>,
+                value: providerUrl,
               },
+              { key: "Timeout", value: sourceDetail.timeout },
             ]}
           />
         </Panel>
-      </Box>
-      <Box m={2}>
-        <Flex wide>
-          <LayoutBox m={1}>
-            <Panel title="Git Reference">
-              <KeyValueTable
-                columns={2}
-                pairs={[
-                  { key: "Branch", value: sourceDetail.reference.branch },
-                  { key: "Tag", value: sourceDetail.reference.tag },
-                  { key: "Semver", value: sourceDetail.reference.semver },
-                  { key: "Commit", value: sourceDetail.reference.commit },
-                ]}
-              />
-            </Panel>
-          </LayoutBox>
-          <LayoutBox m={1}>
-            <Panel title="Artifact">
-              <KeyValueTable
-                columns={1}
-                pairs={[
-                  { key: "Checksum", value: sourceDetail.artifact.checksum },
-                  { key: "Revision", value: sourceDetail.artifact.revision },
-                ]}
-              />
-            </Panel>
-          </LayoutBox>
-        </Flex>
-      </Box>
-      <Box m={2}>
+      </LayoutBox>
+
+      {sourceDetail.reference && (
+        <LayoutBox m={2}>
+          <Panel title="Git Reference">
+            <KeyValueTable
+              columns={2}
+              pairs={[
+                { key: "Branch", value: sourceDetail.reference.branch },
+                { key: "Tag", value: sourceDetail.reference.tag },
+                { key: "Semver", value: sourceDetail.reference.semver },
+                { key: "Commit", value: sourceDetail.reference.commit },
+              ]}
+            />
+          </Panel>
+        </LayoutBox>
+      )}
+
+      <LayoutBox m={2}>
+        <Panel title="Artifact">
+          <KeyValueTable
+            columns={2}
+            pairs={[
+              { key: "Checksum", value: sourceDetail.artifact.checksum },
+              { key: "Revision", value: sourceDetail.artifact.revision },
+            ]}
+          />
+        </Panel>
+      </LayoutBox>
+
+      <LayoutBox m={2}>
         <Panel title="Conditions">
           <ConditionsTable conditions={sourceDetail.conditions} />
         </Panel>
-      </Box>
+      </LayoutBox>
     </Page>
   );
 }

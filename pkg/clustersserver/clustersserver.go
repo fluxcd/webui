@@ -15,6 +15,7 @@ import (
 	pb "github.com/fluxcd/webui/pkg/rpc/clusters"
 	"github.com/fluxcd/webui/pkg/util"
 	appsv1 "k8s.io/api/apps/v1"
+	apimetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -123,6 +124,22 @@ func getSourceTypeEnum(kind string) pb.Source_Type {
 	return pb.Source_Git
 }
 
+func mapConditions(conditions []apimetav1.Condition) []*pb.Condition {
+	out := []*pb.Condition{}
+
+	for _, c := range conditions {
+		out = append(out, &pb.Condition{
+			Type:      c.Type,
+			Status:    string(c.Status),
+			Reason:    c.Reason,
+			Message:   c.Message,
+			Timestamp: c.LastTransitionTime.String(),
+		})
+	}
+
+	return out
+}
+
 func convertKustomization(kustomization kustomizev1.Kustomization) (*pb.Kustomization, error) {
 	reconcileRequestAt := kustomization.Annotations[meta.ReconcileRequestAnnotation]
 
@@ -135,30 +152,11 @@ func convertKustomization(kustomization kustomizev1.Kustomization) (*pb.Kustomiz
 		Path:               kustomization.Spec.Path,
 		SourceRef:          kustomization.Spec.SourceRef.Name,
 		SourceRefKind:      getSourceTypeEnum(kustomization.Spec.SourceRef.Kind),
-		Conditions:         []*pb.Condition{},
+		Conditions:         mapConditions(kustomization.Status.Conditions),
 		Interval:           kustomization.Spec.Interval.Duration.String(),
 		Prune:              kustomization.Spec.Prune,
 		ReconcileRequestAt: reconcileRequestAt,
 		ReconcileAt:        reconcileAt,
-	}
-
-	for _, c := range kustomization.Status.Conditions {
-		k.Conditions = append(k.Conditions, &pb.Condition{
-			Type:      c.Type,
-			Status:    string(c.Status),
-			Reason:    c.Reason,
-			Message:   c.Message,
-			Timestamp: c.LastTransitionTime.String(),
-		})
-	}
-
-	for _, c := range kustomization.Status.Conditions {
-		k.Conditions = append(k.Conditions, &pb.Condition{
-			Type:    c.Type,
-			Status:  string(c.Status),
-			Reason:  c.Reason,
-			Message: c.Message,
-		})
 	}
 
 	return k, nil
@@ -215,17 +213,14 @@ func appendSources(k8sObj runtime.Object, res *pb.ListSourcesRes) error {
 	case *sourcev1.GitRepositoryList:
 		for _, i := range list.Items {
 			artifact := i.Status.Artifact
+			ref := i.Spec.Reference
 
 			src := pb.Source{
-				Name: i.Name, Type: pb.Source_Git,
-				Url:      i.Spec.URL,
-				Artifact: &pb.Artifact{},
-				Reference: &pb.GitRepositoryRef{
-					Branch: i.Spec.Reference.Branch,
-					Tag:    i.Spec.Reference.Tag,
-					Semver: i.Spec.Reference.SemVer,
-					Commit: i.Spec.Reference.Commit,
-				},
+				Name:      i.Name,
+				Type:      pb.Source_Git,
+				Url:       i.Spec.URL,
+				Artifact:  &pb.Artifact{},
+				Reference: &pb.GitRepositoryRef{},
 			}
 			if artifact != nil {
 				src.Artifact = &pb.Artifact{
@@ -236,17 +231,43 @@ func appendSources(k8sObj runtime.Object, res *pb.ListSourcesRes) error {
 				}
 			}
 
+			if ref != nil {
+				src.Reference = &pb.GitRepositoryRef{
+					Branch: i.Spec.Reference.Branch,
+					Tag:    i.Spec.Reference.Tag,
+					Semver: i.Spec.Reference.SemVer,
+					Commit: i.Spec.Reference.Commit,
+				}
+			}
+
 			res.Sources = append(res.Sources, &src)
 		}
 
 	case *sourcev1.BucketList:
 		for _, i := range list.Items {
-			res.Sources = append(res.Sources, &pb.Source{Name: i.Name})
+			res.Sources = append(res.Sources, &pb.Source{
+				Name: i.Name,
+				Type: pb.Source_Bucket,
+			})
 		}
 
 	case *sourcev1.HelmRepositoryList:
 		for _, i := range list.Items {
-			res.Sources = append(res.Sources, &pb.Source{Name: i.Name})
+			src := &pb.Source{
+				Name:    i.Name,
+				Type:    pb.Source_Helm,
+				Url:     i.Spec.URL,
+				Timeout: i.Spec.Timeout.Duration.String(),
+				Artifact: &pb.Artifact{
+					Checksum: i.Status.Artifact.Checksum,
+					Path:     i.Status.Artifact.Path,
+					Revision: i.Status.Artifact.Revision,
+					Url:      i.Status.Artifact.URL,
+				},
+				Conditions: mapConditions(i.Status.Conditions),
+			}
+
+			res.Sources = append(res.Sources, src)
 		}
 	case *sourcev1.HelmChartList:
 		for _, i := range list.Items {
@@ -416,6 +437,7 @@ func (s *Server) ListHelmReleases(ctx context.Context, msg *pb.ListHelmReleasesR
 			SourceKind:      chartSpec.SourceRef.Kind,
 			SourceName:      chartSpec.SourceRef.Name,
 			SourceNamespace: chartSpec.SourceRef.Namespace,
+			Conditions:      mapConditions(r.Status.Conditions),
 		})
 	}
 
