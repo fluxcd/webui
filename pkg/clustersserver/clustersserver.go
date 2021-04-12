@@ -254,17 +254,21 @@ func appendSources(k8sObj runtime.Object, res *pb.ListSourcesRes) error {
 	case *sourcev1.HelmRepositoryList:
 		for _, i := range list.Items {
 			src := &pb.Source{
-				Name:    i.Name,
-				Type:    pb.Source_Helm,
-				Url:     i.Spec.URL,
-				Timeout: i.Spec.Timeout.Duration.String(),
-				Artifact: &pb.Artifact{
+				Name:       i.Name,
+				Type:       pb.Source_Helm,
+				Url:        i.Spec.URL,
+				Timeout:    i.Spec.Timeout.Duration.String(),
+				Artifact:   &pb.Artifact{},
+				Conditions: mapConditions(i.Status.Conditions),
+			}
+
+			if i.Status.Artifact != nil {
+				src.Artifact = &pb.Artifact{
 					Checksum: i.Status.Artifact.Checksum,
 					Path:     i.Status.Artifact.Path,
 					Revision: i.Status.Artifact.Revision,
 					Url:      i.Status.Artifact.URL,
-				},
-				Conditions: mapConditions(i.Status.Conditions),
+				}
 			}
 
 			res.Sources = append(res.Sources, src)

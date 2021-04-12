@@ -21,12 +21,16 @@ export const throwTwirpError = (resp: Response) => {
     return resp.json().then((err: TwirpErrorJSON) => { throw new TwirpError(err); })
 };
 
-export const createTwirpRequest = (url: string, body: object): Request => {
-    return new Request(url, {
-        method: "POST",
-        headers: {
+export const createTwirpRequest = (url: string, body: object, headersOverride: HeadersInit = {}): Request => {
+    const headers = {
+        ...{
             "Content-Type": "application/json"
         },
+        ...headersOverride
+    };
+    return new Request(url, {
+        method: "POST",
+        headers,
         body: JSON.stringify(body)
     });
 };

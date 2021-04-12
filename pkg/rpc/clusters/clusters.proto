@@ -84,13 +84,13 @@ message Artifact {
 
 message Source {
     string name = 1;
-    string url = 2;
+    string url = 2;   
     GitRepositoryRef reference = 3;
     enum Type {
         Git = 0;
         Bucket = 1;
         Helm = 2;
-        Chart = 3;
+        Chart = 4;
     };
     Type type = 4;
     string provider = 5;
@@ -134,6 +134,7 @@ message HelmRelease {
     string sourceKind = 7;
     string sourceName  = 8;
     string sourceNamespace = 9;
+    repeated Condition conditions = 12;
 }
 
 message ListHelmReleasesReq {
