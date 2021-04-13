@@ -23,8 +23,7 @@ assets: ui
 build: assets
 	CGO_ENABLED=0 go build -o ./bin/webui .
 
-dev: assets
-	gin -a 9000 -b ./bin/gin-bin
+	reflex -r '.go' -s -- sh -c 'go run main.go'
 
 proto-native: pkg/rpc/clusters/clusters.proto
 	protoc pkg/rpc/clusters/clusters.proto --twirp_out=./ --go_out=. --twirp_typescript_out=./ui/lib/rpc

@@ -6,7 +6,7 @@ To set up a development environment
 
 1. Install `go` v1.15
 2. Install Node.js version 14.15.1
-3. Install `gin`: `go get github.com/codegangsta/gin`
+3. Install `reflex` for automated server builds: `go get github.com/cespare/reflex`
 4. [Install `kubebuilder`](https://book.kubebuilder.io/quick-start.html#installation)
 5. `npm install --silent` to install UI dependencies
 6. `make dev` to compile and run the app
