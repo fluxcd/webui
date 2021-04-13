@@ -3,26 +3,21 @@ SOURCE_VERSION := v0.11.0
 KUSTOMIZE_VERSION := v0.11.0
 HELM_CRD_VERSION := v0.9.0
 
-$(UPTODATE):
-	touch .uptodate
-
-clean:
-	rm $(UPTODATE)
-
 all: test build
 
-ui: $(UPTODATE)
+dist/index.html:
 	npm run build
 
 test: ui assets
 	go test ./...
 
-assets: ui
+assets: dist/index.html
 	go run -tags=generate pkg/assets/generate.go
 
 build: assets
 	CGO_ENABLED=0 go build -o ./bin/webui .
 
+dev:
 	reflex -r '.go' -s -- sh -c 'go run main.go'
 
 proto-native: pkg/rpc/clusters/clusters.proto
