@@ -99,6 +99,20 @@ export enum SourceType {
   Git = "git",
   Bucket = "bucket",
   Helm = "helm",
+  Chart = "chart",
+}
+
+function convertSourceTypeToInt(s: SourceType) {
+  switch (s) {
+    case SourceType.Git:
+      return 0;
+    case SourceType.Bucket:
+      return 1;
+    case SourceType.Helm:
+      return 2;
+    case SourceType.Chart:
+      return 3;
+  }
 }
 
 type SourceData = {
@@ -127,7 +141,8 @@ export function useSources(
       clustersClient.listSources({
         contextname: currentContext,
         namespace: formatAPINamespace(currentNamespace),
-        sourcetype: s,
+        // @ts-ignore
+        sourcetype: convertSourceTypeToInt(s),
       })
     );
 
