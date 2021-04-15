@@ -53,7 +53,9 @@ function KeyValueTable({ className, pairs, columns, overrides }: Props) {
                 return (
                   <td role="listitem" key={key}>
                     <Key aria-label={label}>{label}</Key>
-                    <Value>{v}</Value>
+                    <Value>
+                      {v || <span style={{ marginLeft: 2 }}>-</span>}
+                    </Value>
                   </td>
                 );
               })}

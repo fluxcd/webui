@@ -134,6 +134,7 @@ message HelmRelease {
     string sourceKind = 7;
     string sourceName  = 8;
     string sourceNamespace = 9;
+    repeated Condition conditions = 12;
 }
 
 message ListHelmReleasesReq {

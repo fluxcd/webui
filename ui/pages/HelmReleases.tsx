@@ -42,7 +42,25 @@ function HelmRelease({ className }: Props) {
       ),
       label: "Name",
     },
+    {
+      value: "chartname",
+      label: "Chart",
+    },
+    {
+      value: "version",
+      label: "Version",
+    },
   ];
+
+  const rows = _.map(helmReleases, (k) => (
+    <TableRow key={k.name}>
+      {_.map(fields, (f) => (
+        <TableCell key={f.label}>
+          {typeof f.value === "function" ? f.value(k) : k[f.value]}
+        </TableCell>
+      ))}
+    </TableRow>
+  ));
 
   return (
     <div className={className}>
@@ -57,15 +75,15 @@ function HelmRelease({ className }: Props) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {_.map(helmReleases, (k) => (
-              <TableRow key={k.name}>
-                {_.map(fields, (f) => (
-                  <TableCell key={f.label}>
-                    {typeof f.value === "function" ? f.value(k) : k[f.value]}
-                  </TableCell>
-                ))}
+            {rows.length > 0 ? (
+              rows
+            ) : (
+              <TableRow>
+                <TableCell align="center" colSpan={fields.length}>
+                  <i>No rows</i>
+                </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </TableContainer>

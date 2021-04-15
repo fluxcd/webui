@@ -17,6 +17,7 @@ type Props = {
     reason: string;
     status: string;
     message: string;
+    timestamp: string;
   }[];
 };
 const Styled = (c) => styled(c)``;
@@ -36,7 +37,7 @@ function ConditionsTable({ className, conditions }: Props) {
           </TableHead>
           <TableBody>
             {_.map(conditions, (c) => (
-              <TableRow>
+              <TableRow key={c.timestamp}>
                 <TableCell>{c.type}</TableCell>
                 <TableCell>{c.status}</TableCell>
                 <TableCell>{c.reason}</TableCell>
