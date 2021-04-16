@@ -4,7 +4,7 @@
 
 To set up a development environment
 
-1. Install `go` v1.15
+1. Install `go` v1.16
 2. Install Node.js version 14.15.1
 3. Install `reflex` for automated server builds: `go get github.com/cespare/reflex`
 4. [Install `kubebuilder`](https://book.kubebuilder.io/quick-start.html#installation)
@@ -23,5 +23,5 @@ go get -u go.larrymyers.com/protoc-gen-twirp_typescript
 Then run:
 
 ```shell
-make proto-native
+make proto
 ```

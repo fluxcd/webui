@@ -1,4 +1,4 @@
-UPTODATE := .uptodate
+.PHONY: clean all test assets dev proto download-crd-deps
 SOURCE_VERSION := v0.11.0
 KUSTOMIZE_VERSION := v0.11.0
 HELM_CRD_VERSION := v0.9.0
@@ -20,7 +20,7 @@ build: assets
 dev:
 	reflex -r '.go' -s -- sh -c 'go run main.go'
 
-proto-native: pkg/rpc/clusters/clusters.proto
+proto: pkg/rpc/clusters/clusters.proto
 	protoc pkg/rpc/clusters/clusters.proto --twirp_out=./ --go_out=. --twirp_typescript_out=./ui/lib/rpc
 
 download-crd-deps:
