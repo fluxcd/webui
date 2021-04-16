@@ -8,13 +8,10 @@ all: test build
 dist/index.html:
 	npm run build
 
-test: ui assets
+test:
 	go test ./...
 
-assets: dist/index.html
-	go run -tags=generate pkg/assets/generate.go
-
-build: assets
+build: dist/index.html
 	CGO_ENABLED=0 go build -o ./bin/webui .
 
 dev:
