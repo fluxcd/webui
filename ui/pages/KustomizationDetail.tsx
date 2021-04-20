@@ -40,19 +40,28 @@ const Styled = (c) => styled(c)`
 `;
 
 const infoFields = [
-  "sourceref",
   "namespace",
-  "reconcileat",
-  "path",
+  "dependson",
+  "decryption",
   "interval",
+  "kubeconfig",
+  "path",
   "prune",
-  "reconcilerequestat",
+  "healthcheck",
+  "serviceaccountname",
+  "sourceref",
+  "suspend",
+  "targetNamespace",
+  "timeout",
+  "reconcileRequestAt",
+  "reconciledAt",
+  "targetnamespace",
 ];
 
 const formatInfo = (detail: Kustomization) =>
   _.map(_.pick(detail, infoFields), (v, k) => ({
     key: k,
-    value: typeof v === "string" ? v : v.toString(),
+    value: typeof v === "string" ? v : (v || "").toString(),
   }));
 
 function KustomizationDetail({ className }: Props) {
@@ -87,12 +96,14 @@ function KustomizationDetail({ className }: Props) {
           currentContext,
           currentNamespace,
           {
-            sourceType: kustomizationDetail.sourcerefkind.toLowerCase(),
-            sourceId: kustomizationDetail.sourceref,
+            sourceType: _.lowerCase(
+              _.get(kustomizationDetail, ["sourceref", "kind"])
+            ),
+            sourceId: _.get(kustomizationDetail, ["sourceref", "name"]),
           }
         )}
       >
-        {kustomizationDetail.sourceref}
+        {kustomizationDetail.sourceref.name}
       </Link>,
       "Source",
     ],
@@ -191,8 +202,8 @@ function KustomizationDetail({ className }: Props) {
           <DependencyGraph
             nodes={[
               {
-                id: `source/${kustomizationDetail.sourceref}`,
-                text: `Source: ${kustomizationDetail.sourceref}`,
+                id: `source/${kustomizationDetail.sourceref.name}`,
+                text: `Source: ${kustomizationDetail.sourceref.name}`,
               },
               {
                 id: `kustomization/${kustomizationDetail.name}`,
@@ -205,7 +216,7 @@ function KustomizationDetail({ className }: Props) {
             ]}
             edges={[
               {
-                source: `source/${kustomizationDetail.sourceref}`,
+                source: `source/${kustomizationDetail.sourceref.name}`,
                 target: `kustomization/${kustomizationDetail.name}`,
               },
               ..._.map(relatedWorkloads, (w) => ({

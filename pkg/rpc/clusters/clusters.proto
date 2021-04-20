@@ -43,18 +43,39 @@ message Condition {
     string timestamp = 5;
 }
 
-message Kustomization {
+message ObjectRef {
     string name = 1;
     string namespace = 2;
-    string targetNamespace = 3;
-    string path = 4;
-    string sourceRef = 5;
-    repeated Condition conditions = 6;
-    string interval = 7;
+    string apiversion = 3;
+    string kind = 4;
+}
+
+message Decryption {
+    string provider = 1;
+    ObjectRef secretref = 2;
+}
+
+message Kustomization {
+    // meta
+    string name = 1;
+    string namespace = 2;
+    // spec
+    repeated ObjectRef dependson = 3;
+    Decryption decryption = 4;
+    string interval = 5;
+    string kubeconfig = 6;
+    string path = 7;
     bool prune = 8;
-    string reconcileRequestAt = 9;
-    string reconcileAt = 10;
-    Source.Type sourceRefKind = 11;
+    repeated ObjectRef healthchecks = 9;
+    string serviceaccountname = 10;
+    ObjectRef sourceref = 11;
+    bool suspend = 12;
+    string targetNamespace = 13;
+    string timeout = 14;
+    // status
+    repeated Condition conditions = 15;
+    string reconcileRequestAt = 16;
+    string reconcileAt = 17;
 }
 
 message ListKustomizationsReq {

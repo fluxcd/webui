@@ -130,32 +130,96 @@ const JSONToCondition = (m: Condition | ConditionJSON): Condition => {
 };
 
 
+export interface ObjectRef {
+    name?: string;
+    namespace?: string;
+    apiversion?: string;
+    kind?: string;
+}
+
+interface ObjectRefJSON {
+    name?: string;
+    namespace?: string;
+    apiversion?: string;
+    kind?: string;
+}
+
+
+
+const JSONToObjectRef = (m: ObjectRef | ObjectRefJSON): ObjectRef => {
+    if (m === null) {
+		return null;
+	}
+    return {
+        name: m.name,
+        namespace: m.namespace,
+        apiversion: m.apiversion,
+        kind: m.kind,
+    };
+};
+
+
+export interface Decryption {
+    provider?: string;
+    secretref?: ObjectRef;
+}
+
+interface DecryptionJSON {
+    provider?: string;
+    secretref?: ObjectRefJSON;
+}
+
+
+
+const JSONToDecryption = (m: Decryption | DecryptionJSON): Decryption => {
+    if (m === null) {
+		return null;
+	}
+    return {
+        provider: m.provider,
+        secretref: JSONToObjectRef(m.secretref),
+    };
+};
+
+
 export interface Kustomization {
     name?: string;
     namespace?: string;
-    targetnamespace?: string;
-    path?: string;
-    sourceref?: string;
-    conditions?: Condition[];
+    dependson?: ObjectRef[];
+    decryption?: Decryption;
     interval?: string;
+    kubeconfig?: string;
+    path?: string;
     prune?: boolean;
+    healthchecks?: ObjectRef[];
+    serviceaccountname?: string;
+    sourceref?: ObjectRef;
+    suspend?: boolean;
+    targetnamespace?: string;
+    timeout?: string;
+    conditions?: Condition[];
     reconcilerequestat?: string;
     reconcileat?: string;
-    sourcerefkind?: string;
 }
 
 interface KustomizationJSON {
     name?: string;
     namespace?: string;
-    targetNamespace?: string;
-    path?: string;
-    sourceRef?: string;
-    conditions?: ConditionJSON[];
+    dependson?: ObjectRefJSON[];
+    decryption?: DecryptionJSON;
     interval?: string;
+    kubeconfig?: string;
+    path?: string;
     prune?: boolean;
+    healthchecks?: ObjectRefJSON[];
+    serviceaccountname?: string;
+    sourceref?: ObjectRefJSON;
+    suspend?: boolean;
+    targetNamespace?: string;
+    timeout?: string;
+    conditions?: ConditionJSON[];
     reconcileRequestAt?: string;
     reconcileAt?: string;
-    sourceRefKind?: string;
 }
 
 
@@ -167,15 +231,21 @@ const JSONToKustomization = (m: Kustomization | KustomizationJSON): Kustomizatio
     return {
         name: m.name,
         namespace: m.namespace,
-        targetnamespace: (((m as Kustomization).targetnamespace) ? (m as Kustomization).targetnamespace : (m as KustomizationJSON).targetNamespace),
-        path: m.path,
-        sourceref: (((m as Kustomization).sourceref) ? (m as Kustomization).sourceref : (m as KustomizationJSON).sourceRef),
-        conditions: (m.conditions as (Condition | ConditionJSON)[]).map(JSONToCondition),
+        dependson: (m.dependson as (ObjectRef | ObjectRefJSON)[]).map(JSONToObjectRef),
+        decryption: JSONToDecryption(m.decryption),
         interval: m.interval,
+        kubeconfig: m.kubeconfig,
+        path: m.path,
         prune: m.prune,
+        healthchecks: (m.healthchecks as (ObjectRef | ObjectRefJSON)[]).map(JSONToObjectRef),
+        serviceaccountname: m.serviceaccountname,
+        sourceref: JSONToObjectRef(m.sourceref),
+        suspend: m.suspend,
+        targetnamespace: (((m as Kustomization).targetnamespace) ? (m as Kustomization).targetnamespace : (m as KustomizationJSON).targetNamespace),
+        timeout: m.timeout,
+        conditions: (m.conditions as (Condition | ConditionJSON)[]).map(JSONToCondition),
         reconcilerequestat: (((m as Kustomization).reconcilerequestat) ? (m as Kustomization).reconcilerequestat : (m as KustomizationJSON).reconcileRequestAt),
         reconcileat: (((m as Kustomization).reconcileat) ? (m as Kustomization).reconcileat : (m as KustomizationJSON).reconcileAt),
-        sourcerefkind: (((m as Kustomization).sourcerefkind) ? (m as Kustomization).sourcerefkind : (m as KustomizationJSON).sourceRefKind),
     };
 };
 
