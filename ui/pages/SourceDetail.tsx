@@ -96,10 +96,22 @@ function SourceDetail({ className }: Props) {
             <KeyValueTable
               columns={2}
               pairs={[
-                { key: "Branch", value: sourceDetail.reference.branch },
-                { key: "Tag", value: sourceDetail.reference.tag },
-                { key: "Semver", value: sourceDetail.reference.semver },
-                { key: "Commit", value: sourceDetail.reference.commit },
+                {
+                  key: "Branch",
+                  value: _.get(sourceDetail, ["reference", "branch"]),
+                },
+                {
+                  key: "Tag",
+                  value: _.get(sourceDetail, ["reference", "tag"]),
+                },
+                {
+                  key: "Semver",
+                  value: _.get(sourceDetail, ["reference", "semver"]),
+                },
+                {
+                  key: "Commit",
+                  value: _.get(sourceDetail, ["reference", "commit"]),
+                },
               ]}
             />
           </Panel>
@@ -111,8 +123,14 @@ function SourceDetail({ className }: Props) {
           <KeyValueTable
             columns={2}
             pairs={[
-              { key: "Checksum", value: sourceDetail.artifact.checksum },
-              { key: "Revision", value: sourceDetail.artifact.revision },
+              {
+                key: "Checksum",
+                value: _.get(sourceDetail, ["artifact", "checksum"]),
+              },
+              {
+                key: "Revision",
+                value: _.get(sourceDetail, ["artifact", "revision"]),
+              },
             ]}
           />
         </Panel>
