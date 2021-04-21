@@ -23,7 +23,7 @@ message ListContextsReq {
 }
 
 message ListContextsRes {
-    string currentContext = 1;
+    string current_context = 1;
     repeated Context contexts = 2;
 }
 
@@ -46,13 +46,13 @@ message Condition {
 message ObjectRef {
     string name = 1;
     string namespace = 2;
-    string apiversion = 3;
+    string api_version = 3;
     string kind = 4;
 }
 
 message Decryption {
     string provider = 1;
-    ObjectRef secretref = 2;
+    ObjectRef secret_ref = 2;
 }
 
 message Kustomization {
@@ -60,26 +60,26 @@ message Kustomization {
     string name = 1;
     string namespace = 2;
     // spec
-    repeated ObjectRef dependson = 3;
+    repeated ObjectRef depends_on = 3;
     Decryption decryption = 4;
     string interval = 5;
     string kubeconfig = 6;
     string path = 7;
     bool prune = 8;
-    repeated ObjectRef healthchecks = 9;
-    string serviceaccountname = 10;
-    ObjectRef sourceref = 11;
+    repeated ObjectRef health_checks = 9;
+    string service_account_name = 10;
+    ObjectRef source_ref = 11;
     bool suspend = 12;
-    string targetNamespace = 13;
+    string target_namespace = 13;
     string timeout = 14;
     // status
     repeated Condition conditions = 15;
-    string reconcileRequestAt = 16;
-    string reconcileAt = 17;
+    string reconcile_request_at = 16;
+    string reconciled_at = 17;
 }
 
 message ListKustomizationsReq {
-    string contextName = 1;
+    string context_name = 1;
     string namespace = 2;
 }
 
@@ -97,7 +97,7 @@ message GitRepositoryRef {
 
 message Artifact {
     string checksum  = 1;
-    int32 lastupdateat = 2;
+    int32 last_updated_at = 2;
     string path = 3;
     string revision = 4;
     string url = 5;
@@ -115,20 +115,20 @@ message Source {
     };
     Type type = 4;
     string provider = 5;
-    string bucketname = 6;
+    string bucket_name = 6;
     string region = 7;
     string namespace = 8;
-    string gitimplementation = 9;
+    string git_implementation = 9;
     string timeout = 10;
-    string secretRefName = 11;
+    string secret_ref_name = 11;
     repeated Condition conditions = 12;
     Artifact artifact = 13;
 }
 
 message ListSourcesReq {
-    string contextName = 1;
+    string context_name = 1;
     string namespace = 2;
-    Source.Type sourceType = 3;
+    Source.Type source_type = 3;
 }
 
 message ListSourcesRes {
@@ -136,10 +136,10 @@ message ListSourcesRes {
 }
 
 message SyncKustomizationReq {
-    string contextName = 1;
+    string context_name = 1;
     string namespace = 2;
-    string kustomizationName = 3;
-    bool withSource = 4;
+    string kustomization_name = 3;
+    bool with_source = 4;
 }
 
 message SyncKustomizationRes {
@@ -150,16 +150,16 @@ message HelmRelease {
     string name = 1;
     string namespace = 2;
     string interval = 3;
-    string chartName = 5;
+    string chart_name = 5;
     string version = 6;
-    string sourceKind = 7;
-    string sourceName  = 8;
-    string sourceNamespace = 9;
+    string source_kind = 7;
+    string source_name  = 8;
+    string source_namespace = 9;
     repeated Condition conditions = 12;
 }
 
 message ListHelmReleasesReq {
-    string contextName = 1;
+    string context_name = 1;
     string namespace = 2;
 }
 
@@ -179,13 +179,13 @@ message PodTemplate {
 message Workload {
     string name = 1;
     string namespace = 2;
-    string kustomizationRefName = 3;
-    string kustomizationRefNamespace = 4;
-    PodTemplate podTemplate = 5;
+    string kustomization_ref_name = 3;
+    string kustomization_ref_namespace = 4;
+    PodTemplate pod_template = 5;
 }
 
 message ListWorkloadsReq {
-    string contextName = 1;
+    string context_name = 1;
     string namespace = 2;
 }
 
@@ -194,9 +194,9 @@ message ListWorkloadsRes {
 }
 
 message ListKustomizationChildrenReq {
-    string contextName = 1;
-    string kustomizationName = 2;
-    string KustomizationNamespace = 3;
+    string context_name = 1;
+    string kustomization_name = 2;
+    string kustomization_namespace = 3;
 }
 
 message ListKustomizationChildrenRes {
@@ -212,7 +212,7 @@ message Event {
 }
 
 message ListEventsReq {
-    string contextName = 1;
+    string context_name = 1;
     string namespace = 2;
 }
 

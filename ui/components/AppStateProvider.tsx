@@ -51,9 +51,8 @@ export default function AppStateProvider(props) {
         setContexts(res.contexts);
         // If there is a context in the path, use that, else use the one set
         // in the .kubeconfig file returned by the backend.
-        const nextCtx = (query.context as string) || res.currentcontext;
+        const nextCtx = (query.context as string) || res.currentContext;
         const ns = query.namespace || AllNamespacesOption;
-
         setCurrentContext(nextCtx);
         setCurrentNamespace(ns as string);
       },

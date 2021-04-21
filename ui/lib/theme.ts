@@ -1,6 +1,6 @@
-import { createMuiTheme } from "@material-ui/core/styles";
-import purple from "@material-ui/core/colors/purple";
 import green from "@material-ui/core/colors/green";
+import purple from "@material-ui/core/colors/purple";
+import { createMuiTheme, Theme } from "@material-ui/core/styles";
 import { createGlobalStyle } from "styled-components";
 
 const theme = createMuiTheme({
@@ -21,7 +21,8 @@ export default theme;
 
 export const GlobalStyle = createGlobalStyle`
   body {
-    font-family: ${(props) => props.theme.typography.fontFamily}, sans-serif;
+    font-family: ${(props: { theme: Theme }) =>
+      props.theme.typography.fontFamily}, sans-serif;
     padding: 0;
     margin: 0;
   }

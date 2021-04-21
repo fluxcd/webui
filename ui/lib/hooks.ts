@@ -61,7 +61,7 @@ export function useKustomizations(
 
     clustersClient
       .listKustomizations({
-        contextname: currentContext,
+        contextName: currentContext,
         namespace: formatAPINamespace(currentNamespace),
       })
       .then((res) => {
@@ -80,10 +80,10 @@ export function useKustomizations(
   const syncKustomization = (k: Kustomization) =>
     clustersClient
       .syncKustomization({
-        contextname: currentContext,
+        contextName: currentContext,
         namespace: k.namespace,
-        withsource: false,
-        kustomizationname: k.name,
+        withSource: false,
+        kustomizationName: k.name,
       })
       .then(() => {
         setKustomizations({
@@ -139,7 +139,7 @@ export function useSources(
 
     const p = _.map(SourceType, (s) =>
       clustersClient.listSources({
-        contextname: currentContext,
+        contextName: currentContext,
         namespace: formatAPINamespace(currentNamespace),
         // @ts-ignore
         sourcetype: convertSourceTypeToInt(s),
@@ -183,7 +183,7 @@ export function useHelmReleases(
 
     clustersClient
       .listHelmReleases({
-        contextname: currentContext,
+        contextName: currentContext,
         namespace: formatAPINamespace(currentNamespace),
       })
       .then((res) => {
@@ -243,7 +243,7 @@ export function useWorkloads(currentContext: string, currentNamespace: string) {
 
     clustersClient
       .listWorkloads({
-        contextname: currentContext,
+        contextName: currentContext,
         namespace:
           currentNamespace === AllNamespacesOption ? "" : currentNamespace,
       })

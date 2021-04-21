@@ -150,17 +150,17 @@ func convertKustomization(kustomization kustomizev1.Kustomization) (*pb.Kustomiz
 		Namespace:       kustomization.Namespace,
 		TargetNamespace: kustomization.Spec.TargetNamespace,
 		Path:            kustomization.Spec.Path,
-		Sourceref: &pb.ObjectRef{
+		SourceRef: &pb.ObjectRef{
 			Name:       kustomization.Spec.SourceRef.Name,
 			Namespace:  kustomization.Spec.SourceRef.Namespace,
 			Kind:       kustomization.Spec.SourceRef.Kind,
-			Apiversion: kustomization.Spec.SourceRef.APIVersion,
+			ApiVersion: kustomization.Spec.SourceRef.APIVersion,
 		},
 		Conditions:         mapConditions(kustomization.Status.Conditions),
 		Interval:           kustomization.Spec.Interval.Duration.String(),
 		Prune:              kustomization.Spec.Prune,
 		ReconcileRequestAt: reconcileRequestAt,
-		ReconcileAt:        reconcileAt,
+		ReconciledAt:       reconcileAt,
 		Suspend:            kustomization.Spec.Suspend,
 	}
 

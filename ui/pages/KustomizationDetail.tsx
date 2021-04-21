@@ -25,7 +25,7 @@ import {
   useNavigation,
   useWorkloads,
 } from "../lib/hooks";
-import { Kustomization } from "../lib/rpc/clusters";
+import { Kustomization, Workload } from "../lib/rpc/clusters";
 import { AllNamespacesOption } from "../lib/types";
 import { formatURL, PageRoute } from "../lib/util";
 
@@ -103,31 +103,31 @@ function KustomizationDetail({ className }: Props) {
           }
         )}
       >
-        {kustomizationDetail.sourceref.name}
+        {kustomizationDetail.sourceRef.name}
       </Link>,
       "Source",
     ],
     reconcileat: [
       ` ${new Date(
-        kustomizationDetail.reconcileat
+        kustomizationDetail.reconcileAt
       ).toLocaleTimeString()} ${new Date(
-        kustomizationDetail.reconcileat
+        kustomizationDetail.reconcileAt
       ).toLocaleDateString()}`,
       "Last Reconcile",
     ],
     reconcilerequestat: [
       ` ${new Date(
-        kustomizationDetail.reconcilerequestat
+        kustomizationDetail.reconcileRequestAt
       ).toLocaleTimeString()} ${new Date(
-        kustomizationDetail.reconcilerequestat
+        kustomizationDetail.reconcileRequestAt
       ).toLocaleDateString()}`,
       "Last Reconcile Request",
     ],
   };
 
-  const relatedWorkloads = _.filter(workloads, {
-    kustomizationrefname: kustomizationDetail.name,
-    kustomizationrefnamespace: kustomizationDetail.namespace,
+  const relatedWorkloads: Workload[] = _.filter(workloads, {
+    kustomizationRefName: kustomizationDetail.name,
+    kustomizationRefNamespace: kustomizationDetail.namespace,
   });
 
   return (
@@ -202,25 +202,25 @@ function KustomizationDetail({ className }: Props) {
           <DependencyGraph
             nodes={[
               {
-                id: `source/${kustomizationDetail.sourceref.name}`,
-                text: `Source: ${kustomizationDetail.sourceref.name}`,
+                id: `source/${kustomizationDetail.sourceRef.name}`,
+                text: `Source: ${kustomizationDetail.sourceRef.name}`,
               },
               {
                 id: `kustomization/${kustomizationDetail.name}`,
                 text: `Kustomization: ${kustomizationDetail.name}`,
               },
-              ..._.map(relatedWorkloads, (w) => ({
+              ..._.map(relatedWorkloads, (w: Workload) => ({
                 id: `workloads/${w.name}`,
                 text: w.name,
               })),
             ]}
             edges={[
               {
-                source: `source/${kustomizationDetail.sourceref.name}`,
+                source: `source/${kustomizationDetail.sourceRef.name}`,
                 target: `kustomization/${kustomizationDetail.name}`,
               },
               ..._.map(relatedWorkloads, (w) => ({
-                source: `kustomization/${w.kustomizationrefname}`,
+                source: `kustomization/${w.kustomizationRefName}`,
                 target: `workloads/${w.name}`,
               })),
             ]}
@@ -229,7 +229,7 @@ function KustomizationDetail({ className }: Props) {
       </Box>
       <Box marginBottom={2}>
         <Panel title="Related Workloads">
-          {_.map(relatedWorkloads, (w) => {
+          {_.map(relatedWorkloads, (w: Workload) => {
             return (
               <div key={w.name}>
                 <Link

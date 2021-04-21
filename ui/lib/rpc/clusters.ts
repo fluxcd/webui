@@ -35,12 +35,12 @@ const ListContextsReqToJSON = (_: ListContextsReq): ListContextsReqJSON => {
 
 
 export interface ListContextsRes {
-    currentcontext?: string;
+    currentContext?: string;
     contexts?: Context[];
 }
 
 interface ListContextsResJSON {
-    currentContext?: string;
+    current_context?: string;
     contexts?: ContextJSON[];
 }
 
@@ -51,7 +51,7 @@ const JSONToListContextsRes = (m: ListContextsRes | ListContextsResJSON): ListCo
 		return null;
 	}
     return {
-        currentcontext: (((m as ListContextsRes).currentcontext) ? (m as ListContextsRes).currentcontext : (m as ListContextsResJSON).currentContext),
+        currentContext: (((m as ListContextsRes).currentContext) ? (m as ListContextsRes).currentContext : (m as ListContextsResJSON).current_context),
         contexts: (m.contexts as (Context | ContextJSON)[]).map(JSONToContext),
     };
 };
@@ -133,14 +133,14 @@ const JSONToCondition = (m: Condition | ConditionJSON): Condition => {
 export interface ObjectRef {
     name?: string;
     namespace?: string;
-    apiversion?: string;
+    apiVersion?: string;
     kind?: string;
 }
 
 interface ObjectRefJSON {
     name?: string;
     namespace?: string;
-    apiversion?: string;
+    api_version?: string;
     kind?: string;
 }
 
@@ -153,7 +153,7 @@ const JSONToObjectRef = (m: ObjectRef | ObjectRefJSON): ObjectRef => {
     return {
         name: m.name,
         namespace: m.namespace,
-        apiversion: m.apiversion,
+        apiVersion: (((m as ObjectRef).apiVersion) ? (m as ObjectRef).apiVersion : (m as ObjectRefJSON).api_version),
         kind: m.kind,
     };
 };
@@ -161,12 +161,12 @@ const JSONToObjectRef = (m: ObjectRef | ObjectRefJSON): ObjectRef => {
 
 export interface Decryption {
     provider?: string;
-    secretref?: ObjectRef;
+    secretRef?: ObjectRef;
 }
 
 interface DecryptionJSON {
     provider?: string;
-    secretref?: ObjectRefJSON;
+    secret_ref?: ObjectRefJSON;
 }
 
 
@@ -177,7 +177,7 @@ const JSONToDecryption = (m: Decryption | DecryptionJSON): Decryption => {
 	}
     return {
         provider: m.provider,
-        secretref: JSONToObjectRef(m.secretref),
+        secretRef: JSONToObjectRef((((m as Decryption).secretRef) ? (m as Decryption).secretRef : (m as DecryptionJSON).secret_ref)),
     };
 };
 
@@ -185,41 +185,41 @@ const JSONToDecryption = (m: Decryption | DecryptionJSON): Decryption => {
 export interface Kustomization {
     name?: string;
     namespace?: string;
-    dependson?: ObjectRef[];
+    dependsOn?: ObjectRef[];
     decryption?: Decryption;
     interval?: string;
     kubeconfig?: string;
     path?: string;
     prune?: boolean;
-    healthchecks?: ObjectRef[];
-    serviceaccountname?: string;
-    sourceref?: ObjectRef;
+    healthChecks?: ObjectRef[];
+    serviceAccountName?: string;
+    sourceRef?: ObjectRef;
     suspend?: boolean;
-    targetnamespace?: string;
+    targetNamespace?: string;
     timeout?: string;
     conditions?: Condition[];
-    reconcilerequestat?: string;
-    reconcileat?: string;
+    reconcileRequestAt?: string;
+    reconciledAt?: string;
 }
 
 interface KustomizationJSON {
     name?: string;
     namespace?: string;
-    dependson?: ObjectRefJSON[];
+    depends_on?: ObjectRefJSON[];
     decryption?: DecryptionJSON;
     interval?: string;
     kubeconfig?: string;
     path?: string;
     prune?: boolean;
-    healthchecks?: ObjectRefJSON[];
-    serviceaccountname?: string;
-    sourceref?: ObjectRefJSON;
+    health_checks?: ObjectRefJSON[];
+    service_account_name?: string;
+    source_ref?: ObjectRefJSON;
     suspend?: boolean;
-    targetNamespace?: string;
+    target_namespace?: string;
     timeout?: string;
     conditions?: ConditionJSON[];
-    reconcileRequestAt?: string;
-    reconcileAt?: string;
+    reconcile_request_at?: string;
+    reconciled_at?: string;
 }
 
 
@@ -231,32 +231,32 @@ const JSONToKustomization = (m: Kustomization | KustomizationJSON): Kustomizatio
     return {
         name: m.name,
         namespace: m.namespace,
-        dependson: (m.dependson as (ObjectRef | ObjectRefJSON)[]).map(JSONToObjectRef),
+        dependsOn: ((((m as Kustomization).dependsOn) ? (m as Kustomization).dependsOn : (m as KustomizationJSON).depends_on) as (ObjectRef | ObjectRefJSON)[]).map(JSONToObjectRef),
         decryption: JSONToDecryption(m.decryption),
         interval: m.interval,
         kubeconfig: m.kubeconfig,
         path: m.path,
         prune: m.prune,
-        healthchecks: (m.healthchecks as (ObjectRef | ObjectRefJSON)[]).map(JSONToObjectRef),
-        serviceaccountname: m.serviceaccountname,
-        sourceref: JSONToObjectRef(m.sourceref),
+        healthChecks: ((((m as Kustomization).healthChecks) ? (m as Kustomization).healthChecks : (m as KustomizationJSON).health_checks) as (ObjectRef | ObjectRefJSON)[]).map(JSONToObjectRef),
+        serviceAccountName: (((m as Kustomization).serviceAccountName) ? (m as Kustomization).serviceAccountName : (m as KustomizationJSON).service_account_name),
+        sourceRef: JSONToObjectRef((((m as Kustomization).sourceRef) ? (m as Kustomization).sourceRef : (m as KustomizationJSON).source_ref)),
         suspend: m.suspend,
-        targetnamespace: (((m as Kustomization).targetnamespace) ? (m as Kustomization).targetnamespace : (m as KustomizationJSON).targetNamespace),
+        targetNamespace: (((m as Kustomization).targetNamespace) ? (m as Kustomization).targetNamespace : (m as KustomizationJSON).target_namespace),
         timeout: m.timeout,
         conditions: (m.conditions as (Condition | ConditionJSON)[]).map(JSONToCondition),
-        reconcilerequestat: (((m as Kustomization).reconcilerequestat) ? (m as Kustomization).reconcilerequestat : (m as KustomizationJSON).reconcileRequestAt),
-        reconcileat: (((m as Kustomization).reconcileat) ? (m as Kustomization).reconcileat : (m as KustomizationJSON).reconcileAt),
+        reconcileRequestAt: (((m as Kustomization).reconcileRequestAt) ? (m as Kustomization).reconcileRequestAt : (m as KustomizationJSON).reconcile_request_at),
+        reconciledAt: (((m as Kustomization).reconciledAt) ? (m as Kustomization).reconciledAt : (m as KustomizationJSON).reconciled_at),
     };
 };
 
 
 export interface ListKustomizationsReq {
-    contextname?: string;
+    contextName?: string;
     namespace?: string;
 }
 
 interface ListKustomizationsReqJSON {
-    contextName?: string;
+    context_name?: string;
     namespace?: string;
 }
 
@@ -268,7 +268,7 @@ const ListKustomizationsReqToJSON = (m: ListKustomizationsReq): ListKustomizatio
 	}
 	
     return {
-        contextName: m.contextname,
+        context_name: m.contextName,
         namespace: m.namespace,
     };
 };
@@ -325,7 +325,7 @@ const JSONToGitRepositoryRef = (m: GitRepositoryRef | GitRepositoryRefJSON): Git
 
 export interface Artifact {
     checksum?: string;
-    lastupdateat?: number;
+    lastUpdatedAt?: number;
     path?: string;
     revision?: string;
     url?: string;
@@ -333,7 +333,7 @@ export interface Artifact {
 
 interface ArtifactJSON {
     checksum?: string;
-    lastupdateat?: number;
+    last_updated_at?: number;
     path?: string;
     revision?: string;
     url?: string;
@@ -347,7 +347,7 @@ const JSONToArtifact = (m: Artifact | ArtifactJSON): Artifact => {
 	}
     return {
         checksum: m.checksum,
-        lastupdateat: m.lastupdateat,
+        lastUpdatedAt: (((m as Artifact).lastUpdatedAt) ? (m as Artifact).lastUpdatedAt : (m as ArtifactJSON).last_updated_at),
         path: m.path,
         revision: m.revision,
         url: m.url,
@@ -361,12 +361,12 @@ export interface Source {
     reference?: GitRepositoryRef;
     type?: string;
     provider?: string;
-    bucketname?: string;
+    bucketName?: string;
     region?: string;
     namespace?: string;
-    gitimplementation?: string;
+    gitImplementation?: string;
     timeout?: string;
-    secretrefname?: string;
+    secretRefName?: string;
     conditions?: Condition[];
     artifact?: Artifact;
 }
@@ -377,12 +377,12 @@ interface SourceJSON {
     reference?: GitRepositoryRefJSON;
     type?: string;
     provider?: string;
-    bucketname?: string;
+    bucket_name?: string;
     region?: string;
     namespace?: string;
-    gitimplementation?: string;
+    git_implementation?: string;
     timeout?: string;
-    secretRefName?: string;
+    secret_ref_name?: string;
     conditions?: ConditionJSON[];
     artifact?: ArtifactJSON;
 }
@@ -399,12 +399,12 @@ const JSONToSource = (m: Source | SourceJSON): Source => {
         reference: JSONToGitRepositoryRef(m.reference),
         type: m.type,
         provider: m.provider,
-        bucketname: m.bucketname,
+        bucketName: (((m as Source).bucketName) ? (m as Source).bucketName : (m as SourceJSON).bucket_name),
         region: m.region,
         namespace: m.namespace,
-        gitimplementation: m.gitimplementation,
+        gitImplementation: (((m as Source).gitImplementation) ? (m as Source).gitImplementation : (m as SourceJSON).git_implementation),
         timeout: m.timeout,
-        secretrefname: (((m as Source).secretrefname) ? (m as Source).secretrefname : (m as SourceJSON).secretRefName),
+        secretRefName: (((m as Source).secretRefName) ? (m as Source).secretRefName : (m as SourceJSON).secret_ref_name),
         conditions: (m.conditions as (Condition | ConditionJSON)[]).map(JSONToCondition),
         artifact: JSONToArtifact(m.artifact),
     };
@@ -412,15 +412,15 @@ const JSONToSource = (m: Source | SourceJSON): Source => {
 
 
 export interface ListSourcesReq {
-    contextname?: string;
-    namespace?: string;
-    sourcetype?: string;
-}
-
-interface ListSourcesReqJSON {
     contextName?: string;
     namespace?: string;
     sourceType?: string;
+}
+
+interface ListSourcesReqJSON {
+    context_name?: string;
+    namespace?: string;
+    source_type?: string;
 }
 
 
@@ -431,9 +431,9 @@ const ListSourcesReqToJSON = (m: ListSourcesReq): ListSourcesReqJSON => {
 	}
 	
     return {
-        contextName: m.contextname,
+        context_name: m.contextName,
         namespace: m.namespace,
-        sourceType: m.sourcetype,
+        source_type: m.sourceType,
     };
 };
 
@@ -459,17 +459,17 @@ const JSONToListSourcesRes = (m: ListSourcesRes | ListSourcesResJSON): ListSourc
 
 
 export interface SyncKustomizationReq {
-    contextname?: string;
-    namespace?: string;
-    kustomizationname?: string;
-    withsource?: boolean;
-}
-
-interface SyncKustomizationReqJSON {
     contextName?: string;
     namespace?: string;
     kustomizationName?: string;
     withSource?: boolean;
+}
+
+interface SyncKustomizationReqJSON {
+    context_name?: string;
+    namespace?: string;
+    kustomization_name?: string;
+    with_source?: boolean;
 }
 
 
@@ -480,10 +480,10 @@ const SyncKustomizationReqToJSON = (m: SyncKustomizationReq): SyncKustomizationR
 	}
 	
     return {
-        contextName: m.contextname,
+        context_name: m.contextName,
         namespace: m.namespace,
-        kustomizationName: m.kustomizationname,
-        withSource: m.withsource,
+        kustomization_name: m.kustomizationName,
+        with_source: m.withSource,
     };
 };
 
@@ -512,11 +512,11 @@ export interface HelmRelease {
     name?: string;
     namespace?: string;
     interval?: string;
-    chartname?: string;
+    chartName?: string;
     version?: string;
-    sourcekind?: string;
-    sourcename?: string;
-    sourcenamespace?: string;
+    sourceKind?: string;
+    sourceName?: string;
+    sourceNamespace?: string;
     conditions?: Condition[];
 }
 
@@ -524,11 +524,11 @@ interface HelmReleaseJSON {
     name?: string;
     namespace?: string;
     interval?: string;
-    chartName?: string;
+    chart_name?: string;
     version?: string;
-    sourceKind?: string;
-    sourceName?: string;
-    sourceNamespace?: string;
+    source_kind?: string;
+    source_name?: string;
+    source_namespace?: string;
     conditions?: ConditionJSON[];
 }
 
@@ -542,23 +542,23 @@ const JSONToHelmRelease = (m: HelmRelease | HelmReleaseJSON): HelmRelease => {
         name: m.name,
         namespace: m.namespace,
         interval: m.interval,
-        chartname: (((m as HelmRelease).chartname) ? (m as HelmRelease).chartname : (m as HelmReleaseJSON).chartName),
+        chartName: (((m as HelmRelease).chartName) ? (m as HelmRelease).chartName : (m as HelmReleaseJSON).chart_name),
         version: m.version,
-        sourcekind: (((m as HelmRelease).sourcekind) ? (m as HelmRelease).sourcekind : (m as HelmReleaseJSON).sourceKind),
-        sourcename: (((m as HelmRelease).sourcename) ? (m as HelmRelease).sourcename : (m as HelmReleaseJSON).sourceName),
-        sourcenamespace: (((m as HelmRelease).sourcenamespace) ? (m as HelmRelease).sourcenamespace : (m as HelmReleaseJSON).sourceNamespace),
+        sourceKind: (((m as HelmRelease).sourceKind) ? (m as HelmRelease).sourceKind : (m as HelmReleaseJSON).source_kind),
+        sourceName: (((m as HelmRelease).sourceName) ? (m as HelmRelease).sourceName : (m as HelmReleaseJSON).source_name),
+        sourceNamespace: (((m as HelmRelease).sourceNamespace) ? (m as HelmRelease).sourceNamespace : (m as HelmReleaseJSON).source_namespace),
         conditions: (m.conditions as (Condition | ConditionJSON)[]).map(JSONToCondition),
     };
 };
 
 
 export interface ListHelmReleasesReq {
-    contextname?: string;
+    contextName?: string;
     namespace?: string;
 }
 
 interface ListHelmReleasesReqJSON {
-    contextName?: string;
+    context_name?: string;
     namespace?: string;
 }
 
@@ -570,7 +570,7 @@ const ListHelmReleasesReqToJSON = (m: ListHelmReleasesReq): ListHelmReleasesReqJ
 	}
 	
     return {
-        contextName: m.contextname,
+        context_name: m.contextName,
         namespace: m.namespace,
     };
 };
@@ -642,17 +642,17 @@ const JSONToPodTemplate = (m: PodTemplate | PodTemplateJSON): PodTemplate => {
 export interface Workload {
     name?: string;
     namespace?: string;
-    kustomizationrefname?: string;
-    kustomizationrefnamespace?: string;
-    podtemplate?: PodTemplate;
+    kustomizationRefName?: string;
+    kustomizationRefNamespace?: string;
+    podTemplate?: PodTemplate;
 }
 
 interface WorkloadJSON {
     name?: string;
     namespace?: string;
-    kustomizationRefName?: string;
-    kustomizationRefNamespace?: string;
-    podTemplate?: PodTemplateJSON;
+    kustomization_ref_name?: string;
+    kustomization_ref_namespace?: string;
+    pod_template?: PodTemplateJSON;
 }
 
 
@@ -664,20 +664,20 @@ const JSONToWorkload = (m: Workload | WorkloadJSON): Workload => {
     return {
         name: m.name,
         namespace: m.namespace,
-        kustomizationrefname: (((m as Workload).kustomizationrefname) ? (m as Workload).kustomizationrefname : (m as WorkloadJSON).kustomizationRefName),
-        kustomizationrefnamespace: (((m as Workload).kustomizationrefnamespace) ? (m as Workload).kustomizationrefnamespace : (m as WorkloadJSON).kustomizationRefNamespace),
-        podtemplate: JSONToPodTemplate((((m as Workload).podtemplate) ? (m as Workload).podtemplate : (m as WorkloadJSON).podTemplate)),
+        kustomizationRefName: (((m as Workload).kustomizationRefName) ? (m as Workload).kustomizationRefName : (m as WorkloadJSON).kustomization_ref_name),
+        kustomizationRefNamespace: (((m as Workload).kustomizationRefNamespace) ? (m as Workload).kustomizationRefNamespace : (m as WorkloadJSON).kustomization_ref_namespace),
+        podTemplate: JSONToPodTemplate((((m as Workload).podTemplate) ? (m as Workload).podTemplate : (m as WorkloadJSON).pod_template)),
     };
 };
 
 
 export interface ListWorkloadsReq {
-    contextname?: string;
+    contextName?: string;
     namespace?: string;
 }
 
 interface ListWorkloadsReqJSON {
-    contextName?: string;
+    context_name?: string;
     namespace?: string;
 }
 
@@ -689,7 +689,7 @@ const ListWorkloadsReqToJSON = (m: ListWorkloadsReq): ListWorkloadsReqJSON => {
 	}
 	
     return {
-        contextName: m.contextname,
+        context_name: m.contextName,
         namespace: m.namespace,
     };
 };
@@ -716,15 +716,15 @@ const JSONToListWorkloadsRes = (m: ListWorkloadsRes | ListWorkloadsResJSON): Lis
 
 
 export interface ListKustomizationChildrenReq {
-    contextname?: string;
-    kustomizationname?: string;
-    kustomizationnamespace?: string;
+    contextName?: string;
+    kustomizationName?: string;
+    kustomizationNamespace?: string;
 }
 
 interface ListKustomizationChildrenReqJSON {
-    contextName?: string;
-    kustomizationName?: string;
-    KustomizationNamespace?: string;
+    context_name?: string;
+    kustomization_name?: string;
+    kustomization_namespace?: string;
 }
 
 
@@ -770,12 +770,12 @@ const JSONToEvent = (m: Event | EventJSON): Event => {
 
 
 export interface ListEventsReq {
-    contextname?: string;
+    contextName?: string;
     namespace?: string;
 }
 
 interface ListEventsReqJSON {
-    contextName?: string;
+    context_name?: string;
     namespace?: string;
 }
 
@@ -787,7 +787,7 @@ const ListEventsReqToJSON = (m: ListEventsReq): ListEventsReqJSON => {
 	}
 	
     return {
-        contextName: m.contextname,
+        context_name: m.contextName,
         namespace: m.namespace,
     };
 };

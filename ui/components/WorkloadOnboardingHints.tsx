@@ -52,9 +52,9 @@ const sourceIsCreated = (
 ) =>
   clustersClient
     .listSources({
-      contextname: contextName,
+      contextName: contextName,
       namespace: "flux-system",
-      sourcetype: sourceType,
+      sourceType: sourceType,
     })
     .then((res) => {
       const s = _.find(res.sources, { name: sourceName });
@@ -68,7 +68,7 @@ const kustomizationIsCreated = (
 ) =>
   clustersClient
     .listKustomizations({
-      contextname: contextName,
+      contextName: contextName,
       namespace: "flux-system",
     })
     .then((res) => {
@@ -166,7 +166,7 @@ function WorkloadOnboardingHints({ className, workloadName }: Props) {
                 variant="outlined"
                 label="Name"
                 value={formValues.name}
-                onChange={(e) =>
+                onChange={(e: any) =>
                   setFormValues({ ...formValues, name: e.target.value })
                 }
               />
@@ -195,7 +195,7 @@ function WorkloadOnboardingHints({ className, workloadName }: Props) {
                 variant="outlined"
                 label="Source URL"
                 value={formValues.sourceUrl}
-                onChange={(e) =>
+                onChange={(e: any) =>
                   setFormValues({ ...formValues, sourceUrl: e.target.value })
                 }
               />
@@ -205,7 +205,7 @@ function WorkloadOnboardingHints({ className, workloadName }: Props) {
                 variant="outlined"
                 label="Clusters YAML Path"
                 value={formValues.yamlPath}
-                onChange={(e) =>
+                onChange={(e: any) =>
                   setFormValues({ ...formValues, yamlPath: e.target.value })
                 }
               />

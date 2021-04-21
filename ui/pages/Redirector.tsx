@@ -22,7 +22,7 @@ export default function Redirector() {
 
         navigate(
           PageRoute.Home,
-          res.currentcontext,
+          res.currentContext,
           currentNamespace || AllNamespacesOption
         );
       },
