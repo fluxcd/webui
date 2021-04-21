@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "jsx": "preserve",
+        "noEmit": true,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "lib": [
+            "es2015"
+        ]
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}
