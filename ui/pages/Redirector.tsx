@@ -1,3 +1,4 @@
+import _ from "lodash";
 import * as React from "react";
 import { AppContext } from "../components/AppStateProvider";
 import { useKubernetesContexts, useNavigation } from "../lib/hooks";
@@ -19,10 +20,21 @@ export default function Redirector() {
     clustersClient.listContexts({}).then(
       (res) => {
         setContexts(res.contexts);
+        let currentContext = res.currentContext;
+        if (!currentContext) {
+          // Avoid an infinite loop here.
+          // Navigating to the home page without a context will redirect back here.
+          if (!res.contexts) {
+            doError("No contexts found");
+            return;
+          }
+
+          currentContext = _.get(_.first(res.contexts), "name");
+        }
 
         navigate(
           PageRoute.Home,
-          res.currentContext,
+          currentContext,
           currentNamespace || AllNamespacesOption
         );
       },

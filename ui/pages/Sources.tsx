@@ -5,6 +5,7 @@ import styled from "styled-components";
 import Link from "../components/Link";
 import Panel from "../components/Panel";
 import { SourceType, useKubernetesContexts, useSources } from "../lib/hooks";
+import { Source } from "../lib/rpc/clusters";
 import { formatURL, PageRoute } from "../lib/util";
 
 type Props = {
@@ -43,8 +44,8 @@ function Sources({ className }: Props) {
           <Box key={t.value} m={2}>
             <Panel title={t.label}>
               <ul>
-                {_.map(sources[t.value], (s) => (
-                  <li key={s.name}>
+                {_.map(sources[t.value], (s: Source) => (
+                  <li key={`${s.name}/${s.namespace}`}>
                     <Link
                       to={formatURL(
                         PageRoute.SourceDetail,
