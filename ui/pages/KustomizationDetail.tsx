@@ -41,21 +41,21 @@ const Styled = (c) => styled(c)`
 
 const infoFields = [
   "namespace",
-  "dependson",
+  "dependsOn",
   "decryption",
   "interval",
   "kubeconfig",
   "path",
   "prune",
-  "healthcheck",
-  "serviceaccountname",
-  "sourceref",
+  "healthChecks",
+  "serviceAccountName",
+  "sourceRef",
   "suspend",
   "targetNamespace",
   "timeout",
   "reconcileRequestAt",
   "reconciledAt",
-  "targetnamespace",
+  "targetNamespace",
 ];
 
 const formatInfo = (detail: Kustomization) =>
@@ -89,7 +89,7 @@ function KustomizationDetail({ className }: Props) {
   }
 
   const overrides = {
-    sourceref: [
+    sourceRef: [
       <Link
         to={formatURL(
           PageRoute.SourceDetail,
@@ -109,9 +109,9 @@ function KustomizationDetail({ className }: Props) {
     ],
     reconcileat: [
       ` ${new Date(
-        kustomizationDetail.reconcileAt
+        kustomizationDetail.reconciledAt
       ).toLocaleTimeString()} ${new Date(
-        kustomizationDetail.reconcileAt
+        kustomizationDetail.reconciledAt
       ).toLocaleDateString()}`,
       "Last Reconcile",
     ],
