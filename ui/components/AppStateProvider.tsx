@@ -63,6 +63,9 @@ export default function AppStateProvider(props) {
   }, []);
 
   React.useEffect(() => {
+    if (!currentContext) {
+      return;
+    }
     clusters.listNamespacesForContext({ contextname: currentContext }).then(
       (nsRes) => {
         const nextNamespaces = nsRes.namespaces;
