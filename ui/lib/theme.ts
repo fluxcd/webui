@@ -27,3 +27,8 @@ export const GlobalStyle = createGlobalStyle`
     margin: 0;
   }
 `;
+
+export const LAYOUT = {
+  topNavHeight: 60,
+  leftNavWidth: 240,
+};

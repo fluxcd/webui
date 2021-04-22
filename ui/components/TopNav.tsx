@@ -3,6 +3,7 @@ import _ from "lodash";
 import * as React from "react";
 import styled from "styled-components";
 import { useKubernetesContexts, useNavigation } from "../lib/hooks";
+import { LAYOUT } from "../lib/theme";
 import { AllNamespacesOption } from "../lib/types";
 import { formatURL, getNavValue, PageRoute } from "../lib/util";
 import Flex from "./Flex";
@@ -16,14 +17,14 @@ type Props = {
 };
 
 const NavWrapper = styled(Flex)`
-  height: 60px;
+  height: ${LAYOUT.topNavHeight}px;
   align-items: flex-end;
 `;
 
 const Styled = (c) => styled(c)`
-  padding: 8px 0;
   background-color: #3570e3;
   width: 100%;
+  position: fixed;
 
   .MuiSelect-outlined {
     border-color: white !important;
