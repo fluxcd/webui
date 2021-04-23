@@ -39,27 +39,27 @@ const Styled = (c) => styled(c)`
   }
 `;
 
-const infoFields = [
+const SPEC_FIELDS = [
   "namespace",
+  "sourceRef",
+  "interval",
+  "path",
   "dependsOn",
   "decryption",
-  "interval",
   "kubeconfig",
-  "path",
   "prune",
   "healthChecks",
   "serviceAccountName",
-  "sourceRef",
   "suspend",
   "targetNamespace",
   "timeout",
-  "reconcileRequestAt",
-  "reconciledAt",
   "targetNamespace",
 ];
 
-const formatInfo = (detail: Kustomization) =>
-  _.map(_.pick(detail, infoFields), (v, k) => ({
+const STATUS_FIELDS = ["reconcileRequestAt", "reconciledAt"];
+
+const formatInfo = (detail: Kustomization, fields) =>
+  _.map(_.pick(detail, fields), (v, k) => ({
     key: k,
     value: typeof v === "string" ? v : (v || "").toString(),
   }));
@@ -158,10 +158,19 @@ function KustomizationDetail({ className }: Props) {
       </Flex>
 
       <Box marginBottom={2}>
-        <Panel title="Info">
+        <Panel title="Status">
           <KeyValueTable
             columns={4}
-            pairs={formatInfo(kustomizationDetail)}
+            pairs={formatInfo(kustomizationDetail, STATUS_FIELDS)}
+          />
+        </Panel>
+      </Box>
+
+      <Box marginBottom={2}>
+        <Panel title="Spec">
+          <KeyValueTable
+            columns={4}
+            pairs={formatInfo(kustomizationDetail, SPEC_FIELDS)}
             overrides={overrides}
           />
         </Panel>
