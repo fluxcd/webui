@@ -5,7 +5,7 @@ before:
 dist: bin
 builds:
   - <<: &build_defaults
-      binary: flux_webui
+      binary: flux-webui
       main: main.go
       ldflags:
         - -s -w -X main.VERSION={{ .Version }}
