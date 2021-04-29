@@ -40,6 +40,25 @@ const LayoutBox = styled(Box)`
 
 const Styled = (c) => styled(c)``;
 
+const infoFields = [
+  "type",
+  "namespace",
+  "url",
+  "timeout",
+  "provider",
+  "bucketName",
+  "region",
+  "gitImplementation",
+  "timeout",
+  "secretRefName",
+];
+
+const formatInfo = (detail: Source) =>
+  _.map(_.pick(detail, infoFields), (v, k) => ({
+    key: k,
+    value: typeof v === "string" ? v : (v || "").toString(),
+  }));
+
 function SourceDetail({ className }: Props) {
   const { query } = useNavigation();
   const { sourceType, sourceId } = query;
@@ -77,15 +96,11 @@ function SourceDetail({ className }: Props) {
       <LayoutBox m={2}>
         <Panel title="Info">
           <KeyValueTable
-            columns={2}
-            pairs={[
-              { key: "Type", value: sourceDetail.type },
-              {
-                key: "URL",
-                value: providerUrl,
-              },
-              { key: "Timeout", value: sourceDetail.timeout },
-            ]}
+            columns={3}
+            overrides={{
+              url: [providerUrl, "URL"],
+            }}
+            pairs={formatInfo(sourceDetail)}
           />
         </Panel>
       </LayoutBox>

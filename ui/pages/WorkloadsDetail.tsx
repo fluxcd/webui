@@ -52,16 +52,16 @@ function WorkloadsDetail({ className }: Props) {
             pairs={[
               {
                 key: "Reconciled By",
-                value: workloadDetail.kustomizationrefname ? (
+                value: workloadDetail.kustomizationRefName ? (
                   <Link
                     to={formatURL(
                       PageRoute.KustomizationDetail,
                       currentContext,
-                      workloadDetail.kustomizationrefnamespace,
-                      { kustomizationId: workloadDetail.kustomizationrefname }
+                      workloadDetail.kustomizationRefNamespace,
+                      { kustomizationId: workloadDetail.kustomizationRefName }
                     )}
                   >
-                    {workloadDetail.kustomizationrefname}
+                    {workloadDetail.kustomizationRefName}
                   </Link>
                 ) : (
                   "-"
@@ -73,7 +73,7 @@ function WorkloadsDetail({ className }: Props) {
       </Box>
       <Box marginBottom={2}>
         <Panel title="Containers">
-          {_.map(workloadDetail.podtemplate.containers, (c) => (
+          {_.map(_.get(workloadDetail, ["podTemplate", "containers"]), (c) => (
             <KeyValueTable
               key={c.name}
               columns={2}
@@ -85,7 +85,7 @@ function WorkloadsDetail({ className }: Props) {
           ))}
         </Panel>
       </Box>
-      {!workloadDetail.kustomizationrefname && (
+      {!workloadDetail.kustomizationRefName && (
         <Box marginBottom={2}>
           <SuggestedAction title="Add this workload to flux">
             <Flex wide center>

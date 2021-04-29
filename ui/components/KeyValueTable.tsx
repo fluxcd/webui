@@ -48,7 +48,7 @@ function KeyValueTable({ className, pairs, columns, overrides }: Props) {
                   k = override[1] as string;
                 }
 
-                const label = _.capitalize(k);
+                const label = _.startCase(k);
 
                 return (
                   <td role="listitem" key={key}>

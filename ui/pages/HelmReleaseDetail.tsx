@@ -48,7 +48,7 @@ function HelmReleaseDetail({ className }: Props) {
               columns={2}
               pairs={[
                 { key: "Interval", value: helmRelease.interval },
-                { key: "Chart", value: helmRelease.chartname },
+                { key: "Chart", value: helmRelease.chartName },
                 { key: "Version", value: helmRelease.version },
               ]}
             />
@@ -65,19 +65,19 @@ function HelmReleaseDetail({ className }: Props) {
                       currentNamespace,
                       {
                         sourceType: SourceType.Helm,
-                        sourceId: helmRelease.sourcename,
+                        sourceId: helmRelease.sourceName,
                       }
                     )}
                   >
-                    {helmRelease.sourcename}
+                    {helmRelease.sourceName}
                   </Link>,
                   "Source",
                 ],
               }}
               pairs={[
-                { key: "Name", value: helmRelease.sourcename },
-                { key: "Kind", value: helmRelease.sourcekind },
-                { key: "Namespace", value: helmRelease.sourcenamespace },
+                { key: "Name", value: helmRelease.sourceName },
+                { key: "Kind", value: helmRelease.sourceKind },
+                { key: "Namespace", value: helmRelease.sourceNamespace },
               ]}
             />
           </Panel>

@@ -55,7 +55,7 @@ function Workloads({ className }: Props) {
         <Panel title="Flux Enabled Workloads">
           <DataTable
             fields={fields}
-            rows={_.filter(workloads, (w) => w.kustomizationrefname !== "")}
+            rows={_.filter(workloads, (w) => w.kustomizationRefName !== "")}
           />
         </Panel>
       </Box>
@@ -80,7 +80,7 @@ function Workloads({ className }: Props) {
               ),
             },
           ]}
-          rows={_.filter(workloads, (w) => w.kustomizationrefname === "")}
+          rows={_.filter(workloads, (w) => w.kustomizationRefName === "")}
         />
       </Panel>
     </Page>

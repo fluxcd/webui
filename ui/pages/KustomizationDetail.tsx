@@ -25,7 +25,7 @@ import {
   useNavigation,
   useWorkloads,
 } from "../lib/hooks";
-import { Kustomization } from "../lib/rpc/clusters";
+import { Kustomization, Workload } from "../lib/rpc/clusters";
 import { AllNamespacesOption } from "../lib/types";
 import { formatURL, PageRoute } from "../lib/util";
 
@@ -39,20 +39,29 @@ const Styled = (c) => styled(c)`
   }
 `;
 
-const infoFields = [
-  "sourceref",
+const SPEC_FIELDS = [
   "namespace",
-  "reconcileat",
-  "path",
+  "sourceRef",
   "interval",
+  "path",
+  "dependsOn",
+  "decryption",
+  "kubeconfig",
   "prune",
-  "reconcilerequestat",
+  "healthChecks",
+  "serviceAccountName",
+  "suspend",
+  "targetNamespace",
+  "timeout",
+  "targetNamespace",
 ];
 
-const formatInfo = (detail: Kustomization) =>
-  _.map(_.pick(detail, infoFields), (v, k) => ({
+const STATUS_FIELDS = ["reconcileRequestAt", "reconciledAt"];
+
+const formatInfo = (detail: Kustomization, fields) =>
+  _.map(_.pick(detail, fields), (v, k) => ({
     key: k,
-    value: typeof v === "string" ? v : v.toString(),
+    value: typeof v === "string" ? v : (v || "").toString(),
   }));
 
 function KustomizationDetail({ className }: Props) {
@@ -80,43 +89,45 @@ function KustomizationDetail({ className }: Props) {
   }
 
   const overrides = {
-    sourceref: [
+    sourceRef: [
       <Link
         to={formatURL(
           PageRoute.SourceDetail,
           currentContext,
           currentNamespace,
           {
-            sourceType: kustomizationDetail.sourcerefkind.toLowerCase(),
-            sourceId: kustomizationDetail.sourceref,
+            sourceType: _.lowerCase(
+              _.get(kustomizationDetail, ["sourceref", "kind"])
+            ),
+            sourceId: _.get(kustomizationDetail, ["sourceref", "name"]),
           }
         )}
       >
-        {kustomizationDetail.sourceref}
+        {kustomizationDetail.sourceRef.name}
       </Link>,
       "Source",
     ],
     reconcileat: [
       ` ${new Date(
-        kustomizationDetail.reconcileat
+        kustomizationDetail.reconciledAt
       ).toLocaleTimeString()} ${new Date(
-        kustomizationDetail.reconcileat
+        kustomizationDetail.reconciledAt
       ).toLocaleDateString()}`,
       "Last Reconcile",
     ],
     reconcilerequestat: [
       ` ${new Date(
-        kustomizationDetail.reconcilerequestat
+        kustomizationDetail.reconcileRequestAt
       ).toLocaleTimeString()} ${new Date(
-        kustomizationDetail.reconcilerequestat
+        kustomizationDetail.reconcileRequestAt
       ).toLocaleDateString()}`,
       "Last Reconcile Request",
     ],
   };
 
-  const relatedWorkloads = _.filter(workloads, {
-    kustomizationrefname: kustomizationDetail.name,
-    kustomizationrefnamespace: kustomizationDetail.namespace,
+  const relatedWorkloads: Workload[] = _.filter(workloads, {
+    kustomizationRefName: kustomizationDetail.name,
+    kustomizationRefNamespace: kustomizationDetail.namespace,
   });
 
   return (
@@ -147,10 +158,19 @@ function KustomizationDetail({ className }: Props) {
       </Flex>
 
       <Box marginBottom={2}>
-        <Panel title="Info">
+        <Panel title="Status">
           <KeyValueTable
             columns={4}
-            pairs={formatInfo(kustomizationDetail)}
+            pairs={formatInfo(kustomizationDetail, STATUS_FIELDS)}
+          />
+        </Panel>
+      </Box>
+
+      <Box marginBottom={2}>
+        <Panel title="Spec">
+          <KeyValueTable
+            columns={4}
+            pairs={formatInfo(kustomizationDetail, SPEC_FIELDS)}
             overrides={overrides}
           />
         </Panel>
@@ -191,25 +211,25 @@ function KustomizationDetail({ className }: Props) {
           <DependencyGraph
             nodes={[
               {
-                id: `source/${kustomizationDetail.sourceref}`,
-                text: `Source: ${kustomizationDetail.sourceref}`,
+                id: `source/${kustomizationDetail.sourceRef.name}`,
+                text: `Source: ${kustomizationDetail.sourceRef.name}`,
               },
               {
                 id: `kustomization/${kustomizationDetail.name}`,
                 text: `Kustomization: ${kustomizationDetail.name}`,
               },
-              ..._.map(relatedWorkloads, (w) => ({
+              ..._.map(relatedWorkloads, (w: Workload) => ({
                 id: `workloads/${w.name}`,
                 text: w.name,
               })),
             ]}
             edges={[
               {
-                source: `source/${kustomizationDetail.sourceref}`,
+                source: `source/${kustomizationDetail.sourceRef.name}`,
                 target: `kustomization/${kustomizationDetail.name}`,
               },
               ..._.map(relatedWorkloads, (w) => ({
-                source: `kustomization/${w.kustomizationrefname}`,
+                source: `kustomization/${w.kustomizationRefName}`,
                 target: `workloads/${w.name}`,
               })),
             ]}
@@ -218,7 +238,7 @@ function KustomizationDetail({ className }: Props) {
       </Box>
       <Box marginBottom={2}>
         <Panel title="Related Workloads">
-          {_.map(relatedWorkloads, (w) => {
+          {_.map(relatedWorkloads, (w: Workload) => {
             return (
               <div key={w.name}>
                 <Link

@@ -20,7 +20,7 @@ function Events({ className }: Props) {
   React.useEffect(() => {
     clustersClient
       .listEvents({
-        contextname: currentContext,
+        contextName: currentContext,
         namespace: "flux-system",
       })
       .then((res) => {
