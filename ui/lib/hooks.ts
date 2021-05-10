@@ -151,6 +151,9 @@ export function useSources(
       clustersClient.listSources({
         contextname: currentContext,
         namespace: formatAPINamespace(currentNamespace),
+        meta: {
+          limit: 1,
+        },
         // @ts-ignore
         sourcetype: convertSourceTypeToInt(s),
       })

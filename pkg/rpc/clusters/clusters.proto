@@ -106,14 +106,21 @@ message Source {
     Artifact artifact = 13;
 }
 
+message RequestMeta {
+    int64 limit = 1;
+    string continue = 2;
+}
+
 message ListSourcesReq {
     string contextName = 1;
     string namespace = 2;
     Source.Type sourceType = 3;
+    RequestMeta meta = 4;
 }
 
 message ListSourcesRes {
     repeated Source sources  = 1;
+    RequestMeta meta = 2;
 }
 
 message SyncSourceReq {

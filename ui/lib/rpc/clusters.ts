@@ -341,16 +341,54 @@ const JSONToSource = (m: Source | SourceJSON): Source => {
 };
 
 
+export interface RequestMeta {
+    limit?: number;
+    continue?: string;
+}
+
+interface RequestMetaJSON {
+    limit?: number;
+    continue?: string;
+}
+
+
+
+const RequestMetaToJSON = (m: RequestMeta): RequestMetaJSON => {
+	if (m === null) {
+		return null;
+	}
+	
+    return {
+        limit: m.limit,
+        continue: m.continue,
+    };
+};
+
+
+
+const JSONToRequestMeta = (m: RequestMeta | RequestMetaJSON): RequestMeta => {
+    if (m === null) {
+		return null;
+	}
+    return {
+        limit: m.limit,
+        continue: m.continue,
+    };
+};
+
+
 export interface ListSourcesReq {
     contextname?: string;
     namespace?: string;
     sourcetype?: string;
+    meta?: RequestMeta;
 }
 
 interface ListSourcesReqJSON {
     contextName?: string;
     namespace?: string;
     sourceType?: string;
+    meta?: RequestMetaJSON;
 }
 
 
@@ -364,16 +402,19 @@ const ListSourcesReqToJSON = (m: ListSourcesReq): ListSourcesReqJSON => {
         contextName: m.contextname,
         namespace: m.namespace,
         sourceType: m.sourcetype,
+        meta: RequestMetaToJSON(m.meta),
     };
 };
 
 
 export interface ListSourcesRes {
     sources?: Source[];
+    meta?: RequestMeta;
 }
 
 interface ListSourcesResJSON {
     sources?: SourceJSON[];
+    meta?: RequestMetaJSON;
 }
 
 
@@ -384,6 +425,7 @@ const JSONToListSourcesRes = (m: ListSourcesRes | ListSourcesResJSON): ListSourc
 	}
     return {
         sources: (m.sources as (Source | SourceJSON)[]).map(JSONToSource),
+        meta: JSONToRequestMeta(m.meta),
     };
 };
 

@@ -272,6 +272,8 @@ func appendSources(k8sObj runtime.Object, res *pb.ListSourcesRes) error {
 			res.Sources = append(res.Sources, &src)
 		}
 
+		res.Meta = &pb.RequestMeta{Continue: list.Continue}
+
 	case *sourcev1.BucketList:
 		for _, i := range list.Items {
 			res.Sources = append(res.Sources, &pb.Source{
@@ -279,6 +281,8 @@ func appendSources(k8sObj runtime.Object, res *pb.ListSourcesRes) error {
 				Type: pb.Source_Bucket,
 			})
 		}
+
+		res.Meta = &pb.RequestMeta{Continue: list.Continue}
 
 	case *sourcev1.HelmRepositoryList:
 		for _, i := range list.Items {
@@ -302,17 +306,22 @@ func appendSources(k8sObj runtime.Object, res *pb.ListSourcesRes) error {
 
 			res.Sources = append(res.Sources, src)
 		}
+
+		res.Meta = &pb.RequestMeta{Continue: list.Continue}
+
 	case *sourcev1.HelmChartList:
 		for _, i := range list.Items {
-			res.Sources = append(res.Sources, &pb.Source{Name: i.Name})
+			res.Sources = append(res.Sources, &pb.Source{Name: i.Name, Type: pb.Source_Chart})
 		}
+
+		res.Meta = &pb.RequestMeta{Continue: list.Continue}
 	}
 
 	return nil
 }
 
 func (s *Server) ListSources(ctx context.Context, msg *pb.ListSourcesReq) (*pb.ListSourcesRes, error) {
-	client, err := s.getClient(msg.ContextName)
+	c, err := s.getClient(msg.ContextName)
 
 	if err != nil {
 		return nil, fmt.Errorf("could not create client: %w", err)
@@ -326,7 +335,12 @@ func (s *Server) ListSources(ctx context.Context, msg *pb.ListSourcesReq) (*pb.L
 		return nil, fmt.Errorf("could not get source type: %w", err)
 	}
 
-	if err := client.List(ctx, k8sList, namespaceOpts(msg.Namespace)); err != nil {
+	opts := client.ListOptions{
+		Limit:    msg.Meta.Limit,
+		Continue: msg.Meta.Continue,
+	}
+
+	if err := c.List(ctx, k8sList, namespaceOpts(msg.Namespace), &opts); err != nil {
 		if apierrors.IsNotFound(err) {
 			return res, nil
 		}
