@@ -124,7 +124,7 @@ type SourceData = {
 export function useSources(
   currentContext: string,
   currentNamespace: string
-): SourceData {
+): { sources: SourceData; syncSource: (Source) => Promise<any> } {
   const { doError } = useContext(AppContext);
   const [sources, setSources] = useState({
     [SourceType.Git]: [],
@@ -166,7 +166,21 @@ export function useSources(
       });
   }, [currentContext, currentNamespace]);
 
-  return sources;
+  const syncSource = (s: Source) =>
+    clustersClient
+      .syncSource({
+        contextname: currentContext,
+        namespace: s.namespace,
+        sourcename: s.name,
+      })
+      .then(() => {
+        setSources({
+          ...sources,
+          [s.name]: s,
+        });
+      });
+
+  return { sources, syncSource };
 }
 
 export function useHelmReleases(

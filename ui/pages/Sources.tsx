@@ -33,7 +33,7 @@ const sections = [
 
 function Sources({ className }: Props) {
   const { currentContext, currentNamespace } = useKubernetesContexts();
-  const sources = useSources(currentContext, currentNamespace);
+  const { sources } = useSources(currentContext, currentNamespace);
 
   return (
     <div className={className}>

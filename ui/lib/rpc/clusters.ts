@@ -388,6 +388,56 @@ const JSONToListSourcesRes = (m: ListSourcesRes | ListSourcesResJSON): ListSourc
 };
 
 
+export interface SyncSourceReq {
+    contextname?: string;
+    namespace?: string;
+    sourcename?: string;
+    sourcetype?: string;
+}
+
+interface SyncSourceReqJSON {
+    contextName?: string;
+    namespace?: string;
+    sourceName?: string;
+    sourceType?: string;
+}
+
+
+
+const SyncSourceReqToJSON = (m: SyncSourceReq): SyncSourceReqJSON => {
+	if (m === null) {
+		return null;
+	}
+	
+    return {
+        contextName: m.contextname,
+        namespace: m.namespace,
+        sourceName: m.sourcename,
+        sourceType: m.sourcetype,
+    };
+};
+
+
+export interface SyncSourceRes {
+    ok?: string;
+}
+
+interface SyncSourceResJSON {
+    ok?: string;
+}
+
+
+
+const JSONToSyncSourceRes = (m: SyncSourceRes | SyncSourceResJSON): SyncSourceRes => {
+    if (m === null) {
+		return null;
+	}
+    return {
+        ok: m.ok,
+    };
+};
+
+
 export interface SyncKustomizationReq {
     contextname?: string;
     namespace?: string;
@@ -760,6 +810,8 @@ export interface Clusters {
     
     listEvents: (listEventsReq: ListEventsReq) => Promise<ListEventsRes>;
     
+    syncSource: (syncSourceReq: SyncSourceReq) => Promise<SyncSourceRes>;
+    
 }
 
 export class DefaultClusters implements Clusters {
@@ -892,6 +944,21 @@ export class DefaultClusters implements Clusters {
             }
 
             return resp.json().then(JSONToListEventsRes);
+        });
+    }
+    
+    syncSource(syncSourceReq: SyncSourceReq): Promise<SyncSourceRes> {
+        const url = this.hostname + this.pathPrefix + "SyncSource";
+        let body: SyncSourceReq | SyncSourceReqJSON = syncSourceReq;
+        if (!this.writeCamelCase) {
+            body = SyncSourceReqToJSON(syncSourceReq);
+        }
+        return this.fetch(createTwirpRequest(url, body, this.headersOverride)).then((resp) => {
+            if (!resp.ok) {
+                return throwTwirpError(resp);
+            }
+
+            return resp.json().then(JSONToSyncSourceRes);
         });
     }
     

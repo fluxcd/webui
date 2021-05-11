@@ -15,7 +15,7 @@ import (
 	pb "github.com/fluxcd/webui/pkg/rpc/clusters"
 	"github.com/fluxcd/webui/pkg/util"
 	appsv1 "k8s.io/api/apps/v1"
-	apimetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -100,8 +100,11 @@ func (s *Server) ListNamespacesForContext(ctx context.Context, msg *pb.ListNames
 	}
 
 	for _, ns := range result.Items {
+
 		res.Namespaces = append(res.Namespaces, ns.Name)
 	}
+
+	fmt.Println(len(res.Namespaces))
 
 	return &res, nil
 }
@@ -124,7 +127,7 @@ func getSourceTypeEnum(kind string) pb.Source_Type {
 	return pb.Source_Git
 }
 
-func mapConditions(conditions []apimetav1.Condition) []*pb.Condition {
+func mapConditions(conditions []metav1.Condition) []*pb.Condition {
 	out := []*pb.Condition{}
 
 	for _, c := range conditions {
@@ -190,22 +193,31 @@ func (s *Server) ListKustomizations(ctx context.Context, msg *pb.ListKustomizati
 
 }
 
-func getSourceType(sourceType pb.Source_Type) (runtime.Object, error) {
-	switch sourceType {
-	case pb.Source_Git:
-		return &sourcev1.GitRepositoryList{}, nil
-
-	case pb.Source_Bucket:
-		return &sourcev1.BucketList{}, nil
-
-	case pb.Source_Helm:
-		return &sourcev1.HelmRepositoryList{}, nil
-
-	case pb.Source_Chart:
-		return &sourcev1.HelmChartList{}, nil
+func kindToSourceType(kind string) pb.Source_Type {
+	switch kind {
+	case pb.Source_Git.String():
+		return pb.Source_Git
 	}
 
-	return nil, errors.New("could not find source type")
+	return -1
+}
+
+func getSourceType(sourceType pb.Source_Type) (runtime.Object, *reconcileWrapper, error) {
+	switch sourceType {
+	case pb.Source_Git:
+		return &sourcev1.GitRepositoryList{}, &reconcileWrapper{object: gitRepositoryAdapter{&sourcev1.GitRepository{}}}, nil
+
+	case pb.Source_Bucket:
+		return &sourcev1.BucketList{}, &reconcileWrapper{object: bucketAdapter{&sourcev1.Bucket{}}}, nil
+
+	case pb.Source_Helm:
+		return &sourcev1.HelmRepositoryList{}, &reconcileWrapper{object: helmRepoAdapter{&sourcev1.HelmRepository{}}}, nil
+
+	case pb.Source_Chart:
+		return &sourcev1.HelmChartList{}, &reconcileWrapper{object: helmChartAdapter{&sourcev1.HelmChart{}}}, nil
+	}
+
+	return nil, nil, errors.New("could not find source type")
 }
 
 func appendSources(k8sObj runtime.Object, res *pb.ListSourcesRes) error {
@@ -217,6 +229,7 @@ func appendSources(k8sObj runtime.Object, res *pb.ListSourcesRes) error {
 
 			src := pb.Source{
 				Name:      i.Name,
+				Namespace: i.Namespace,
 				Type:      pb.Source_Git,
 				Url:       i.Spec.URL,
 				Artifact:  &pb.Artifact{},
@@ -291,7 +304,7 @@ func (s *Server) ListSources(ctx context.Context, msg *pb.ListSourcesReq) (*pb.L
 
 	res := &pb.ListSourcesRes{Sources: []*pb.Source{}}
 
-	k8sList, err := getSourceType(msg.SourceType)
+	k8sList, _, err := getSourceType(msg.SourceType)
 
 	if err != nil {
 		return nil, fmt.Errorf("could not get source type: %w", err)
@@ -311,19 +324,13 @@ func (s *Server) ListSources(ctx context.Context, msg *pb.ListSourcesReq) (*pb.L
 	return res, nil
 }
 
-type reconcilable interface {
-	runtime.Object
-	GetAnnotations() map[string]string
-	SetAnnotations(map[string]string)
-}
-
-func reconcileSource(ctx context.Context, c client.Client, spec kustomizev1.KustomizationSpec, obj reconcilable) error {
+func reconcileSource(ctx context.Context, c client.Client, sourceName, namespace string, obj reconcilable) error {
 	name := types.NamespacedName{
-		Name:      spec.SourceRef.Name,
-		Namespace: spec.SourceRef.Namespace,
+		Name:      sourceName,
+		Namespace: namespace,
 	}
 
-	if err := c.Get(ctx, name, obj); err != nil {
+	if err := c.Get(ctx, name, obj.asRuntimeObject()); err != nil {
 		return err
 	}
 
@@ -337,17 +344,17 @@ func reconcileSource(ctx context.Context, c client.Client, spec kustomizev1.Kust
 		obj.SetAnnotations(annotations)
 	}
 
-	return c.Update(ctx, obj)
+	return c.Update(ctx, obj.asRuntimeObject())
 }
 
-func checkKustomizationSync(ctx context.Context, c client.Client, name types.NamespacedName, lastReconcile string) func() (bool, error) {
+func checkResourceSync(ctx context.Context, c client.Client, name types.NamespacedName, obj reconcilable, lastReconcile string) func() (bool, error) {
 	return func() (bool, error) {
-		kustomization := kustomizev1.Kustomization{}
-		err := c.Get(ctx, name, &kustomization)
+		err := c.Get(ctx, name, obj.asRuntimeObject())
 		if err != nil {
 			return false, err
 		}
-		return kustomization.Status.LastHandledReconcileAt != lastReconcile, nil
+
+		return obj.GetLastHandledReconcileRequest() != lastReconcile, nil
 	}
 }
 
@@ -369,12 +376,16 @@ func (s *Server) SyncKustomization(ctx context.Context, msg *pb.SyncKustomizatio
 	}
 
 	if msg.WithSource {
-		switch kustomization.Spec.SourceRef.Kind {
-		case sourcev1.GitRepositoryKind:
-			err = reconcileSource(ctx, client, kustomization.Spec, &sourcev1.GitRepository{})
-		case sourcev1.BucketKind:
-			err = reconcileSource(ctx, client, kustomization.Spec, &sourcev1.Bucket{})
+		sourceRef := kustomization.Spec.SourceRef
+
+		_, sourceObj, err := getSourceType(kindToSourceType(sourceRef.Kind))
+
+		if err != nil {
+			return nil, fmt.Errorf("could not get reconcileable source object: %w", err)
 		}
+
+		err = reconcileSource(ctx, client, sourceRef.Name, sourceRef.Namespace, sourceObj.object)
+
 		if err != nil {
 			return nil, fmt.Errorf("could not reconcile source: %w", err)
 		}
@@ -395,7 +406,7 @@ func (s *Server) SyncKustomization(ctx context.Context, msg *pb.SyncKustomizatio
 	if err := wait.PollImmediate(
 		k8sPollInterval,
 		k8sTimeout,
-		checkKustomizationSync(ctx, client, name, kustomization.Status.LastHandledReconcileAt),
+		checkResourceSync(ctx, client, name, kustomizationAdapter{&kustomizev1.Kustomization{}}, kustomization.Status.LastHandledReconcileAt),
 	); err != nil {
 		return nil, err
 	}
@@ -407,6 +418,39 @@ func (s *Server) SyncKustomization(ctx context.Context, msg *pb.SyncKustomizatio
 	}
 	return &pb.SyncKustomizationRes{Kustomization: k}, nil
 
+}
+
+func (s *Server) SyncSource(ctx context.Context, msg *pb.SyncSourceReq) (*pb.SyncSourceRes, error) {
+	c, err := s.getClient(msg.ContextName)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not create client: %w", err)
+	}
+
+	_, sourceObj, err := getSourceType(msg.SourceType)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not get source type: %w", err)
+	}
+
+	if err := reconcileSource(ctx, c, msg.SourceName, msg.Namespace, sourceObj.object); err != nil {
+		return nil, fmt.Errorf("could not reconcile source: %w", err)
+	}
+
+	name := types.NamespacedName{
+		Name:      msg.SourceName,
+		Namespace: msg.Namespace,
+	}
+
+	if err := wait.PollImmediate(
+		k8sPollInterval,
+		k8sTimeout,
+		checkResourceSync(ctx, c, name, sourceObj.object, sourceObj.object.GetLastHandledReconcileRequest()),
+	); err != nil {
+		return nil, err
+	}
+
+	return &pb.SyncSourceRes{}, nil
 }
 
 func (s *Server) ListHelmReleases(ctx context.Context, msg *pb.ListHelmReleasesReq) (*pb.ListHelmReleasesRes, error) {

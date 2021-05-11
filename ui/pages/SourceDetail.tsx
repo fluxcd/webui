@@ -1,4 +1,4 @@
-import { Box, Breadcrumbs } from "@material-ui/core";
+import { Box, Breadcrumbs, Button, CircularProgress } from "@material-ui/core";
 import _ from "lodash";
 import * as React from "react";
 import styled from "styled-components";
@@ -41,10 +41,11 @@ const LayoutBox = styled(Box)`
 const Styled = (c) => styled(c)``;
 
 function SourceDetail({ className }: Props) {
+  const [syncing, setSyncing] = React.useState(false);
   const { query } = useNavigation();
   const { sourceType, sourceId } = query;
   const { currentContext, currentNamespace } = useKubernetesContexts();
-  const sources = useSources(currentContext, currentNamespace);
+  const { sources, syncSource } = useSources(currentContext, currentNamespace);
 
   const sourceDetail: Source = _.find(sources[sourceType as string], {
     name: sourceId,
@@ -62,18 +63,39 @@ function SourceDetail({ className }: Props) {
     sourceDetail.url
   );
 
+  console.log(sourceDetail);
+
+  const handleSyncClicked = () => {
+    setSyncing(true);
+
+    syncSource(sourceDetail).then(() => {
+      setSyncing(false);
+    });
+  };
+
   return (
     <Page className={className}>
-      <Breadcrumbs>
-        <Link
-          to={formatURL(PageRoute.Sources, currentContext, currentNamespace)}
+      <Flex align wide between>
+        <Breadcrumbs>
+          <Link
+            to={formatURL(PageRoute.Sources, currentContext, currentNamespace)}
+          >
+            <h2>Sources</h2>
+          </Link>
+          <Flex wide>
+            <h2>{sourceDetail.name}</h2>
+          </Flex>
+        </Breadcrumbs>
+        <Button
+          onClick={handleSyncClicked}
+          color="primary"
+          disabled={syncing}
+          variant="contained"
         >
-          <h2>Sources</h2>
-        </Link>
-        <Flex wide>
-          <h2>{sourceDetail.name}</h2>
-        </Flex>
-      </Breadcrumbs>
+          {syncing ? <CircularProgress size={24} /> : "Sync"}
+        </Button>
+      </Flex>
+
       <LayoutBox m={2}>
         <Panel title="Info">
           <KeyValueTable
