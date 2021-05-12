@@ -21,7 +21,7 @@ const Styled = (c) => styled(c)``;
 
 function HelmRelease({ className }: Props) {
   const { currentContext, currentNamespace } = useKubernetesContexts();
-  const helmReleases = useHelmReleases(currentContext, currentNamespace);
+  const { helmReleases } = useHelmReleases(currentContext, currentNamespace);
 
   const fields: {
     value: string | ((w: any) => JSX.Element);

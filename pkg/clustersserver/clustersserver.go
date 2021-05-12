@@ -104,8 +104,6 @@ func (s *Server) ListNamespacesForContext(ctx context.Context, msg *pb.ListNames
 		res.Namespaces = append(res.Namespaces, ns.Name)
 	}
 
-	fmt.Println(len(res.Namespaces))
-
 	return &res, nil
 }
 
@@ -141,6 +139,16 @@ func mapConditions(conditions []metav1.Condition) []*pb.Condition {
 	}
 
 	return out
+}
+
+func doReconcileAnnotations(annotations map[string]string) {
+	if annotations == nil {
+		annotations = map[string]string{
+			meta.ReconcileAtAnnotation: time.Now().Format(time.RFC3339Nano),
+		}
+	} else {
+		annotations[meta.ReconcileAtAnnotation] = time.Now().Format(time.RFC3339Nano)
+	}
 }
 
 func convertKustomization(kustomization kustomizev1.Kustomization) (*pb.Kustomization, error) {
@@ -195,8 +203,16 @@ func (s *Server) ListKustomizations(ctx context.Context, msg *pb.ListKustomizati
 
 func kindToSourceType(kind string) pb.Source_Type {
 	switch kind {
-	case pb.Source_Git.String():
+	case "Git":
 		return pb.Source_Git
+	case "Bucket":
+		return pb.Source_Bucket
+
+	case "HelmRelease":
+		return pb.Source_Helm
+
+	case "HelmChart":
+		return pb.Source_Chart
 	}
 
 	return -1
@@ -211,7 +227,7 @@ func getSourceType(sourceType pb.Source_Type) (runtime.Object, *reconcileWrapper
 		return &sourcev1.BucketList{}, &reconcileWrapper{object: bucketAdapter{&sourcev1.Bucket{}}}, nil
 
 	case pb.Source_Helm:
-		return &sourcev1.HelmRepositoryList{}, &reconcileWrapper{object: helmRepoAdapter{&sourcev1.HelmRepository{}}}, nil
+		return &sourcev1.HelmRepositoryList{}, &reconcileWrapper{object: helmReleaseAdapter{&helmv2.HelmRelease{}}}, nil
 
 	case pb.Source_Chart:
 		return &sourcev1.HelmChartList{}, &reconcileWrapper{object: helmChartAdapter{&sourcev1.HelmChart{}}}, nil
@@ -333,16 +349,10 @@ func reconcileSource(ctx context.Context, c client.Client, sourceName, namespace
 	if err := c.Get(ctx, name, obj.asRuntimeObject()); err != nil {
 		return err
 	}
+	annotations := obj.GetAnnotations()
+	doReconcileAnnotations(annotations)
 
-	if annotations := obj.GetAnnotations(); obj.GetAnnotations() == nil {
-		obj.SetAnnotations(map[string]string{
-			meta.ReconcileAtAnnotation: time.Now().Format(time.RFC3339Nano),
-		})
-
-	} else {
-		annotations[meta.ReconcileAtAnnotation] = time.Now().Format(time.RFC3339Nano)
-		obj.SetAnnotations(annotations)
-	}
+	obj.SetAnnotations(annotations)
 
 	return c.Update(ctx, obj.asRuntimeObject())
 }
@@ -391,13 +401,7 @@ func (s *Server) SyncKustomization(ctx context.Context, msg *pb.SyncKustomizatio
 		}
 	}
 
-	if kustomization.Annotations == nil {
-		kustomization.Annotations = map[string]string{
-			meta.ReconcileAtAnnotation: time.Now().Format(time.RFC3339Nano),
-		}
-	} else {
-		kustomization.Annotations[meta.ReconcileAtAnnotation] = time.Now().Format(time.RFC3339Nano)
-	}
+	doReconcileAnnotations(kustomization.Annotations)
 
 	if err := client.Update(ctx, &kustomization); err != nil {
 		return nil, fmt.Errorf("could not update kustomization: %w", err)
@@ -453,6 +457,22 @@ func (s *Server) SyncSource(ctx context.Context, msg *pb.SyncSourceReq) (*pb.Syn
 	return &pb.SyncSourceRes{}, nil
 }
 
+func convertHelmRelease(hr helmv2.HelmRelease) *pb.HelmRelease {
+	spec := hr.Spec
+	chartSpec := hr.Spec.Chart.Spec
+	return &pb.HelmRelease{
+		Name:            hr.Name,
+		Namespace:       hr.Namespace,
+		Interval:        spec.Interval.Duration.String(),
+		ChartName:       chartSpec.Chart,
+		Version:         chartSpec.Version,
+		SourceKind:      chartSpec.SourceRef.Kind,
+		SourceName:      chartSpec.SourceRef.Name,
+		SourceNamespace: chartSpec.SourceRef.Namespace,
+		Conditions:      mapConditions(hr.Status.Conditions),
+	}
+}
+
 func (s *Server) ListHelmReleases(ctx context.Context, msg *pb.ListHelmReleasesReq) (*pb.ListHelmReleasesRes, error) {
 	c, err := s.getClient(msg.ContextName)
 
@@ -473,23 +493,45 @@ func (s *Server) ListHelmReleases(ctx context.Context, msg *pb.ListHelmReleasesR
 	}
 
 	for _, r := range list.Items {
-		spec := r.Spec
-		chartSpec := r.Spec.Chart.Spec
-
-		res.HelmReleases = append(res.HelmReleases, &pb.HelmRelease{
-			Name:            r.Name,
-			Namespace:       r.Namespace,
-			Interval:        spec.Interval.Duration.String(),
-			ChartName:       chartSpec.Chart,
-			Version:         chartSpec.Version,
-			SourceKind:      chartSpec.SourceRef.Kind,
-			SourceName:      chartSpec.SourceRef.Name,
-			SourceNamespace: chartSpec.SourceRef.Namespace,
-			Conditions:      mapConditions(r.Status.Conditions),
-		})
+		res.HelmReleases = append(res.HelmReleases, convertHelmRelease(r))
 	}
 
 	return res, nil
+}
+
+func (s *Server) SyncHelmRelease(ctx context.Context, msg *pb.SyncHelmReleaseReq) (*pb.SyncHelmReleaseRes, error) {
+	c, err := s.getClient(msg.ContextName)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not create client: %w", err)
+	}
+
+	name := types.NamespacedName{
+		Name:      msg.HelmReleaseName,
+		Namespace: msg.Namespace,
+	}
+	hr := helmv2.HelmRelease{}
+
+	if err := c.Get(ctx, name, &hr); err != nil {
+		return nil, fmt.Errorf("could not get helm release: %w", err)
+	}
+
+	doReconcileAnnotations(hr.Annotations)
+
+	if err := c.Update(ctx, &hr); err != nil {
+		return nil, fmt.Errorf("could not update kustomization: %w", err)
+	}
+
+	if err := wait.PollImmediate(
+		k8sPollInterval,
+		k8sTimeout,
+		checkResourceSync(ctx, c, name, helmReleaseAdapter{&helmv2.HelmRelease{}}, hr.Status.LastHandledReconcileAt),
+	); err != nil {
+		return nil, err
+	}
+
+	return &pb.SyncHelmReleaseRes{Helmrelease: convertHelmRelease(hr)}, nil
+
 }
 
 const KustomizationNameLabelKey string = "kustomize.toolkit.fluxcd.io/name"

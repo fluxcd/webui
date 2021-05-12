@@ -1,6 +1,7 @@
 package clustersserver
 
 import (
+	helmv2 "github.com/fluxcd/helm-controller/api/v2beta1"
 	kustomizev1 "github.com/fluxcd/kustomize-controller/api/v1beta1"
 	sourcev1 "github.com/fluxcd/source-controller/api/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -51,16 +52,16 @@ func (obj bucketAdapter) asRuntimeObject() runtime.Object {
 	return obj
 }
 
-type helmRepoAdapter struct {
-	*sourcev1.HelmRepository
+type helmReleaseAdapter struct {
+	*helmv2.HelmRelease
 }
 
-func (obj helmRepoAdapter) GetLastHandledReconcileRequest() string {
+func (obj helmReleaseAdapter) GetLastHandledReconcileRequest() string {
 	return obj.Status.GetLastHandledReconcileRequest()
 }
 
-func (obj helmRepoAdapter) asRuntimeObject() runtime.Object {
-	return obj.HelmRepository
+func (obj helmReleaseAdapter) asRuntimeObject() runtime.Object {
+	return obj.HelmRelease
 }
 
 type helmChartAdapter struct {

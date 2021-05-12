@@ -2,7 +2,6 @@ import _ from "lodash";
 import qs from "query-string";
 import { useContext, useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
-import { toast } from "react-toastify";
 import { AppContext } from "../components/AppStateProvider";
 import {
   Context,
@@ -201,8 +200,10 @@ export function useSources(
 export function useHelmReleases(
   currentContext: string,
   currentNamespace: string
-): { [name: string]: HelmRelease } {
-  const [helmReleases, setHelmReleases] = useState({});
+) {
+  const [helmReleases, setHelmReleases] = useState<{
+    [name: string]: HelmRelease;
+  }>({});
   const { doError } = useContext(AppContext);
 
   useEffect(() => {
@@ -224,7 +225,23 @@ export function useHelmReleases(
       });
   }, [currentContext, currentNamespace]);
 
-  return helmReleases;
+  const syncHelmRelease = (hr: HelmRelease) =>
+    clustersClient
+      .syncHelmRelease({
+        contextname: currentContext,
+        namespace: hr.namespace,
+        helmreleasename: hr.name,
+      })
+      .then(() => {
+        setHelmReleases({
+          ...helmReleases,
+          [hr.name]: hr,
+        });
+        notifySuccess("Sync successful");
+      })
+      .catch((err) => notifyError(err.message));
+
+  return { helmReleases, syncHelmRelease };
 }
 
 export function useAppState() {

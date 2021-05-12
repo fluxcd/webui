@@ -419,11 +419,11 @@ const SyncSourceReqToJSON = (m: SyncSourceReq): SyncSourceReqJSON => {
 
 
 export interface SyncSourceRes {
-    ok?: string;
+    source?: Source;
 }
 
 interface SyncSourceResJSON {
-    ok?: string;
+    source?: SourceJSON;
 }
 
 
@@ -433,7 +433,7 @@ const JSONToSyncSourceRes = (m: SyncSourceRes | SyncSourceResJSON): SyncSourceRe
 		return null;
 	}
     return {
-        ok: m.ok,
+        source: JSONToSource(m.source),
     };
 };
 
@@ -572,6 +572,53 @@ const JSONToListHelmReleasesRes = (m: ListHelmReleasesRes | ListHelmReleasesResJ
 	}
     return {
         helmReleases: ((((m as ListHelmReleasesRes).helmReleases) ? (m as ListHelmReleasesRes).helmReleases : (m as ListHelmReleasesResJSON).helm_releases) as (HelmRelease | HelmReleaseJSON)[]).map(JSONToHelmRelease),
+    };
+};
+
+
+export interface SyncHelmReleaseReq {
+    contextname?: string;
+    namespace?: string;
+    helmreleasename?: string;
+}
+
+interface SyncHelmReleaseReqJSON {
+    contextName?: string;
+    namespace?: string;
+    helmReleaseName?: string;
+}
+
+
+
+const SyncHelmReleaseReqToJSON = (m: SyncHelmReleaseReq): SyncHelmReleaseReqJSON => {
+	if (m === null) {
+		return null;
+	}
+	
+    return {
+        contextName: m.contextname,
+        namespace: m.namespace,
+        helmReleaseName: m.helmreleasename,
+    };
+};
+
+
+export interface SyncHelmReleaseRes {
+    helmrelease?: HelmRelease;
+}
+
+interface SyncHelmReleaseResJSON {
+    helmrelease?: HelmReleaseJSON;
+}
+
+
+
+const JSONToSyncHelmReleaseRes = (m: SyncHelmReleaseRes | SyncHelmReleaseResJSON): SyncHelmReleaseRes => {
+    if (m === null) {
+		return null;
+	}
+    return {
+        helmrelease: JSONToHelmRelease(m.helmrelease),
     };
 };
 
@@ -812,6 +859,8 @@ export interface Clusters {
     
     syncSource: (syncSourceReq: SyncSourceReq) => Promise<SyncSourceRes>;
     
+    syncHelmRelease: (syncHelmReleaseReq: SyncHelmReleaseReq) => Promise<SyncHelmReleaseRes>;
+    
 }
 
 export class DefaultClusters implements Clusters {
@@ -959,6 +1008,21 @@ export class DefaultClusters implements Clusters {
             }
 
             return resp.json().then(JSONToSyncSourceRes);
+        });
+    }
+    
+    syncHelmRelease(syncHelmReleaseReq: SyncHelmReleaseReq): Promise<SyncHelmReleaseRes> {
+        const url = this.hostname + this.pathPrefix + "SyncHelmRelease";
+        let body: SyncHelmReleaseReq | SyncHelmReleaseReqJSON = syncHelmReleaseReq;
+        if (!this.writeCamelCase) {
+            body = SyncHelmReleaseReqToJSON(syncHelmReleaseReq);
+        }
+        return this.fetch(createTwirpRequest(url, body, this.headersOverride)).then((resp) => {
+            if (!resp.ok) {
+                return throwTwirpError(resp);
+            }
+
+            return resp.json().then(JSONToSyncHelmReleaseRes);
         });
     }
     
