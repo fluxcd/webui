@@ -63,8 +63,6 @@ function SourceDetail({ className }: Props) {
     sourceDetail.url
   );
 
-  console.log(sourceDetail);
-
   const handleSyncClicked = () => {
     setSyncing(true);
 

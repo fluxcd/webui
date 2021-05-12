@@ -2,16 +2,25 @@ import _ from "lodash";
 import qs from "query-string";
 import { useContext, useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
 import { AppContext } from "../components/AppStateProvider";
 import {
   Context,
   HelmRelease,
   Kustomization,
   Source,
+  SyncKustomizationRes,
   Workload,
 } from "./rpc/clusters";
 import { AllNamespacesOption } from "./types";
-import { clustersClient, formatURL, normalizePath, PageRoute } from "./util";
+import {
+  clustersClient,
+  formatURL,
+  normalizePath,
+  notifyError,
+  notifySuccess,
+  PageRoute,
+} from "./util";
 // The backend doesn't like the word "all". Instead, it wants an empty string.
 // Navigation might get weird if we use an empty string on the front-end.
 // There may also be a naming collision with a namespace named "all".
@@ -85,12 +94,14 @@ export function useKustomizations(
         withsource: false,
         kustomizationname: k.name,
       })
-      .then(() => {
+      .then((res: SyncKustomizationRes) => {
         setKustomizations({
           ...kustomizations,
-          [k.name]: k,
+          [k.name]: res.kustomization,
         });
-      });
+        notifySuccess("Sync successful");
+      })
+      .catch((err) => notifyError(err.message));
 
   return { kustomizations, syncKustomization };
 }
@@ -178,6 +189,10 @@ export function useSources(
           ...sources,
           [s.name]: s,
         });
+        notifySuccess("Sync successful");
+      })
+      .catch((err) => {
+        doError(err);
       });
 
   return { sources, syncSource };

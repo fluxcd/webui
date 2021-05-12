@@ -1,5 +1,6 @@
 import _ from "lodash";
 import qs from "query-string";
+import { toast } from "react-toastify";
 import { DefaultClusters } from "./rpc/clusters";
 
 export const wrappedFetch = (url, opts: RequestInit = {}) => {
@@ -87,3 +88,11 @@ export const clustersClient = new DefaultClusters(
   "/api/clusters",
   wrappedFetch
 );
+
+export function notifySuccess(message: string) {
+  toast["success"](message);
+}
+
+export function notifyError(message: string) {
+  toast["error"](`Error: ${message}`);
+}
