@@ -3,9 +3,12 @@ import {
   TableBody,
   TableCell,
   TableContainer,
+  TableFooter,
   TableHead,
+  TablePagination,
   TableRow,
 } from "@material-ui/core";
+import TablePaginationActions from "@material-ui/core/TablePagination/TablePaginationActions";
 import _ from "lodash";
 import * as React from "react";
 import styled from "styled-components";
@@ -14,6 +17,10 @@ type Props = {
   className?: string;
   fields: { label: string; value: string | ((k: any) => string) }[];
   rows: any[];
+  rowsPerPage: number;
+  count: number;
+  onChangePage: (number) => void;
+  pageNum: number;
 };
 
 const EmptyRow = styled(TableRow)<{ colSpan: number }>`
@@ -23,9 +30,23 @@ const EmptyRow = styled(TableRow)<{ colSpan: number }>`
     text-align: center;
   }
 `;
-const Styled = (c) => styled(c)``;
 
-function DataTable({ className, fields, rows }: Props) {
+function DataTable({
+  className,
+  fields,
+  rows,
+  count,
+  onChangePage,
+  rowsPerPage,
+  pageNum,
+}: Props) {
+  const handleChangePage = (
+    event: React.MouseEvent<HTMLButtonElement> | null,
+    newPage: number
+  ) => {
+    onChangePage(newPage);
+  };
+
   const r = _.map(rows, (r, i) => (
     <TableRow key={i}>
       {_.map(fields, (f) => (
@@ -58,10 +79,28 @@ function DataTable({ className, fields, rows }: Props) {
               </EmptyRow>
             )}
           </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TablePagination
+                rowsPerPageOptions={[]}
+                colSpan={fields.length}
+                count={count}
+                labelRowsPerPage={null}
+                rowsPerPage={rowsPerPage}
+                page={pageNum}
+                SelectProps={{
+                  inputProps: { "aria-label": "rows per page" },
+                  native: true,
+                }}
+                onChangePage={handleChangePage}
+                ActionsComponent={TablePaginationActions}
+              />
+            </TableRow>
+          </TableFooter>
         </Table>
       </TableContainer>
     </div>
   );
 }
 
-export default Styled(DataTable);
+export default DataTable;

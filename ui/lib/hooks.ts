@@ -264,7 +264,7 @@ export function useNavigation() {
 
   return {
     currentPage,
-    query: qs.parse(location.search),
+    query: qs.parse(location.search) as { [k: string]: string },
     navigate: (
       page: PageRoute | null,
       context: string,

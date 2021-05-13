@@ -272,7 +272,7 @@ func appendSources(k8sObj runtime.Object, res *pb.ListSourcesRes) error {
 			res.Sources = append(res.Sources, &src)
 		}
 
-		res.Meta = &pb.RequestMeta{Continue: list.Continue}
+		res.Meta = &pb.RequestMeta{Cursor: list.Continue}
 
 	case *sourcev1.BucketList:
 		for _, i := range list.Items {
@@ -282,7 +282,7 @@ func appendSources(k8sObj runtime.Object, res *pb.ListSourcesRes) error {
 			})
 		}
 
-		res.Meta = &pb.RequestMeta{Continue: list.Continue}
+		res.Meta = &pb.RequestMeta{Cursor: list.Continue}
 
 	case *sourcev1.HelmRepositoryList:
 		for _, i := range list.Items {
@@ -307,14 +307,14 @@ func appendSources(k8sObj runtime.Object, res *pb.ListSourcesRes) error {
 			res.Sources = append(res.Sources, src)
 		}
 
-		res.Meta = &pb.RequestMeta{Continue: list.Continue}
+		res.Meta = &pb.RequestMeta{Cursor: list.Continue}
 
 	case *sourcev1.HelmChartList:
 		for _, i := range list.Items {
 			res.Sources = append(res.Sources, &pb.Source{Name: i.Name, Type: pb.Source_Chart})
 		}
 
-		res.Meta = &pb.RequestMeta{Continue: list.Continue}
+		res.Meta = &pb.RequestMeta{Cursor: list.Continue}
 	}
 
 	return nil
@@ -337,7 +337,7 @@ func (s *Server) ListSources(ctx context.Context, msg *pb.ListSourcesReq) (*pb.L
 
 	opts := client.ListOptions{
 		Limit:    msg.Meta.Limit,
-		Continue: msg.Meta.Continue,
+		Continue: msg.Meta.Cursor,
 	}
 
 	if err := c.List(ctx, k8sList, namespaceOpts(msg.Namespace), &opts); err != nil {
@@ -601,8 +601,13 @@ func (s *Server) ListEvents(ctx context.Context, msg *pb.ListEventsReq) (*pb.Lis
 		return nil, fmt.Errorf("could not create client: %w", err)
 	}
 
+	opts := client.ListOptions{
+		Limit:    msg.Meta.Limit,
+		Continue: msg.Meta.Cursor,
+	}
+
 	list := corev1.EventList{}
-	if err := c.List(ctx, &list, namespaceOpts(msg.Namespace)); err != nil {
+	if err := c.List(ctx, &list, namespaceOpts(msg.Namespace), &opts); err != nil {
 		return nil, fmt.Errorf("could not get events: %w", err)
 	}
 
@@ -618,5 +623,16 @@ func (s *Server) ListEvents(ctx context.Context, msg *pb.ListEventsReq) (*pb.Lis
 		})
 	}
 
-	return &pb.ListEventsRes{Events: events}, nil
+	var remaining int32
+
+	if list.RemainingItemCount != nil {
+		remaining = int32(*list.RemainingItemCount)
+	}
+
+	return &pb.ListEventsRes{
+		Events: events,
+		Meta: &pb.ResponseMeta{
+			NextCursor: list.Continue,
+			Remaining:  remaining,
+		}}, nil
 }

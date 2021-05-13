@@ -6,15 +6,16 @@ type Props = {
   className?: string;
   children: any;
   to?: string;
+  href?: string;
 };
 
 const Styled = (c) => styled(c)``;
 
-function Link({ className, children, to, ...rest }: Props) {
-  return (
-    <RouterLink {...rest} to={to} className={className}>
-      {children}
-    </RouterLink>
+function Link({ className, to, href, ...rest }: Props) {
+  return href ? (
+    <a href={href} {...rest} />
+  ) : (
+    <RouterLink {...rest} to={to} className={className} />
   );
 }
 

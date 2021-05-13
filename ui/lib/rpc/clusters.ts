@@ -343,12 +343,12 @@ const JSONToSource = (m: Source | SourceJSON): Source => {
 
 export interface RequestMeta {
     limit?: number;
-    continue?: string;
+    cursor?: string;
 }
 
 interface RequestMetaJSON {
     limit?: number;
-    continue?: string;
+    cursor?: string;
 }
 
 
@@ -360,7 +360,7 @@ const RequestMetaToJSON = (m: RequestMeta): RequestMetaJSON => {
 	
     return {
         limit: m.limit,
-        continue: m.continue,
+        cursor: m.cursor,
     };
 };
 
@@ -372,7 +372,30 @@ const JSONToRequestMeta = (m: RequestMeta | RequestMetaJSON): RequestMeta => {
 	}
     return {
         limit: m.limit,
-        continue: m.continue,
+        cursor: m.cursor,
+    };
+};
+
+
+export interface ResponseMeta {
+    nextcursor?: string;
+    remaining?: number;
+}
+
+interface ResponseMetaJSON {
+    nextCursor?: string;
+    remaining?: number;
+}
+
+
+
+const JSONToResponseMeta = (m: ResponseMeta | ResponseMetaJSON): ResponseMeta => {
+    if (m === null) {
+		return null;
+	}
+    return {
+        nextcursor: (((m as ResponseMeta).nextcursor) ? (m as ResponseMeta).nextcursor : (m as ResponseMetaJSON).nextCursor),
+        remaining: m.remaining,
     };
 };
 
@@ -841,11 +864,13 @@ const JSONToEvent = (m: Event | EventJSON): Event => {
 export interface ListEventsReq {
     contextname?: string;
     namespace?: string;
+    meta?: RequestMeta;
 }
 
 interface ListEventsReqJSON {
     contextName?: string;
     namespace?: string;
+    meta?: RequestMetaJSON;
 }
 
 
@@ -858,16 +883,19 @@ const ListEventsReqToJSON = (m: ListEventsReq): ListEventsReqJSON => {
     return {
         contextName: m.contextname,
         namespace: m.namespace,
+        meta: RequestMetaToJSON(m.meta),
     };
 };
 
 
 export interface ListEventsRes {
     events?: Event[];
+    meta?: ResponseMeta;
 }
 
 interface ListEventsResJSON {
     events?: EventJSON[];
+    meta?: ResponseMetaJSON;
 }
 
 
@@ -878,6 +906,7 @@ const JSONToListEventsRes = (m: ListEventsRes | ListEventsResJSON): ListEventsRe
 	}
     return {
         events: (m.events as (Event | EventJSON)[]).map(JSONToEvent),
+        meta: JSONToResponseMeta(m.meta),
     };
 };
 

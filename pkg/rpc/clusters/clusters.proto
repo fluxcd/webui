@@ -108,7 +108,12 @@ message Source {
 
 message RequestMeta {
     int64 limit = 1;
-    string continue = 2;
+    string cursor = 2;
+}
+
+message ResponseMeta {
+    string nextCursor = 1;
+    int32 remaining = 2;
 }
 
 message ListSourcesReq {
@@ -223,8 +228,10 @@ message Event {
 message ListEventsReq {
     string contextName = 1;
     string namespace = 2;
+    RequestMeta meta = 3;
 }
 
 message ListEventsRes {
     repeated Event events = 1;
+    ResponseMeta meta = 2;
 }
