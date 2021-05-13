@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 var _ = Describe("clustersserver", func() {
@@ -125,7 +125,7 @@ var _ = Describe("clustersserver", func() {
 
 })
 
-func getPopulatedSourceType(sourceType pb.Source_Type) (runtime.Object, error) {
+func getPopulatedSourceType(sourceType pb.Source_Type) (client.Object, error) {
 	objMeta := metav1.ObjectMeta{Name: "somename", Namespace: "default"}
 
 	switch sourceType {

@@ -5,18 +5,16 @@ import (
 	kustomizev1 "github.com/fluxcd/kustomize-controller/api/v1beta1"
 	sourcev1 "github.com/fluxcd/source-controller/api/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type reconcilable interface {
-	runtime.Object
+	client.Object
 	GetAnnotations() map[string]string
 	SetAnnotations(map[string]string)
 	GetStatusConditions() *[]metav1.Condition
 	GetLastHandledReconcileRequest() string
-	DeepCopyObject() runtime.Object
-
-	asRuntimeObject() runtime.Object
+	asClientObject() client.Object
 }
 
 type apiType struct {
@@ -36,7 +34,7 @@ func (o gitRepositoryAdapter) GetLastHandledReconcileRequest() string {
 	return o.Status.GetLastHandledReconcileRequest()
 }
 
-func (o gitRepositoryAdapter) asRuntimeObject() runtime.Object {
+func (o gitRepositoryAdapter) asClientObject() client.Object {
 	return o.GitRepository
 }
 
@@ -48,7 +46,7 @@ func (obj bucketAdapter) GetLastHandledReconcileRequest() string {
 	return obj.Status.GetLastHandledReconcileRequest()
 }
 
-func (obj bucketAdapter) asRuntimeObject() runtime.Object {
+func (obj bucketAdapter) asClientObject() client.Object {
 	return obj
 }
 
@@ -60,7 +58,7 @@ func (obj helmReleaseAdapter) GetLastHandledReconcileRequest() string {
 	return obj.Status.GetLastHandledReconcileRequest()
 }
 
-func (obj helmReleaseAdapter) asRuntimeObject() runtime.Object {
+func (obj helmReleaseAdapter) asClientObject() client.Object {
 	return obj.HelmRelease
 }
 
@@ -72,7 +70,7 @@ func (obj helmChartAdapter) GetLastHandledReconcileRequest() string {
 	return obj.Status.GetLastHandledReconcileRequest()
 }
 
-func (obj helmChartAdapter) asRuntimeObject() runtime.Object {
+func (obj helmChartAdapter) asClientObject() client.Object {
 	return obj.HelmChart
 }
 
@@ -84,6 +82,6 @@ func (o kustomizationAdapter) GetLastHandledReconcileRequest() string {
 	return o.Status.GetLastHandledReconcileRequest()
 }
 
-func (o kustomizationAdapter) asRuntimeObject() runtime.Object {
+func (o kustomizationAdapter) asClientObject() client.Object {
 	return o.Kustomization
 }

@@ -218,7 +218,7 @@ func kindToSourceType(kind string) pb.Source_Type {
 	return -1
 }
 
-func getSourceType(sourceType pb.Source_Type) (runtime.Object, *reconcileWrapper, error) {
+func getSourceType(sourceType pb.Source_Type) (client.ObjectList, *reconcileWrapper, error) {
 	switch sourceType {
 	case pb.Source_Git:
 		return &sourcev1.GitRepositoryList{}, &reconcileWrapper{object: gitRepositoryAdapter{&sourcev1.GitRepository{}}}, nil
@@ -346,7 +346,7 @@ func reconcileSource(ctx context.Context, c client.Client, sourceName, namespace
 		Namespace: namespace,
 	}
 
-	if err := c.Get(ctx, name, obj.asRuntimeObject()); err != nil {
+	if err := c.Get(ctx, name, obj.asClientObject()); err != nil {
 		return err
 	}
 	annotations := obj.GetAnnotations()
@@ -354,12 +354,12 @@ func reconcileSource(ctx context.Context, c client.Client, sourceName, namespace
 
 	obj.SetAnnotations(annotations)
 
-	return c.Update(ctx, obj.asRuntimeObject())
+	return c.Update(ctx, obj.asClientObject())
 }
 
 func checkResourceSync(ctx context.Context, c client.Client, name types.NamespacedName, obj reconcilable, lastReconcile string) func() (bool, error) {
 	return func() (bool, error) {
-		err := c.Get(ctx, name, obj.asRuntimeObject())
+		err := c.Get(ctx, name, obj.asClientObject())
 		if err != nil {
 			return false, err
 		}

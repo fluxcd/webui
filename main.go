@@ -42,7 +42,7 @@ func initialContexts() (contexts []string, currentCtx string, err error) {
 }
 
 func main() {
-	log := logger.NewLogger("debug", false)
+	log := logger.NewLogger(logger.Options{LogLevel: "debug"})
 
 	mux := http.NewServeMux()
 
