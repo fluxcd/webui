@@ -1,10 +1,8 @@
 import qs from "query-string";
 import * as React from "react";
-import { useHistory } from "react-router";
-import { toast } from "react-toastify";
 import { DefaultClusters } from "../lib/rpc/clusters";
 import { AllNamespacesOption } from "../lib/types";
-import { formatURL, PageRoute, wrappedFetch } from "../lib/util";
+import { wrappedFetch } from "../lib/util";
 
 export const AppContext = React.createContext(null as any);
 
@@ -27,8 +25,6 @@ export default function AppStateProvider(props) {
   );
   const [appState, setAppState] = React.useState({ error: null });
 
-  const history = useHistory();
-
   const doError = (message: string, fatal: boolean, detail?: Error) => {
     console.error(message);
     console.error(detail);
@@ -36,10 +32,6 @@ export default function AppStateProvider(props) {
       ...(appState as AppState),
       error: { message, fatal, detail },
     });
-
-    history.push(
-      formatURL(PageRoute.Error, currentContext as string, currentNamespace)
-    );
   };
 
   const query = qs.parse(location.pathname);
@@ -94,9 +86,6 @@ export default function AppStateProvider(props) {
     setNamespaces,
     setCurrentNamespace,
     doError,
-    notify: (type, msg) => {
-      toast[type](msg);
-    },
   };
 
   return <AppContext.Provider value={value} {...props} />;

@@ -8,10 +8,18 @@ import {
   HelmRelease,
   Kustomization,
   Source,
+  SyncKustomizationRes,
   Workload,
 } from "./rpc/clusters";
 import { AllNamespacesOption } from "./types";
-import { clustersClient, formatURL, normalizePath, PageRoute } from "./util";
+import {
+  clustersClient,
+  formatURL,
+  normalizePath,
+  notifyError,
+  notifySuccess,
+  PageRoute,
+} from "./util";
 // The backend doesn't like the word "all". Instead, it wants an empty string.
 // Navigation might get weird if we use an empty string on the front-end.
 // There may also be a naming collision with a namespace named "all".
@@ -85,12 +93,14 @@ export function useKustomizations(
         withsource: false,
         kustomizationname: k.name,
       })
-      .then(() => {
+      .then((res: SyncKustomizationRes) => {
         setKustomizations({
           ...kustomizations,
-          [k.name]: k,
+          [k.name]: res.kustomization,
         });
-      });
+        notifySuccess("Sync successful");
+      })
+      .catch((err) => notifyError(err.message));
 
   return { kustomizations, syncKustomization };
 }
@@ -124,7 +134,7 @@ type SourceData = {
 export function useSources(
   currentContext: string,
   currentNamespace: string
-): SourceData {
+): { sources: SourceData; syncSource: (Source) => Promise<any> } {
   const { doError } = useContext(AppContext);
   const [sources, setSources] = useState({
     [SourceType.Git]: [],
@@ -166,14 +176,34 @@ export function useSources(
       });
   }, [currentContext, currentNamespace]);
 
-  return sources;
+  const syncSource = (s: Source) =>
+    clustersClient
+      .syncSource({
+        contextname: currentContext,
+        namespace: s.namespace,
+        sourcename: s.name,
+      })
+      .then(() => {
+        setSources({
+          ...sources,
+          [s.name]: s,
+        });
+        notifySuccess("Sync successful");
+      })
+      .catch((err) => {
+        doError(err);
+      });
+
+  return { sources, syncSource };
 }
 
 export function useHelmReleases(
   currentContext: string,
   currentNamespace: string
-): { [name: string]: HelmRelease } {
-  const [helmReleases, setHelmReleases] = useState({});
+) {
+  const [helmReleases, setHelmReleases] = useState<{
+    [name: string]: HelmRelease;
+  }>({});
   const { doError } = useContext(AppContext);
 
   useEffect(() => {
@@ -195,7 +225,23 @@ export function useHelmReleases(
       });
   }, [currentContext, currentNamespace]);
 
-  return helmReleases;
+  const syncHelmRelease = (hr: HelmRelease) =>
+    clustersClient
+      .syncHelmRelease({
+        contextname: currentContext,
+        namespace: hr.namespace,
+        helmreleasename: hr.name,
+      })
+      .then(() => {
+        setHelmReleases({
+          ...helmReleases,
+          [hr.name]: hr,
+        });
+        notifySuccess("Sync successful");
+      })
+      .catch((err) => notifyError(err.message));
+
+  return { helmReleases, syncHelmRelease };
 }
 
 export function useAppState() {

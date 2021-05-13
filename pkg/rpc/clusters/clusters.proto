@@ -12,6 +12,8 @@ service Clusters {
     rpc ListHelmReleases (ListHelmReleasesReq) returns (ListHelmReleasesRes);
     rpc ListWorkloads (ListWorkloadsReq) returns (ListWorkloadsRes);
     rpc ListEvents (ListEventsReq) returns (ListEventsRes);
+    rpc SyncSource (SyncSourceReq) returns (SyncSourceRes);
+    rpc SyncHelmRelease (SyncHelmReleaseReq) returns (SyncHelmReleaseRes);
 }
 
 message Context {
@@ -114,6 +116,17 @@ message ListSourcesRes {
     repeated Source sources  = 1;
 }
 
+message SyncSourceReq {
+    string contextName = 1;
+    string namespace = 2;
+    string sourceName = 3;
+    Source.Type sourceType = 4;
+}
+
+message SyncSourceRes {
+    Source source = 1;
+}
+
 message SyncKustomizationReq {
     string contextName = 1;
     string namespace = 2;
@@ -144,6 +157,16 @@ message ListHelmReleasesReq {
 
 message ListHelmReleasesRes {
     repeated HelmRelease helm_releases = 1;
+}
+
+message SyncHelmReleaseReq {
+    string contextName = 1;
+    string namespace = 2;
+    string helmReleaseName = 3;
+}
+
+message SyncHelmReleaseRes {
+    HelmRelease helmrelease = 1;
 }
 
 message Container {
