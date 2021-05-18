@@ -10,7 +10,7 @@ import Flex from "./components/Flex";
 import LeftNav from "./components/LeftNav";
 import TopNav from "./components/TopNav";
 import theme, { GlobalStyle } from "./lib/theme";
-import { PageRoute } from "./lib/util";
+import { clustersClient, PageRoute } from "./lib/util";
 import Error from "./pages/Error";
 import Events from "./pages/Events";
 import HelmReleaseDetail from "./pages/HelmReleaseDetail";
@@ -50,7 +50,7 @@ export default function App() {
 
         <Router>
           <ErrorBoundary>
-            <AppStateProvider>
+            <AppStateProvider clustersClient={clustersClient}>
               <AppContainer>
                 <TopNavContainer>
                   <TopNav />
