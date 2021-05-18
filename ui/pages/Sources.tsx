@@ -3,8 +3,11 @@ import _ from "lodash";
 import * as React from "react";
 import styled from "styled-components";
 import Link from "../components/Link";
+import LoadingPage from "../components/LoadingPage";
+import Page from "../components/Page";
 import Panel from "../components/Panel";
-import { SourceType, useKubernetesContexts, useSources } from "../lib/hooks";
+import { useKubernetesContexts } from "../lib/hooks/app";
+import { SourceType, useSources } from "../lib/hooks/sources";
 import { formatURL, PageRoute } from "../lib/util";
 
 type Props = {
@@ -33,10 +36,14 @@ const sections = [
 
 function Sources({ className }: Props) {
   const { currentContext, currentNamespace } = useKubernetesContexts();
-  const { sources } = useSources(currentContext, currentNamespace);
+  const { sources, loading } = useSources(currentContext, currentNamespace);
+
+  if (loading) {
+    return <LoadingPage />;
+  }
 
   return (
-    <div className={className}>
+    <Page className={className}>
       <h2>Sources</h2>
       <div>
         {_.map(sections, (t) => (
@@ -63,7 +70,7 @@ function Sources({ className }: Props) {
           </Box>
         ))}
       </div>
-    </div>
+    </Page>
   );
 }
 

@@ -2,7 +2,7 @@ import { Tab, Tabs } from "@material-ui/core";
 import _ from "lodash";
 import * as React from "react";
 import styled from "styled-components";
-import { useKubernetesContexts, useNavigation } from "../lib/hooks";
+import { useKubernetesContexts, useNavigation } from "../lib/hooks/app";
 import { formatURL, getNavValue, PageRoute } from "../lib/util";
 import Link from "./Link";
 
@@ -11,7 +11,6 @@ type Props = {
 };
 
 const navItems = [
-  { value: PageRoute.Workloads, label: "Workloads" },
   { value: PageRoute.Sources, label: "Sources" },
   { value: PageRoute.Kustomizations, label: "Kustomizations" },
   { value: PageRoute.HelmReleases, label: "Helm Releases" },

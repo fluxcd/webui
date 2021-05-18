@@ -12,9 +12,11 @@
     "test": "jest"
   },
   "dependencies": {
-    "@material-ui/core": "^4.11.2",
+    "@material-ui/core": "^4.11.4",
     "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.58",
     "@types/lodash": "^4.14.165",
+    "@types/react": "^17.0.6",
     "@types/react-router": "^5.1.8",
     "@types/react-router-dom": "^5.1.6",
     "@types/styled-components": "^5.1.4",
@@ -23,8 +25,8 @@
     "dagre-d3": "^0.6.4",
     "lodash": "^4.17.20",
     "query-string": "^6.13.7",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "react-router-dom": "^5.2.0",
     "react-toastify": "^7.0.3",
     "styled-components": "^5.2.1"

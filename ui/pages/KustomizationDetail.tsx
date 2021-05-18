@@ -14,19 +14,13 @@ import _ from "lodash";
 import * as React from "react";
 import styled from "styled-components";
 import Flex from "../components/Flex";
-import DependencyGraph from "../components/Graph";
 import KeyValueTable from "../components/KeyValueTable";
 import Link from "../components/Link";
 import Page from "../components/Page";
 import Panel from "../components/Panel";
-import {
-  useKubernetesContexts,
-  useKustomizations,
-  useNavigation,
-  useWorkloads,
-} from "../lib/hooks";
+import { useKubernetesContexts, useNavigation } from "../lib/hooks/app";
+import { useKustomizations } from "../lib/hooks/kustomizations";
 import { Kustomization } from "../lib/rpc/clusters";
-import { AllNamespacesOption } from "../lib/types";
 import { formatURL, PageRoute } from "../lib/util";
 
 type Props = {
@@ -59,7 +53,6 @@ function KustomizationDetail({ className }: Props) {
   const [syncing, setSyncing] = React.useState(false);
   const { query } = useNavigation();
   const { currentContext, currentNamespace } = useKubernetesContexts();
-  const workloads = useWorkloads(currentContext, AllNamespacesOption);
 
   const { kustomizations, syncKustomization } = useKustomizations(
     currentContext,
@@ -113,11 +106,6 @@ function KustomizationDetail({ className }: Props) {
       "Last Reconcile Request",
     ],
   };
-
-  const relatedWorkloads = _.filter(workloads, {
-    kustomizationrefname: kustomizationDetail.name,
-    kustomizationrefnamespace: kustomizationDetail.namespace,
-  });
 
   return (
     <Page className={className}>
@@ -184,56 +172,6 @@ function KustomizationDetail({ className }: Props) {
               </TableBody>
             </Table>
           </TableContainer>
-        </Panel>
-      </Box>
-      <Box marginBottom={2}>
-        <Panel title="Graph">
-          <DependencyGraph
-            nodes={[
-              {
-                id: `source/${kustomizationDetail.sourceref}`,
-                text: `Source: ${kustomizationDetail.sourceref}`,
-              },
-              {
-                id: `kustomization/${kustomizationDetail.name}`,
-                text: `Kustomization: ${kustomizationDetail.name}`,
-              },
-              ..._.map(relatedWorkloads, (w) => ({
-                id: `workloads/${w.name}`,
-                text: w.name,
-              })),
-            ]}
-            edges={[
-              {
-                source: `source/${kustomizationDetail.sourceref}`,
-                target: `kustomization/${kustomizationDetail.name}`,
-              },
-              ..._.map(relatedWorkloads, (w) => ({
-                source: `kustomization/${w.kustomizationrefname}`,
-                target: `workloads/${w.name}`,
-              })),
-            ]}
-          ></DependencyGraph>
-        </Panel>
-      </Box>
-      <Box marginBottom={2}>
-        <Panel title="Related Workloads">
-          {_.map(relatedWorkloads, (w) => {
-            return (
-              <div key={w.name}>
-                <Link
-                  to={formatURL(
-                    PageRoute.WorkloadDetail,
-                    currentContext,
-                    w.namespace,
-                    { workloadId: w.name }
-                  )}
-                >
-                  {w.name}
-                </Link>
-              </div>
-            );
-          })}
         </Panel>
       </Box>
     </Page>
