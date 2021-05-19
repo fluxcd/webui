@@ -1,0 +1,627 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`KustomizationDetail renders 1`] = `
+Object {
+  "asFragment": [Function],
+  "baseElement": <body>
+    <div />
+    <div>
+      <div
+        class="sc-jSgupP sc-fubCfw ERjJi"
+      >
+        <div
+          class="sc-bdfBwQ kLrCXV"
+        >
+          <nav
+            class="MuiTypography-root MuiBreadcrumbs-root MuiTypography-body1 MuiTypography-colorTextSecondary"
+          >
+            <ol
+              class="MuiBreadcrumbs-ol"
+            >
+              <li
+                class="MuiBreadcrumbs-li"
+              >
+                <a
+                  class="sc-eCssSg"
+                  href="/kustomizations?context=my-context&namespace=all"
+                >
+                  <h2>
+                    Kustomizations
+                  </h2>
+                </a>
+              </li>
+              <li
+                aria-hidden="true"
+                class="MuiBreadcrumbs-separator"
+              >
+                /
+              </li>
+              <li
+                class="MuiBreadcrumbs-li"
+              >
+                <div
+                  class="sc-bdfBwQ jANNfu"
+                >
+                  <h2>
+                    my-kustomization
+                  </h2>
+                </div>
+              </li>
+            </ol>
+          </nav>
+          <button
+            class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary"
+            tabindex="0"
+            type="button"
+          >
+            <span
+              class="MuiButton-label"
+            >
+              Sync
+            </span>
+            <span
+              class="MuiTouchRipple-root"
+            />
+          </button>
+        </div>
+        <div
+          class="MuiBox-root MuiBox-root-1"
+        >
+          <div
+            class="sc-iBPRYJ"
+          >
+            <div
+              class="MuiPaper-root MuiCard-root MuiPaper-outlined MuiPaper-rounded"
+            >
+              <div
+                class="sc-gKsewC ejJyga"
+              >
+                <h3>
+                  Info
+                </h3>
+              </div>
+              <div
+                class="MuiCardContent-root"
+              >
+                <div>
+                  <div
+                    class="sc-hKgILt emSDXW"
+                    role="list"
+                  >
+                    <table>
+                      <tbody>
+                        <tr>
+                          <td
+                            role="listitem"
+                          >
+                            <div
+                              aria-label="Source"
+                              class="sc-gsTCUz bCQwq"
+                            >
+                              Source
+                            </div>
+                            <div
+                              class="sc-dlfnbm"
+                            >
+                              <a
+                                class="sc-eCssSg"
+                                href="/sources_detail?context=my-context&namespace=all&sourceId=my-source&sourceType=git"
+                              >
+                                my-source
+                              </a>
+                            </div>
+                          </td>
+                          <td
+                            role="listitem"
+                          >
+                            <div
+                              aria-label="Namespace"
+                              class="sc-gsTCUz bCQwq"
+                            >
+                              Namespace
+                            </div>
+                            <div
+                              class="sc-dlfnbm"
+                            >
+                              default
+                            </div>
+                          </td>
+                          <td
+                            role="listitem"
+                          >
+                            <div
+                              aria-label="Last reconcile"
+                              class="sc-gsTCUz bCQwq"
+                            >
+                              Last reconcile
+                            </div>
+                            <div
+                              class="sc-dlfnbm"
+                            >
+                               Invalid Date Invalid Date
+                            </div>
+                          </td>
+                          <td
+                            role="listitem"
+                          >
+                            <div
+                              aria-label="Path"
+                              class="sc-gsTCUz bCQwq"
+                            >
+                              Path
+                            </div>
+                            <div
+                              class="sc-dlfnbm"
+                            >
+                              /k8s
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td
+                            role="listitem"
+                          >
+                            <div
+                              aria-label="Interval"
+                              class="sc-gsTCUz bCQwq"
+                            >
+                              Interval
+                            </div>
+                            <div
+                              class="sc-dlfnbm"
+                            >
+                              1m
+                            </div>
+                          </td>
+                          <td
+                            role="listitem"
+                          >
+                            <div
+                              aria-label="Prune"
+                              class="sc-gsTCUz bCQwq"
+                            >
+                              Prune
+                            </div>
+                            <div
+                              class="sc-dlfnbm"
+                            >
+                              false
+                            </div>
+                          </td>
+                          <td
+                            role="listitem"
+                          >
+                            <div
+                              aria-label="Last reconcile request"
+                              class="sc-gsTCUz bCQwq"
+                            >
+                              Last reconcile request
+                            </div>
+                            <div
+                              class="sc-dlfnbm"
+                            >
+                               Invalid Date Invalid Date
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="MuiBox-root MuiBox-root-2"
+        >
+          <div
+            class="sc-iBPRYJ"
+          >
+            <div
+              class="MuiPaper-root MuiCard-root MuiPaper-outlined MuiPaper-rounded"
+            >
+              <div
+                class="sc-gKsewC ejJyga"
+              >
+                <h3>
+                  Conditions
+                </h3>
+              </div>
+              <div
+                class="MuiCardContent-root"
+              >
+                <div>
+                  <div
+                    class="MuiTableContainer-root"
+                  >
+                    <table
+                      class="MuiTable-root"
+                    >
+                      <thead
+                        class="MuiTableHead-root"
+                      >
+                        <tr
+                          class="MuiTableRow-root MuiTableRow-head"
+                        >
+                          <th
+                            class="MuiTableCell-root MuiTableCell-head"
+                            scope="col"
+                          >
+                            Type
+                          </th>
+                          <th
+                            class="MuiTableCell-root MuiTableCell-head"
+                            scope="col"
+                          >
+                            Status
+                          </th>
+                          <th
+                            class="MuiTableCell-root MuiTableCell-head"
+                            scope="col"
+                          >
+                            Timestamp
+                          </th>
+                          <th
+                            class="MuiTableCell-root MuiTableCell-head"
+                            scope="col"
+                          >
+                            Reason
+                          </th>
+                          <th
+                            class="MuiTableCell-root MuiTableCell-head"
+                            scope="col"
+                          >
+                            Message
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody
+                        class="MuiTableBody-root"
+                      />
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>,
+  "container": <div>
+    <div
+      class="sc-jSgupP sc-fubCfw ERjJi"
+    >
+      <div
+        class="sc-bdfBwQ kLrCXV"
+      >
+        <nav
+          class="MuiTypography-root MuiBreadcrumbs-root MuiTypography-body1 MuiTypography-colorTextSecondary"
+        >
+          <ol
+            class="MuiBreadcrumbs-ol"
+          >
+            <li
+              class="MuiBreadcrumbs-li"
+            >
+              <a
+                class="sc-eCssSg"
+                href="/kustomizations?context=my-context&namespace=all"
+              >
+                <h2>
+                  Kustomizations
+                </h2>
+              </a>
+            </li>
+            <li
+              aria-hidden="true"
+              class="MuiBreadcrumbs-separator"
+            >
+              /
+            </li>
+            <li
+              class="MuiBreadcrumbs-li"
+            >
+              <div
+                class="sc-bdfBwQ jANNfu"
+              >
+                <h2>
+                  my-kustomization
+                </h2>
+              </div>
+            </li>
+          </ol>
+        </nav>
+        <button
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary"
+          tabindex="0"
+          type="button"
+        >
+          <span
+            class="MuiButton-label"
+          >
+            Sync
+          </span>
+          <span
+            class="MuiTouchRipple-root"
+          />
+        </button>
+      </div>
+      <div
+        class="MuiBox-root MuiBox-root-1"
+      >
+        <div
+          class="sc-iBPRYJ"
+        >
+          <div
+            class="MuiPaper-root MuiCard-root MuiPaper-outlined MuiPaper-rounded"
+          >
+            <div
+              class="sc-gKsewC ejJyga"
+            >
+              <h3>
+                Info
+              </h3>
+            </div>
+            <div
+              class="MuiCardContent-root"
+            >
+              <div>
+                <div
+                  class="sc-hKgILt emSDXW"
+                  role="list"
+                >
+                  <table>
+                    <tbody>
+                      <tr>
+                        <td
+                          role="listitem"
+                        >
+                          <div
+                            aria-label="Source"
+                            class="sc-gsTCUz bCQwq"
+                          >
+                            Source
+                          </div>
+                          <div
+                            class="sc-dlfnbm"
+                          >
+                            <a
+                              class="sc-eCssSg"
+                              href="/sources_detail?context=my-context&namespace=all&sourceId=my-source&sourceType=git"
+                            >
+                              my-source
+                            </a>
+                          </div>
+                        </td>
+                        <td
+                          role="listitem"
+                        >
+                          <div
+                            aria-label="Namespace"
+                            class="sc-gsTCUz bCQwq"
+                          >
+                            Namespace
+                          </div>
+                          <div
+                            class="sc-dlfnbm"
+                          >
+                            default
+                          </div>
+                        </td>
+                        <td
+                          role="listitem"
+                        >
+                          <div
+                            aria-label="Last reconcile"
+                            class="sc-gsTCUz bCQwq"
+                          >
+                            Last reconcile
+                          </div>
+                          <div
+                            class="sc-dlfnbm"
+                          >
+                             Invalid Date Invalid Date
+                          </div>
+                        </td>
+                        <td
+                          role="listitem"
+                        >
+                          <div
+                            aria-label="Path"
+                            class="sc-gsTCUz bCQwq"
+                          >
+                            Path
+                          </div>
+                          <div
+                            class="sc-dlfnbm"
+                          >
+                            /k8s
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td
+                          role="listitem"
+                        >
+                          <div
+                            aria-label="Interval"
+                            class="sc-gsTCUz bCQwq"
+                          >
+                            Interval
+                          </div>
+                          <div
+                            class="sc-dlfnbm"
+                          >
+                            1m
+                          </div>
+                        </td>
+                        <td
+                          role="listitem"
+                        >
+                          <div
+                            aria-label="Prune"
+                            class="sc-gsTCUz bCQwq"
+                          >
+                            Prune
+                          </div>
+                          <div
+                            class="sc-dlfnbm"
+                          >
+                            false
+                          </div>
+                        </td>
+                        <td
+                          role="listitem"
+                        >
+                          <div
+                            aria-label="Last reconcile request"
+                            class="sc-gsTCUz bCQwq"
+                          >
+                            Last reconcile request
+                          </div>
+                          <div
+                            class="sc-dlfnbm"
+                          >
+                             Invalid Date Invalid Date
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="MuiBox-root MuiBox-root-2"
+      >
+        <div
+          class="sc-iBPRYJ"
+        >
+          <div
+            class="MuiPaper-root MuiCard-root MuiPaper-outlined MuiPaper-rounded"
+          >
+            <div
+              class="sc-gKsewC ejJyga"
+            >
+              <h3>
+                Conditions
+              </h3>
+            </div>
+            <div
+              class="MuiCardContent-root"
+            >
+              <div>
+                <div
+                  class="MuiTableContainer-root"
+                >
+                  <table
+                    class="MuiTable-root"
+                  >
+                    <thead
+                      class="MuiTableHead-root"
+                    >
+                      <tr
+                        class="MuiTableRow-root MuiTableRow-head"
+                      >
+                        <th
+                          class="MuiTableCell-root MuiTableCell-head"
+                          scope="col"
+                        >
+                          Type
+                        </th>
+                        <th
+                          class="MuiTableCell-root MuiTableCell-head"
+                          scope="col"
+                        >
+                          Status
+                        </th>
+                        <th
+                          class="MuiTableCell-root MuiTableCell-head"
+                          scope="col"
+                        >
+                          Timestamp
+                        </th>
+                        <th
+                          class="MuiTableCell-root MuiTableCell-head"
+                          scope="col"
+                        >
+                          Reason
+                        </th>
+                        <th
+                          class="MuiTableCell-root MuiTableCell-head"
+                          scope="col"
+                        >
+                          Message
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody
+                      class="MuiTableBody-root"
+                    />
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>,
+  "debug": [Function],
+  "findAllByAltText": [Function],
+  "findAllByDisplayValue": [Function],
+  "findAllByLabelText": [Function],
+  "findAllByPlaceholderText": [Function],
+  "findAllByRole": [Function],
+  "findAllByTestId": [Function],
+  "findAllByText": [Function],
+  "findAllByTitle": [Function],
+  "findByAltText": [Function],
+  "findByDisplayValue": [Function],
+  "findByLabelText": [Function],
+  "findByPlaceholderText": [Function],
+  "findByRole": [Function],
+  "findByTestId": [Function],
+  "findByText": [Function],
+  "findByTitle": [Function],
+  "getAllByAltText": [Function],
+  "getAllByDisplayValue": [Function],
+  "getAllByLabelText": [Function],
+  "getAllByPlaceholderText": [Function],
+  "getAllByRole": [Function],
+  "getAllByTestId": [Function],
+  "getAllByText": [Function],
+  "getAllByTitle": [Function],
+  "getByAltText": [Function],
+  "getByDisplayValue": [Function],
+  "getByLabelText": [Function],
+  "getByPlaceholderText": [Function],
+  "getByRole": [Function],
+  "getByTestId": [Function],
+  "getByText": [Function],
+  "getByTitle": [Function],
+  "queryAllByAltText": [Function],
+  "queryAllByDisplayValue": [Function],
+  "queryAllByLabelText": [Function],
+  "queryAllByPlaceholderText": [Function],
+  "queryAllByRole": [Function],
+  "queryAllByTestId": [Function],
+  "queryAllByText": [Function],
+  "queryAllByTitle": [Function],
+  "queryByAltText": [Function],
+  "queryByDisplayValue": [Function],
+  "queryByLabelText": [Function],
+  "queryByPlaceholderText": [Function],
+  "queryByRole": [Function],
+  "queryByTestId": [Function],
+  "queryByText": [Function],
+  "queryByTitle": [Function],
+  "rerender": [Function],
+  "unmount": [Function],
+}
+`;

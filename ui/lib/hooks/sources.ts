@@ -2,7 +2,7 @@ import _ from "lodash";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../components/AppStateProvider";
 import { Source } from "../rpc/clusters";
-import { clustersClient, notifySuccess } from "../util";
+import { notifySuccess } from "../util";
 import { formatAPINamespace } from "./app";
 
 export enum SourceType {
@@ -47,7 +47,7 @@ export function useSources(
   currentContext: string,
   currentNamespace: string
 ): SourceHook {
-  const { doAsyncError } = useContext(AppContext);
+  const { doAsyncError, clustersClient } = useContext(AppContext);
   const [sources, setSources] = useState(initialState);
   const [loading, setLoading] = useState(true);
 

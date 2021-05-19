@@ -2,7 +2,7 @@ import _ from "lodash";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../components/AppStateProvider";
 import { Kustomization, SyncKustomizationRes } from "../rpc/clusters";
-import { clustersClient, notifyError, notifySuccess } from "../util";
+import { notifyError, notifySuccess } from "../util";
 import { formatAPINamespace } from "./app";
 
 type KustomizationList = { [name: string]: Kustomization };
@@ -12,7 +12,7 @@ export function useKustomizations(
   currentNamespace: string
 ) {
   const [loading, setLoading] = useState(true);
-  const { doAsyncError } = useContext(AppContext);
+  const { doAsyncError, clustersClient } = useContext(AppContext);
   const [kustomizations, setKustomizations] = useState({} as KustomizationList);
 
   useEffect(() => {

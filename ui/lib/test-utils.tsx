@@ -4,12 +4,17 @@ import * as React from "react";
 import { MemoryRouter } from "react-router";
 import { ThemeProvider } from "styled-components";
 import AppStateProvider from "../components/AppStateProvider";
-import { ListContextsRes, ListNamespacesForContextRes } from "./rpc/clusters";
+import {
+  ListContextsRes,
+  ListKustomizationsRes,
+  ListNamespacesForContextRes,
+} from "./rpc/clusters";
 import theme from "./theme";
 
 type ClientOverrides = {
   listContexts: ListContextsRes;
   listNamespacesForContext: ListNamespacesForContextRes;
+  listKustomizations?: ListKustomizationsRes;
 };
 
 export function withContext(

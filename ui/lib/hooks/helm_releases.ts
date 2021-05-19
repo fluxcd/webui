@@ -2,7 +2,7 @@ import _ from "lodash";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../components/AppStateProvider";
 import { HelmRelease } from "../rpc/clusters";
-import { clustersClient, notifyError, notifySuccess } from "../util";
+import { notifyError, notifySuccess } from "../util";
 import { formatAPINamespace } from "./app";
 
 export function useHelmReleases(
@@ -12,7 +12,7 @@ export function useHelmReleases(
   const [helmReleases, setHelmReleases] = useState<{
     [name: string]: HelmRelease;
   }>({});
-  const { doAsyncError } = useContext(AppContext);
+  const { doAsyncError, clustersClient } = useContext(AppContext);
 
   useEffect(() => {
     if (!currentContext) {
