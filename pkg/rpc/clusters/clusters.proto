@@ -10,7 +10,6 @@ service Clusters {
     rpc ListSources (ListSourcesReq) returns (ListSourcesRes);
     rpc SyncKustomization (SyncKustomizationReq) returns (SyncKustomizationRes);
     rpc ListHelmReleases (ListHelmReleasesReq) returns (ListHelmReleasesRes);
-    rpc ListWorkloads (ListWorkloadsReq) returns (ListWorkloadsRes);
     rpc ListEvents (ListEventsReq) returns (ListEventsRes);
     rpc SyncSource (SyncSourceReq) returns (SyncSourceRes);
     rpc SyncHelmRelease (SyncHelmReleaseReq) returns (SyncHelmReleaseRes);

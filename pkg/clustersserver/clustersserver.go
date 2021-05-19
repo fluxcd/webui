@@ -14,7 +14,6 @@ import (
 	sourcev1 "github.com/fluxcd/source-controller/api/v1beta1"
 	pb "github.com/fluxcd/webui/pkg/rpc/clusters"
 	"github.com/fluxcd/webui/pkg/util"
-	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -536,49 +535,6 @@ func (s *Server) SyncHelmRelease(ctx context.Context, msg *pb.SyncHelmReleaseReq
 
 const KustomizationNameLabelKey string = "kustomize.toolkit.fluxcd.io/name"
 const KustomizationNamespaceLabelKey string = "kustomize.toolkit.fluxcd.io/namespace"
-
-func (s *Server) ListWorkloads(ctx context.Context, msg *pb.ListWorkloadsReq) (*pb.ListWorkloadsRes, error) {
-	c, err := s.getClient(msg.ContextName)
-
-	if err != nil {
-		return nil, fmt.Errorf("could not create client: %w", err)
-	}
-
-	deployments := appsv1.DeploymentList{}
-
-	if err := c.List(ctx, &deployments, namespaceOpts(msg.Namespace)); err != nil {
-		return nil, fmt.Errorf("could not get kustomization: %w", err)
-	}
-
-	workloads := []*pb.Workload{}
-
-	for _, dep := range deployments.Items {
-		kustomizationRefName := dep.Labels[KustomizationNameLabelKey]
-		kustomizationRefNamespace := dep.Labels[KustomizationNamespaceLabelKey]
-
-		wl := pb.Workload{
-			Name:                      dep.Name,
-			Namespace:                 dep.Namespace,
-			KustomizationRefName:      kustomizationRefName,
-			KustomizationRefNamespace: kustomizationRefNamespace,
-			PodTemplate: &pb.PodTemplate{
-				Containers: []*pb.Container{},
-			},
-		}
-
-		for _, c := range dep.Spec.Template.Spec.Containers {
-			wl.PodTemplate.Containers = append(wl.PodTemplate.Containers, &pb.Container{
-				Name:  c.Name,
-				Image: c.Image,
-			})
-		}
-
-		workloads = append(workloads, &wl)
-	}
-
-	return &pb.ListWorkloadsRes{Workloads: workloads}, nil
-
-}
 
 func (s *Server) ListEvents(ctx context.Context, msg *pb.ListEventsReq) (*pb.ListEventsRes, error) {
 	c, err := s.getClient(msg.ContextName)
