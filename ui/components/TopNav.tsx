@@ -2,7 +2,7 @@ import { FormControl, InputLabel, MenuItem, Select } from "@material-ui/core";
 import _ from "lodash";
 import * as React from "react";
 import styled from "styled-components";
-import { useKubernetesContexts, useNavigation } from "../lib/hooks";
+import { useKubernetesContexts, useNavigation } from "../lib/hooks/app";
 import { AllNamespacesOption } from "../lib/types";
 import { formatURL, getNavValue, PageRoute } from "../lib/util";
 import Flex from "./Flex";

@@ -8,7 +8,8 @@ import KeyValueTable from "../components/KeyValueTable";
 import Link from "../components/Link";
 import Page from "../components/Page";
 import Panel from "../components/Panel";
-import { useKubernetesContexts, useNavigation, useSources } from "../lib/hooks";
+import { useKubernetesContexts, useNavigation } from "../lib/hooks/app";
+import { useSources } from "../lib/hooks/sources";
 import { Source } from "../lib/rpc/clusters";
 import { formatURL, PageRoute } from "../lib/util";
 

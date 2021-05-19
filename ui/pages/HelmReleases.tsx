@@ -10,7 +10,9 @@ import _ from "lodash";
 import * as React from "react";
 import styled from "styled-components";
 import Link from "../components/Link";
-import { useHelmReleases, useKubernetesContexts } from "../lib/hooks";
+import Page from "../components/Page";
+import { useKubernetesContexts } from "../lib/hooks/app";
+import { useHelmReleases } from "../lib/hooks/helm_releases";
 import { HelmRelease } from "../lib/rpc/clusters";
 import { formatURL, PageRoute } from "../lib/util";
 
@@ -63,7 +65,7 @@ function HelmRelease({ className }: Props) {
   ));
 
   return (
-    <div className={className}>
+    <Page className={className}>
       <h2>Helm Releases</h2>
       <TableContainer>
         <Table aria-label="simple table">
@@ -87,7 +89,7 @@ function HelmRelease({ className }: Props) {
           </TableBody>
         </Table>
       </TableContainer>
-    </div>
+    </Page>
   );
 }
 

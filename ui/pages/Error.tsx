@@ -3,7 +3,7 @@ import { useHistory } from "react-router";
 import styled from "styled-components";
 import Flex from "../components/Flex";
 import Page from "../components/Page";
-import { useAppState } from "../lib/hooks";
+import { useAppState } from "../lib/hooks/app";
 
 type Props = {
   className?: string;

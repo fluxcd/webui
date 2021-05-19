@@ -10,7 +10,7 @@ import Flex from "./components/Flex";
 import LeftNav from "./components/LeftNav";
 import TopNav from "./components/TopNav";
 import theme, { GlobalStyle } from "./lib/theme";
-import { PageRoute } from "./lib/util";
+import { clustersClient, PageRoute } from "./lib/util";
 import Error from "./pages/Error";
 import Events from "./pages/Events";
 import HelmReleaseDetail from "./pages/HelmReleaseDetail";
@@ -20,9 +20,6 @@ import Kustomizations from "./pages/Kustomizations";
 import Redirector from "./pages/Redirector";
 import SourceDetail from "./pages/SourceDetail";
 import Sources from "./pages/Sources";
-import WorkloadOnboarding from "./pages/WorkloadOnboarding";
-import Workloads from "./pages/Workloads";
-import WorkloadsDetail from "./pages/WorkloadsDetail";
 
 const AppContainer = styled.div`
   width: 100%;
@@ -35,7 +32,7 @@ const NavContainer = styled.div`
   width: 240px;
 `;
 
-const ContentCotainer = styled.div`
+const ContentContainer = styled.div`
   width: 100%;
   max-width: 1024px;
   margin: 0 auto;
@@ -52,92 +49,72 @@ export default function App() {
         <GlobalStyle />
 
         <Router>
-          <AppStateProvider>
-            <AppContainer>
-              <TopNavContainer>
-                <TopNav />
-              </TopNavContainer>
-              <div>
+          <ErrorBoundary>
+            <AppStateProvider clustersClient={clustersClient}>
+              <AppContainer>
+                <TopNavContainer>
+                  <TopNav />
+                </TopNavContainer>
                 <Flex>
                   <NavContainer>
                     <LeftNav />
                   </NavContainer>
-                  <ContentCotainer>
-                    <ErrorBoundary>
-                      <Switch>
-                        <Route
-                          exact
-                          path={PageRoute.Redirector}
-                          component={Redirector}
-                        />
-                        <Route exact path="/error" component={Error} />
-                        <Route
-                          exact
-                          path={PageRoute.Kustomizations}
-                          component={Kustomizations}
-                        />
-                        <Route
-                          exact
-                          path={PageRoute.KustomizationDetail}
-                          component={KustomizationDetail}
-                        />
-                        <Route
-                          exact
-                          path={PageRoute.Sources}
-                          component={Sources}
-                        />
-                        <Route
-                          exact
-                          path={PageRoute.SourceDetail}
-                          component={SourceDetail}
-                        />
-                        <Route
-                          exact
-                          path={PageRoute.HelmReleases}
-                          component={HelmReleases}
-                        />
-                        <Route
-                          exact
-                          path={PageRoute.HelmReleaseDetail}
-                          component={HelmReleaseDetail}
-                        />
-                        <Route
-                          exact
-                          path={PageRoute.Workloads}
-                          component={Workloads}
-                        />
-                        <Route
-                          exact
-                          path={PageRoute.WorkloadDetail}
-                          component={WorkloadsDetail}
-                        />
-                        <Route
-                          exact
-                          path={PageRoute.Events}
-                          component={Events}
-                        />
-                        <Route
-                          exact
-                          path={PageRoute.WorkloadOnboarding}
-                          component={WorkloadOnboarding}
-                        />
-                        <Route exact path="*" component={() => <p>404</p>} />
-                      </Switch>
-                    </ErrorBoundary>
-                  </ContentCotainer>
+                  <ContentContainer>
+                    <Switch>
+                      <Route
+                        exact
+                        path={PageRoute.Redirector}
+                        component={Redirector}
+                      />
+                      <Route exact path="/error" component={Error} />
+                      <Route
+                        exact
+                        path={PageRoute.Kustomizations}
+                        component={Kustomizations}
+                      />
+                      <Route
+                        exact
+                        path={PageRoute.KustomizationDetail}
+                        component={KustomizationDetail}
+                      />
+                      <Route
+                        exact
+                        path={PageRoute.Sources}
+                        component={Sources}
+                      />
+                      <Route
+                        exact
+                        path={PageRoute.SourceDetail}
+                        component={SourceDetail}
+                      />
+                      <Route
+                        exact
+                        path={PageRoute.HelmReleases}
+                        component={HelmReleases}
+                      />
+                      <Route
+                        exact
+                        path={PageRoute.HelmReleaseDetail}
+                        component={HelmReleaseDetail}
+                      />
+                      <Route exact path={PageRoute.Events} component={Events} />
+
+                      <Route exact path="*" component={() => <p>404</p>} />
+                    </Switch>
+                  </ContentContainer>
                 </Flex>
-              </div>
-              <ToastContainer
-                position="top-center"
-                autoClose={10000}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-              />
-            </AppContainer>
-          </AppStateProvider>
+                <ToastContainer
+                  position="top-center"
+                  autoClose={10000}
+                  newestOnTop={false}
+                  closeOnClick
+                  rtl={false}
+                  pauseOnFocusLoss
+                  draggable
+                />
+              </AppContainer>
+            </AppStateProvider>
+          </ErrorBoundary>
         </Router>
       </ThemeProvider>
     </MuiThemeProvider>

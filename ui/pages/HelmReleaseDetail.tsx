@@ -7,12 +7,9 @@ import KeyValueTable from "../components/KeyValueTable";
 import Link from "../components/Link";
 import Page from "../components/Page";
 import Panel from "../components/Panel";
-import {
-  SourceType,
-  useHelmReleases,
-  useKubernetesContexts,
-  useNavigation,
-} from "../lib/hooks";
+import { useKubernetesContexts, useNavigation } from "../lib/hooks/app";
+import { useHelmReleases } from "../lib/hooks/helm_releases";
+import { SourceType } from "../lib/hooks/sources";
 import { formatURL, PageRoute } from "../lib/util";
 
 type Props = {

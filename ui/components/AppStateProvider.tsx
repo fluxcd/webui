@@ -1,33 +1,44 @@
 import qs from "query-string";
 import * as React from "react";
-import { DefaultClusters } from "../lib/rpc/clusters";
+import { useLocation } from "react-router";
+import { Clusters, Context } from "../lib/rpc/clusters";
 import { AllNamespacesOption } from "../lib/types";
-import { wrappedFetch } from "../lib/util";
 
-export const AppContext = React.createContext(null as any);
+export type AppContextType = {
+  contexts: Context[];
+  namespaces: { [context: string]: string[] };
+  currentContext: string;
+  currentNamespace: string;
+  appState: AppState;
+  setContexts: (contexts: Context[]) => void;
+  setNamespaces: (namespaces: string[]) => void;
+  setCurrentNamespace: (namespace: string) => void;
+  doAsyncError: (message: string, fatal?: boolean, detail?: Error) => void;
+  clustersClient: Clusters;
+};
+
+export const AppContext = React.createContext<AppContextType>(null as any);
 
 type AppState = {
   error: null | { fatal: boolean; message: string; detail?: string };
-  loading: true;
+  loading: boolean;
 };
 
-const clusters = new DefaultClusters("/api/clusters", wrappedFetch);
-
-export default function AppStateProvider(props) {
+export default function AppStateProvider({ clustersClient, ...props }) {
+  const location = useLocation();
   const { context } = qs.parse(location.search);
   const [contexts, setContexts] = React.useState([]);
-  const [currentContext, setCurrentContext] = React.useState<string>(
-    context as string
-  );
   const [namespaces, setNamespaces] = React.useState({});
   const [currentNamespace, setCurrentNamespace] = React.useState(
     AllNamespacesOption
   );
-  const [appState, setAppState] = React.useState({ error: null });
+  const [appState, setAppState] = React.useState({
+    error: null,
+    loading: false,
+  });
 
-  const doError = (message: string, fatal: boolean, detail?: Error) => {
+  const doAsyncError = (message: string, fatal: boolean, detail?: Error) => {
     console.error(message);
-    console.error(detail);
     setAppState({
       ...(appState as AppState),
       error: { message, fatal, detail },
@@ -36,27 +47,8 @@ export default function AppStateProvider(props) {
 
   const query = qs.parse(location.pathname);
 
-  React.useEffect(() => {
-    // Runs once on app startup.
-    clusters.listContexts({}).then(
-      (res) => {
-        setContexts(res.contexts);
-        // If there is a context in the path, use that, else use the one set
-        // in the .kubeconfig file returned by the backend.
-        const nextCtx = (query.context as string) || res.currentcontext;
-        const ns = query.namespace || AllNamespacesOption;
-
-        setCurrentContext(nextCtx);
-        setCurrentNamespace(ns as string);
-      },
-      (err) => {
-        doError("Error getting contexts", true, err);
-      }
-    );
-  }, []);
-
-  React.useEffect(() => {
-    clusters.listNamespacesForContext({ contextname: currentContext }).then(
+  const getNamespaces = (ctx) => {
+    clustersClient.listNamespacesForContext({ contextname: ctx }).then(
       (nsRes) => {
         const nextNamespaces = nsRes.namespaces;
 
@@ -65,27 +57,58 @@ export default function AppStateProvider(props) {
         setNamespaces({
           ...namespaces,
           ...{
-            [currentContext]: nextNamespaces,
+            [ctx as string]: nextNamespaces,
           },
         });
       },
       (err) => {
-        doError("There was an error fetching namespaces", true, err.message);
+        doAsyncError(
+          "There was an error fetching namespaces",
+          true,
+          err.message
+        );
       }
     );
-  }, [currentContext]);
+  };
 
-  const value = {
+  React.useEffect(() => {
+    // Runs once on app startup.
+    clustersClient.listContexts({}).then(
+      (res) => {
+        setContexts(res.contexts);
+        const ns = query.namespace || AllNamespacesOption;
+        setCurrentNamespace(ns as string);
+      },
+      (err) => {
+        doAsyncError("Error getting contexts", true, err);
+      }
+    );
+  }, []);
+
+  React.useEffect(() => {
+    // Get namespaces whenever context changes
+    getNamespaces(context);
+  }, [context]);
+
+  React.useEffect(() => {
+    // clear the error state on navigation
+    setAppState({
+      ...appState,
+      error: null,
+    });
+  }, [context, currentNamespace, location]);
+
+  const value: AppContextType = {
     contexts,
     namespaces,
-    currentContext,
+    currentContext: context as string,
     currentNamespace,
     appState,
     setContexts,
-    setCurrentContext,
     setNamespaces,
     setCurrentNamespace,
-    doError,
+    doAsyncError,
+    clustersClient,
   };
 
   return <AppContext.Provider value={value} {...props} />;

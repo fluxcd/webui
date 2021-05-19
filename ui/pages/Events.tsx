@@ -4,9 +4,9 @@ import styled from "styled-components";
 import DataTable from "../components/DataTable";
 import Flex from "../components/Flex";
 import Page from "../components/Page";
-import { useKubernetesContexts } from "../lib/hooks";
+import { useKubernetesContexts } from "../lib/hooks/app";
+import useEvents from "../lib/hooks/events";
 import { Event } from "../lib/rpc/clusters";
-import { clustersClient } from "../lib/util";
 
 type Props = {
   className?: string;
@@ -14,21 +14,11 @@ type Props = {
 const Styled = (c) => styled(c)``;
 
 function Events({ className }: Props) {
-  const [events, setEvents] = React.useState([]);
   const { currentContext } = useKubernetesContexts();
+  const { events, loading } = useEvents(currentContext);
 
-  React.useEffect(() => {
-    clustersClient
-      .listEvents({
-        contextname: currentContext,
-        namespace: "flux-system",
-      })
-      .then((res) => {
-        setEvents(res.events);
-      });
-  }, []);
   return (
-    <Page className={className}>
+    <Page loading={loading} className={className}>
       <Flex wide>
         <h2>Events</h2>
       </Flex>

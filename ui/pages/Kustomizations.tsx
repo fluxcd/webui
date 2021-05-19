@@ -1,16 +1,11 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-} from "@material-ui/core";
 import _ from "lodash";
 import * as React from "react";
 import styled from "styled-components";
+import DataTable from "../components/DataTable";
 import Link from "../components/Link";
-import { useKubernetesContexts, useKustomizations } from "../lib/hooks";
+import Page from "../components/Page";
+import { useKubernetesContexts } from "../lib/hooks/app";
+import { useKustomizations } from "../lib/hooks/kustomizations";
 import { Kustomization } from "../lib/rpc/clusters";
 import { formatURL, PageRoute } from "../lib/util";
 
@@ -21,7 +16,7 @@ const Styled = (c) => styled(c)``;
 
 function Kustomizations({ className }: Props) {
   const { currentContext, currentNamespace } = useKubernetesContexts();
-  const { kustomizations } = useKustomizations(
+  const { kustomizations, loading } = useKustomizations(
     currentContext,
     currentNamespace
   );
@@ -67,31 +62,10 @@ function Kustomizations({ className }: Props) {
   ];
 
   return (
-    <div className={className}>
+    <Page loading={loading} className={className}>
       <h2>Kustomizations</h2>
-      <TableContainer>
-        <Table aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              {_.map(fields, (f) => (
-                <TableCell key={f.label}>{f.label}</TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {_.map(kustomizations, (k) => (
-              <TableRow key={k.name}>
-                {_.map(fields, (f) => (
-                  <TableCell key={f.label}>
-                    {typeof f.value === "function" ? f.value(k) : k[f.value]}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </div>
+      <DataTable fields={fields} rows={kustomizations} />
+    </Page>
   );
 }
 

@@ -634,18 +634,6 @@ interface ContainerJSON {
 }
 
 
-
-const JSONToContainer = (m: Container | ContainerJSON): Container => {
-    if (m === null) {
-		return null;
-	}
-    return {
-        name: m.name,
-        image: m.image,
-    };
-};
-
-
 export interface PodTemplate {
     containers?: Container[];
 }
@@ -653,17 +641,6 @@ export interface PodTemplate {
 interface PodTemplateJSON {
     containers?: ContainerJSON[];
 }
-
-
-
-const JSONToPodTemplate = (m: PodTemplate | PodTemplateJSON): PodTemplate => {
-    if (m === null) {
-		return null;
-	}
-    return {
-        containers: (m.containers as (Container | ContainerJSON)[]).map(JSONToContainer),
-    };
-};
 
 
 export interface Workload {
@@ -683,21 +660,6 @@ interface WorkloadJSON {
 }
 
 
-
-const JSONToWorkload = (m: Workload | WorkloadJSON): Workload => {
-    if (m === null) {
-		return null;
-	}
-    return {
-        name: m.name,
-        namespace: m.namespace,
-        kustomizationrefname: (((m as Workload).kustomizationrefname) ? (m as Workload).kustomizationrefname : (m as WorkloadJSON).kustomizationRefName),
-        kustomizationrefnamespace: (((m as Workload).kustomizationrefnamespace) ? (m as Workload).kustomizationrefnamespace : (m as WorkloadJSON).kustomizationRefNamespace),
-        podtemplate: JSONToPodTemplate((((m as Workload).podtemplate) ? (m as Workload).podtemplate : (m as WorkloadJSON).podTemplate)),
-    };
-};
-
-
 export interface ListWorkloadsReq {
     contextname?: string;
     namespace?: string;
@@ -709,19 +671,6 @@ interface ListWorkloadsReqJSON {
 }
 
 
-
-const ListWorkloadsReqToJSON = (m: ListWorkloadsReq): ListWorkloadsReqJSON => {
-	if (m === null) {
-		return null;
-	}
-	
-    return {
-        contextName: m.contextname,
-        namespace: m.namespace,
-    };
-};
-
-
 export interface ListWorkloadsRes {
     workloads?: Workload[];
 }
@@ -729,17 +678,6 @@ export interface ListWorkloadsRes {
 interface ListWorkloadsResJSON {
     workloads?: WorkloadJSON[];
 }
-
-
-
-const JSONToListWorkloadsRes = (m: ListWorkloadsRes | ListWorkloadsResJSON): ListWorkloadsRes => {
-    if (m === null) {
-		return null;
-	}
-    return {
-        workloads: (m.workloads as (Workload | WorkloadJSON)[]).map(JSONToWorkload),
-    };
-};
 
 
 export interface ListKustomizationChildrenReq {
@@ -853,8 +791,6 @@ export interface Clusters {
     
     listHelmReleases: (listHelmReleasesReq: ListHelmReleasesReq) => Promise<ListHelmReleasesRes>;
     
-    listWorkloads: (listWorkloadsReq: ListWorkloadsReq) => Promise<ListWorkloadsRes>;
-    
     listEvents: (listEventsReq: ListEventsReq) => Promise<ListEventsRes>;
     
     syncSource: (syncSourceReq: SyncSourceReq) => Promise<SyncSourceRes>;
@@ -963,21 +899,6 @@ export class DefaultClusters implements Clusters {
             }
 
             return resp.json().then(JSONToListHelmReleasesRes);
-        });
-    }
-    
-    listWorkloads(listWorkloadsReq: ListWorkloadsReq): Promise<ListWorkloadsRes> {
-        const url = this.hostname + this.pathPrefix + "ListWorkloads";
-        let body: ListWorkloadsReq | ListWorkloadsReqJSON = listWorkloadsReq;
-        if (!this.writeCamelCase) {
-            body = ListWorkloadsReqToJSON(listWorkloadsReq);
-        }
-        return this.fetch(createTwirpRequest(url, body, this.headersOverride)).then((resp) => {
-            if (!resp.ok) {
-                return throwTwirpError(resp);
-            }
-
-            return resp.json().then(JSONToListWorkloadsRes);
         });
     }
     

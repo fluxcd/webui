@@ -44,17 +44,14 @@ export const formatURL = (
 
 export enum PageRoute {
   Redirector = "/",
-  Home = "/workloads",
+  Home = "/sources",
   Sources = "/sources",
   SourceDetail = "/sources_detail",
   Kustomizations = "/kustomizations",
   KustomizationDetail = "/kustomizations_detail",
   HelmReleases = "/helmreleases",
   HelmReleaseDetail = "/helmreleases_detail",
-  Workloads = "/workloads",
-  WorkloadDetail = "/workloads_detail",
   Events = "/events",
-  WorkloadOnboarding = "/workloads_onboarding",
   Error = "/error",
 }
 
@@ -70,11 +67,6 @@ export const getNavValue = (currentPage: any): PageRoute | boolean => {
     case "helmreleases":
     case "helmreleases_detail":
       return PageRoute.HelmReleases;
-
-    case "workloads":
-    case "workloads_detail":
-    case "workloads_onboarding":
-      return PageRoute.Workloads;
 
     case "events":
       return PageRoute.Events;

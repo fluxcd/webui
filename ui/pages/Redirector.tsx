@@ -1,11 +1,11 @@
 import * as React from "react";
 import { AppContext } from "../components/AppStateProvider";
-import { useKubernetesContexts, useNavigation } from "../lib/hooks";
+import { useKubernetesContexts, useNavigation } from "../lib/hooks/app";
 import { AllNamespacesOption } from "../lib/types";
 import { clustersClient, PageRoute } from "../lib/util";
 
 export default function Redirector() {
-  const { doError, setContexts } = React.useContext(AppContext);
+  const { doAsyncError, setContexts } = React.useContext(AppContext);
   const { currentContext, currentNamespace } = useKubernetesContexts();
   const { navigate } = useNavigation();
 
@@ -14,6 +14,8 @@ export default function Redirector() {
       navigate(PageRoute.Home, currentContext, currentNamespace);
       return;
     }
+
+    console.log("doing redirector things");
 
     // Runs once on app startup.
     clustersClient.listContexts({}).then(
@@ -27,7 +29,7 @@ export default function Redirector() {
         );
       },
       (err) => {
-        doError("Error getting contexts", true, err);
+        doAsyncError("Error getting contexts", true, err);
       }
     );
   }, []);
