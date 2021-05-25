@@ -5,6 +5,9 @@ import { MemoryRouter } from "react-router";
 import { ThemeProvider } from "styled-components";
 import AppStateProvider from "../components/AppStateProvider";
 import {
+  GetChildObjectsRes,
+  GetReconciledObjectsRes,
+  Kustomization,
   ListContextsRes,
   ListKustomizationsRes,
   ListNamespacesForContextRes,
@@ -15,6 +18,8 @@ type ClientOverrides = {
   listContexts: ListContextsRes;
   listNamespacesForContext: ListNamespacesForContextRes;
   listKustomizations?: ListKustomizationsRes;
+  getReconciledObjects?: GetReconciledObjectsRes;
+  getChildObjects?: GetChildObjectsRes;
 };
 
 export function withContext(
@@ -46,3 +51,55 @@ export function withContext(
     </MuiThemeProvider>
   );
 }
+
+const k: Kustomization = {
+  name: "my-kustomization",
+  namespace: "default",
+  path: "/k8s",
+  sourceref: "my-source",
+  conditions: [],
+  interval: "1m",
+  prune: false,
+  reconcilerequestat: "",
+  reconcileat: "",
+  sourcerefkind: "Git",
+};
+
+export const stubbedClustersResponses = {
+  listContexts: {
+    contexts: [{ name: "my-context" }, { name: "other-context" }],
+    currentcontext: "other-context",
+  },
+  listNamespacesForContext: { namespaces: ["default"] },
+  listKustomizations: {
+    kustomizations: [k],
+  },
+  getReconciledObjects: {
+    objects: [
+      {
+        groupversionkind: {
+          group: "apps",
+          version: "v1",
+          kind: "Deployment",
+        },
+        name: "reconciled-deployment",
+        namespace: "default",
+        status: "Current",
+      },
+    ],
+  },
+  getChildObjects: {
+    objects: [
+      {
+        groupversionkind: {
+          group: "",
+          version: "v1",
+          kind: "Pod",
+        },
+        name: "reconciled-deployment-abc",
+        namespace: "default",
+        status: "Current",
+      },
+    ],
+  },
+};

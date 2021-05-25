@@ -15,10 +15,14 @@ import (
 	pb "github.com/fluxcd/webui/pkg/rpc/clusters"
 	"github.com/fluxcd/webui/pkg/util"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/wait"
+
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/kustomize/kstatus/status"
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -150,23 +154,60 @@ func doReconcileAnnotations(annotations map[string]string) {
 	}
 }
 
-func convertKustomization(kustomization kustomizev1.Kustomization) (*pb.Kustomization, error) {
-	reconcileRequestAt := kustomization.Annotations[meta.ReconcileRequestAnnotation]
+func addSnapshots(out []*pb.GroupVersionKind, collection []schema.GroupVersionKind) []*pb.GroupVersionKind {
+	for _, gvk := range collection {
+		out = append(out, &pb.GroupVersionKind{
+			Group:   gvk.Group,
+			Version: gvk.Version,
+			Kind:    gvk.Kind,
+		})
+	}
 
+	return out
+}
+
+func convertKustomization(kustomization kustomizev1.Kustomization, namespace string) (*pb.Kustomization, error) {
+	reconcileRequestAt := kustomization.Annotations[meta.ReconcileRequestAnnotation]
 	reconcileAt := kustomization.Annotations[meta.ReconcileAtAnnotation]
 
 	k := &pb.Kustomization{
-		Name:               kustomization.Name,
-		Namespace:          kustomization.Namespace,
-		TargetNamespace:    kustomization.Spec.TargetNamespace,
-		Path:               kustomization.Spec.Path,
-		SourceRef:          kustomization.Spec.SourceRef.Name,
-		SourceRefKind:      getSourceTypeEnum(kustomization.Spec.SourceRef.Kind),
-		Conditions:         mapConditions(kustomization.Status.Conditions),
-		Interval:           kustomization.Spec.Interval.Duration.String(),
-		Prune:              kustomization.Spec.Prune,
-		ReconcileRequestAt: reconcileRequestAt,
-		ReconcileAt:        reconcileAt,
+		Name:                  kustomization.Name,
+		Namespace:             kustomization.Namespace,
+		TargetNamespace:       kustomization.Spec.TargetNamespace,
+		Path:                  kustomization.Spec.Path,
+		SourceRef:             kustomization.Spec.SourceRef.Name,
+		SourceRefKind:         getSourceTypeEnum(kustomization.Spec.SourceRef.Kind),
+		Conditions:            mapConditions(kustomization.Status.Conditions),
+		Interval:              kustomization.Spec.Interval.Duration.String(),
+		Prune:                 kustomization.Spec.Prune,
+		ReconcileRequestAt:    reconcileRequestAt,
+		ReconcileAt:           reconcileAt,
+		Snapshots:             []*pb.SnapshotEntry{},
+		LastAppliedRevision:   kustomization.Status.LastAppliedRevision,
+		LastAttemptedRevision: kustomization.Status.LastAttemptedRevision,
+	}
+	kinds := []*pb.GroupVersionKind{}
+
+	// The current test environment does not append a Snapshot,
+	// so check for it here. Should only be nil in tests.
+	if kustomization.Status.Snapshot != nil {
+		for ns, gvks := range kustomization.Status.Snapshot.NamespacedKinds() {
+			kinds = addSnapshots(kinds, gvks)
+
+			k.Snapshots = append(k.Snapshots, &pb.SnapshotEntry{
+				Namespace: ns,
+				Kinds:     kinds,
+			})
+		}
+
+		for _, gvk := range kustomization.Status.Snapshot.NonNamespacedKinds() {
+			kinds = addSnapshots(kinds, []schema.GroupVersionKind{gvk})
+
+			k.Snapshots = append(k.Snapshots, &pb.SnapshotEntry{
+				Namespace: "",
+				Kinds:     kinds,
+			})
+		}
 	}
 
 	return k, nil
@@ -188,7 +229,7 @@ func (s *Server) ListKustomizations(ctx context.Context, msg *pb.ListKustomizati
 
 	k := []*pb.Kustomization{}
 	for _, kustomization := range result.Items {
-		m, err := convertKustomization(kustomization)
+		m, err := convertKustomization(kustomization, msg.Namespace)
 		if err != nil {
 			return nil, err
 		}
@@ -198,6 +239,118 @@ func (s *Server) ListKustomizations(ctx context.Context, msg *pb.ListKustomizati
 
 	return &pb.ListKustomizationsRes{Kustomizations: k}, nil
 
+}
+
+const KustomizeNameKey string = "kustomize.toolkit.fluxcd.io/name"
+const KustomizeNamespaceKey string = "kustomize.toolkit.fluxcd.io/namespace"
+
+func (s *Server) GetReconciledObjects(ctx context.Context, msg *pb.GetReconciledObjectsReq) (*pb.GetReconciledObjectsRes, error) {
+	c, err := s.getClient(msg.ContextName)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not create client: %w", err)
+	}
+
+	result := []unstructured.Unstructured{}
+
+	for _, gvk := range msg.Kinds {
+		list := unstructured.UnstructuredList{}
+
+		list.SetGroupVersionKind(schema.GroupVersionKind{
+			Group:   gvk.Group,
+			Kind:    gvk.Kind,
+			Version: gvk.Version,
+		})
+
+		opts := client.MatchingLabels{
+			KustomizeNameKey:      msg.KustomizationName,
+			KustomizeNamespaceKey: msg.KustomizationNamespace,
+		}
+
+		if err := c.List(ctx, &list, opts); err != nil {
+			return nil, fmt.Errorf("could not get unstructured list: %s\n", err)
+		}
+
+		result = append(result, list.Items...)
+
+	}
+
+	objects := []*pb.UnstructuredObject{}
+	for _, obj := range result {
+		res, err := status.Compute(&obj)
+
+		if err != nil {
+			return nil, fmt.Errorf("could not get status for %s: %w", obj.GetName(), err)
+		}
+
+		objects = append(objects, &pb.UnstructuredObject{
+			GroupVersionKind: &pb.GroupVersionKind{
+				Group:   obj.GetObjectKind().GroupVersionKind().Group,
+				Version: obj.GetObjectKind().GroupVersionKind().GroupVersion().Version,
+				Kind:    obj.GetKind(),
+			},
+			Name:      obj.GetName(),
+			Namespace: obj.GetNamespace(),
+			Status:    res.Status.String(),
+			Uid:       string(obj.GetUID()),
+		})
+	}
+	return &pb.GetReconciledObjectsRes{Objects: objects}, nil
+}
+
+func (s *Server) GetChildObjects(ctx context.Context, msg *pb.GetChildObjectsReq) (*pb.GetChildObjectsRes, error) {
+	c, err := s.getClient(msg.ContextName)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not create client: %w", err)
+	}
+
+	list := unstructured.UnstructuredList{}
+
+	list.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   msg.GroupVersionKind.Group,
+		Version: msg.GroupVersionKind.Version,
+		Kind:    msg.GroupVersionKind.Kind,
+	})
+
+	if err := c.List(ctx, &list, namespaceOpts("default")); err != nil {
+		return nil, fmt.Errorf("could not get unstructured object: %s\n", err)
+	}
+
+	objects := []*pb.UnstructuredObject{}
+
+Items:
+	for _, obj := range list.Items {
+
+		refs := obj.GetOwnerReferences()
+
+		for _, ref := range refs {
+			if ref.UID != types.UID(msg.ParentUid) {
+				// This is not the child we are looking for.
+				// Skip the rest of the operations in the outer loop
+				continue Items
+			}
+		}
+
+		res, err := status.Compute(&obj)
+
+		if err != nil {
+			return nil, fmt.Errorf("could not get status for %s: %w", obj.GetName(), err)
+		}
+		objects = append(objects, &pb.UnstructuredObject{
+			GroupVersionKind: &pb.GroupVersionKind{
+				Group:   obj.GetObjectKind().GroupVersionKind().Group,
+				Version: obj.GetObjectKind().GroupVersionKind().GroupVersion().Version,
+				Kind:    obj.GetKind(),
+			},
+			Name:      obj.GetName(),
+			Namespace: obj.GetNamespace(),
+			Status:    res.Status.String(),
+			Uid:       string(obj.GetUID()),
+		})
+	}
+
+	return &pb.GetChildObjectsRes{Objects: objects}, nil
 }
 
 func kindToSourceType(kind string) pb.Source_Type {
@@ -414,7 +567,7 @@ func (s *Server) SyncKustomization(ctx context.Context, msg *pb.SyncKustomizatio
 		return nil, err
 	}
 
-	k, err := convertKustomization(kustomization)
+	k, err := convertKustomization(kustomization, msg.Namespace)
 
 	if err != nil {
 		return nil, err

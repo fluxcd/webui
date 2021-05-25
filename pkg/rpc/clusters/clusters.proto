@@ -13,6 +13,8 @@ service Clusters {
     rpc ListEvents (ListEventsReq) returns (ListEventsRes);
     rpc SyncSource (SyncSourceReq) returns (SyncSourceRes);
     rpc SyncHelmRelease (SyncHelmReleaseReq) returns (SyncHelmReleaseRes);
+    rpc GetReconciledObjects(GetReconciledObjectsReq) returns (GetReconciledObjectsRes);
+    rpc GetChildObjects(GetChildObjectsReq) returns (GetChildObjectsRes);
 }
 
 message Context {
@@ -44,6 +46,17 @@ message Condition {
     string timestamp = 5;
 }
 
+message GroupVersionKind {
+    string group = 1;
+    string kind = 2;
+    string version = 3;
+}
+
+message SnapshotEntry {
+    string namespace = 1;
+    repeated GroupVersionKind kinds =2;
+}
+
 message Kustomization {
     string name = 1;
     string namespace = 2;
@@ -56,6 +69,10 @@ message Kustomization {
     string reconcileRequestAt = 9;
     string reconcileAt = 10;
     Source.Type sourceRefKind = 11;
+    repeated SnapshotEntry snapshots = 12;
+    string lastAppliedRevision = 13;
+    string lastAttemptedRevision = 14;
+
 }
 
 message ListKustomizationsReq {
@@ -219,4 +236,34 @@ message ListEventsReq {
 
 message ListEventsRes {
     repeated Event events = 1;
+}
+
+
+message GetReconciledObjectsReq {
+    string contextName = 1;
+    string kustomizationName = 2;
+    string kustomizationNamespace = 3;
+    repeated GroupVersionKind kinds = 4;
+}
+
+message UnstructuredObject {
+    GroupVersionKind groupVersionKind = 2;
+    string name = 3;
+    string namespace = 4;
+    string uid = 5;
+    string status = 6;
+}
+
+message GetReconciledObjectsRes {
+    repeated UnstructuredObject objects = 1;
+}
+
+message GetChildObjectsReq {
+    string contextName = 1;
+    GroupVersionKind groupVersionKind = 2;
+    string parentUid = 3;
+}
+
+message GetChildObjectsRes {
+    repeated UnstructuredObject objects = 1;
 }
