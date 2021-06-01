@@ -13,14 +13,18 @@ import {
 import _ from "lodash";
 import * as React from "react";
 import styled from "styled-components";
+import DataTable from "../components/DataTable";
 import Flex from "../components/Flex";
 import KeyValueTable from "../components/KeyValueTable";
 import Link from "../components/Link";
 import Page from "../components/Page";
 import Panel from "../components/Panel";
 import { useKubernetesContexts, useNavigation } from "../lib/hooks/app";
-import { useKustomizations } from "../lib/hooks/kustomizations";
-import { Kustomization } from "../lib/rpc/clusters";
+import {
+  PARENT_CHILD_LOOKUP,
+  useKustomizations,
+} from "../lib/hooks/kustomizations";
+import { GroupVersionKind, Kustomization } from "../lib/rpc/clusters";
 import { formatURL, PageRoute } from "../lib/util";
 
 type Props = {
@@ -36,11 +40,10 @@ const Styled = (c) => styled(c)`
 const infoFields = [
   "sourceref",
   "namespace",
-  "reconcileat",
   "path",
   "interval",
   "prune",
-  "reconcilerequestat",
+  "lastappliedrevision",
 ];
 
 const formatInfo = (detail: Kustomization) =>
@@ -51,13 +54,18 @@ const formatInfo = (detail: Kustomization) =>
 
 function KustomizationDetail({ className }: Props) {
   const [syncing, setSyncing] = React.useState(false);
+  const [reconciledObjects, setReconciledObjects] = React.useState<
+    GroupVersionKind[]
+  >([]);
   const { query } = useNavigation();
   const { currentContext, currentNamespace } = useKubernetesContexts();
 
-  const { kustomizations, syncKustomization } = useKustomizations(
-    currentContext,
-    currentNamespace
-  );
+  const {
+    kustomizations,
+    syncKustomization,
+    getReconciledObjects,
+    getChildrenRecursive,
+  } = useKustomizations(currentContext, currentNamespace);
   const kustomizationDetail = kustomizations[query.kustomizationId as string];
 
   const handleSyncClicked = () => {
@@ -67,6 +75,56 @@ function KustomizationDetail({ className }: Props) {
       setSyncing(false);
     });
   };
+
+  React.useEffect(() => {
+    if (!kustomizationDetail) {
+      return;
+    }
+
+    const { snapshots, name, namespace } = kustomizationDetail;
+
+    const kinds = _.reduce(
+      snapshots,
+      (r, e) => {
+        r = [...r, ...e.kinds];
+        return r;
+      },
+      []
+    );
+
+    const uniq = _.uniqBy(kinds, "kind");
+
+    const getChildren = async () => {
+      const { objects } = await getReconciledObjects(name, namespace, uniq);
+
+      const result = [];
+      for (let o = 0; o < objects.length; o++) {
+        const obj = objects[o];
+
+        await getChildrenRecursive(result, obj, PARENT_CHILD_LOOKUP);
+      }
+
+      setReconciledObjects(_.flatten(result));
+    };
+
+    let timeout;
+    function poll() {
+      timeout = setTimeout(async () => {
+        // Polling will stop if this errors.
+        // Also prevents sending a request before the previous request finishes.
+        await getChildren();
+        poll();
+      }, 5000);
+    }
+
+    // Get children now, to avoid waiting for the first poll() setTimeout.
+    getChildren();
+    // Start polling.
+    poll();
+
+    // Stop polling when the component unmounts
+    return () => clearTimeout(timeout);
+  }, [kustomizationDetail]);
 
   if (!kustomizationDetail) {
     return null;
@@ -89,21 +147,9 @@ function KustomizationDetail({ className }: Props) {
       </Link>,
       "Source",
     ],
-    reconcileat: [
-      ` ${new Date(
-        kustomizationDetail.reconcileat
-      ).toLocaleTimeString()} ${new Date(
-        kustomizationDetail.reconcileat
-      ).toLocaleDateString()}`,
-      "Last Reconcile",
-    ],
-    reconcilerequestat: [
-      ` ${new Date(
-        kustomizationDetail.reconcilerequestat
-      ).toLocaleTimeString()} ${new Date(
-        kustomizationDetail.reconcilerequestat
-      ).toLocaleDateString()}`,
-      "Last Reconcile Request",
+    lastappliedrevision: [
+      kustomizationDetail.lastappliedrevision,
+      "Applied Revision",
     ],
   };
 
@@ -137,7 +183,7 @@ function KustomizationDetail({ className }: Props) {
       <Box marginBottom={2}>
         <Panel title="Info">
           <KeyValueTable
-            columns={4}
+            columns={3}
             pairs={formatInfo(kustomizationDetail)}
             overrides={overrides}
           />
@@ -172,6 +218,20 @@ function KustomizationDetail({ className }: Props) {
               </TableBody>
             </Table>
           </TableContainer>
+        </Panel>
+      </Box>
+      <Box marginBottom={2}>
+        <Panel title="Reconciled Objects">
+          <DataTable
+            sortFields={["name", "kind"]}
+            fields={[
+              { label: "Kind", value: (v) => v.groupversionkind.kind },
+              { label: "Name", value: "name" },
+              { label: "Namespace", value: "namespace" },
+              { label: "Status", value: "status" },
+            ]}
+            rows={reconciledObjects}
+          />
         </Panel>
       </Box>
     </Page>

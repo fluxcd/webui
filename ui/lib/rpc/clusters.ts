@@ -130,6 +130,69 @@ const JSONToCondition = (m: Condition | ConditionJSON): Condition => {
 };
 
 
+export interface GroupVersionKind {
+    group?: string;
+    kind?: string;
+    version?: string;
+}
+
+interface GroupVersionKindJSON {
+    group?: string;
+    kind?: string;
+    version?: string;
+}
+
+
+
+const GroupVersionKindToJSON = (m: GroupVersionKind): GroupVersionKindJSON => {
+	if (m === null) {
+		return null;
+	}
+	
+    return {
+        group: m.group,
+        kind: m.kind,
+        version: m.version,
+    };
+};
+
+
+
+const JSONToGroupVersionKind = (m: GroupVersionKind | GroupVersionKindJSON): GroupVersionKind => {
+    if (m === null) {
+		return null;
+	}
+    return {
+        group: m.group,
+        kind: m.kind,
+        version: m.version,
+    };
+};
+
+
+export interface SnapshotEntry {
+    namespace?: string;
+    kinds?: GroupVersionKind[];
+}
+
+interface SnapshotEntryJSON {
+    namespace?: string;
+    kinds?: GroupVersionKindJSON[];
+}
+
+
+
+const JSONToSnapshotEntry = (m: SnapshotEntry | SnapshotEntryJSON): SnapshotEntry => {
+    if (m === null) {
+		return null;
+	}
+    return {
+        namespace: m.namespace,
+        kinds: (m.kinds as (GroupVersionKind | GroupVersionKindJSON)[]).map(JSONToGroupVersionKind),
+    };
+};
+
+
 export interface Kustomization {
     name?: string;
     namespace?: string;
@@ -142,6 +205,9 @@ export interface Kustomization {
     reconcilerequestat?: string;
     reconcileat?: string;
     sourcerefkind?: string;
+    snapshots?: SnapshotEntry[];
+    lastappliedrevision?: string;
+    lastattemptedrevision?: string;
 }
 
 interface KustomizationJSON {
@@ -156,6 +222,9 @@ interface KustomizationJSON {
     reconcileRequestAt?: string;
     reconcileAt?: string;
     sourceRefKind?: string;
+    snapshots?: SnapshotEntryJSON[];
+    lastAppliedRevision?: string;
+    lastAttemptedRevision?: string;
 }
 
 
@@ -176,6 +245,9 @@ const JSONToKustomization = (m: Kustomization | KustomizationJSON): Kustomizatio
         reconcilerequestat: (((m as Kustomization).reconcilerequestat) ? (m as Kustomization).reconcilerequestat : (m as KustomizationJSON).reconcileRequestAt),
         reconcileat: (((m as Kustomization).reconcileat) ? (m as Kustomization).reconcileat : (m as KustomizationJSON).reconcileAt),
         sourcerefkind: (((m as Kustomization).sourcerefkind) ? (m as Kustomization).sourcerefkind : (m as KustomizationJSON).sourceRefKind),
+        snapshots: (m.snapshots as (SnapshotEntry | SnapshotEntryJSON)[]).map(JSONToSnapshotEntry),
+        lastappliedrevision: (((m as Kustomization).lastappliedrevision) ? (m as Kustomization).lastappliedrevision : (m as KustomizationJSON).lastAppliedRevision),
+        lastattemptedrevision: (((m as Kustomization).lastattemptedrevision) ? (m as Kustomization).lastattemptedrevision : (m as KustomizationJSON).lastAttemptedRevision),
     };
 };
 
@@ -778,6 +850,135 @@ const JSONToListEventsRes = (m: ListEventsRes | ListEventsResJSON): ListEventsRe
 };
 
 
+export interface GetReconciledObjectsReq {
+    contextname?: string;
+    kustomizationname?: string;
+    kustomizationnamespace?: string;
+    kinds?: GroupVersionKind[];
+}
+
+interface GetReconciledObjectsReqJSON {
+    contextName?: string;
+    kustomizationName?: string;
+    kustomizationNamespace?: string;
+    kinds?: GroupVersionKindJSON[];
+}
+
+
+
+const GetReconciledObjectsReqToJSON = (m: GetReconciledObjectsReq): GetReconciledObjectsReqJSON => {
+	if (m === null) {
+		return null;
+	}
+	
+    return {
+        contextName: m.contextname,
+        kustomizationName: m.kustomizationname,
+        kustomizationNamespace: m.kustomizationnamespace,
+        kinds: m.kinds.map(GroupVersionKindToJSON),
+    };
+};
+
+
+export interface UnstructuredObject {
+    groupversionkind?: GroupVersionKind;
+    name?: string;
+    namespace?: string;
+    uid?: string;
+    status?: string;
+}
+
+interface UnstructuredObjectJSON {
+    groupVersionKind?: GroupVersionKindJSON;
+    name?: string;
+    namespace?: string;
+    uid?: string;
+    status?: string;
+}
+
+
+
+const JSONToUnstructuredObject = (m: UnstructuredObject | UnstructuredObjectJSON): UnstructuredObject => {
+    if (m === null) {
+		return null;
+	}
+    return {
+        groupversionkind: JSONToGroupVersionKind((((m as UnstructuredObject).groupversionkind) ? (m as UnstructuredObject).groupversionkind : (m as UnstructuredObjectJSON).groupVersionKind)),
+        name: m.name,
+        namespace: m.namespace,
+        uid: m.uid,
+        status: m.status,
+    };
+};
+
+
+export interface GetReconciledObjectsRes {
+    objects?: UnstructuredObject[];
+}
+
+interface GetReconciledObjectsResJSON {
+    objects?: UnstructuredObjectJSON[];
+}
+
+
+
+const JSONToGetReconciledObjectsRes = (m: GetReconciledObjectsRes | GetReconciledObjectsResJSON): GetReconciledObjectsRes => {
+    if (m === null) {
+		return null;
+	}
+    return {
+        objects: (m.objects as (UnstructuredObject | UnstructuredObjectJSON)[]).map(JSONToUnstructuredObject),
+    };
+};
+
+
+export interface GetChildObjectsReq {
+    contextname?: string;
+    groupversionkind?: GroupVersionKind;
+    parentuid?: string;
+}
+
+interface GetChildObjectsReqJSON {
+    contextName?: string;
+    groupVersionKind?: GroupVersionKindJSON;
+    parentUid?: string;
+}
+
+
+
+const GetChildObjectsReqToJSON = (m: GetChildObjectsReq): GetChildObjectsReqJSON => {
+	if (m === null) {
+		return null;
+	}
+	
+    return {
+        contextName: m.contextname,
+        groupVersionKind: GroupVersionKindToJSON(m.groupversionkind),
+        parentUid: m.parentuid,
+    };
+};
+
+
+export interface GetChildObjectsRes {
+    objects?: UnstructuredObject[];
+}
+
+interface GetChildObjectsResJSON {
+    objects?: UnstructuredObjectJSON[];
+}
+
+
+
+const JSONToGetChildObjectsRes = (m: GetChildObjectsRes | GetChildObjectsResJSON): GetChildObjectsRes => {
+    if (m === null) {
+		return null;
+	}
+    return {
+        objects: (m.objects as (UnstructuredObject | UnstructuredObjectJSON)[]).map(JSONToUnstructuredObject),
+    };
+};
+
+
 export interface Clusters {
     listContexts: (listContextsReq: ListContextsReq) => Promise<ListContextsRes>;
     
@@ -796,6 +997,10 @@ export interface Clusters {
     syncSource: (syncSourceReq: SyncSourceReq) => Promise<SyncSourceRes>;
     
     syncHelmRelease: (syncHelmReleaseReq: SyncHelmReleaseReq) => Promise<SyncHelmReleaseRes>;
+    
+    getReconciledObjects: (getReconciledObjectsReq: GetReconciledObjectsReq) => Promise<GetReconciledObjectsRes>;
+    
+    getChildObjects: (getChildObjectsReq: GetChildObjectsReq) => Promise<GetChildObjectsRes>;
     
 }
 
@@ -944,6 +1149,36 @@ export class DefaultClusters implements Clusters {
             }
 
             return resp.json().then(JSONToSyncHelmReleaseRes);
+        });
+    }
+    
+    getReconciledObjects(getReconciledObjectsReq: GetReconciledObjectsReq): Promise<GetReconciledObjectsRes> {
+        const url = this.hostname + this.pathPrefix + "GetReconciledObjects";
+        let body: GetReconciledObjectsReq | GetReconciledObjectsReqJSON = getReconciledObjectsReq;
+        if (!this.writeCamelCase) {
+            body = GetReconciledObjectsReqToJSON(getReconciledObjectsReq);
+        }
+        return this.fetch(createTwirpRequest(url, body, this.headersOverride)).then((resp) => {
+            if (!resp.ok) {
+                return throwTwirpError(resp);
+            }
+
+            return resp.json().then(JSONToGetReconciledObjectsRes);
+        });
+    }
+    
+    getChildObjects(getChildObjectsReq: GetChildObjectsReq): Promise<GetChildObjectsRes> {
+        const url = this.hostname + this.pathPrefix + "GetChildObjects";
+        let body: GetChildObjectsReq | GetChildObjectsReqJSON = getChildObjectsReq;
+        if (!this.writeCamelCase) {
+            body = GetChildObjectsReqToJSON(getChildObjectsReq);
+        }
+        return this.fetch(createTwirpRequest(url, body, this.headersOverride)).then((resp) => {
+            if (!resp.ok) {
+                return throwTwirpError(resp);
+            }
+
+            return resp.json().then(JSONToGetChildObjectsRes);
         });
     }
     

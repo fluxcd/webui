@@ -7,10 +7,10 @@ Object {
     <div />
     <div>
       <div
-        class="sc-jSgupP sc-fubCfw ERjJi"
+        class="sc-iBPRYJ sc-jrAGrp dzRsDN"
       >
         <div
-          class="sc-bdfBwQ kLrCXV"
+          class="sc-dlfnbm emcvKi"
         >
           <nav
             class="MuiTypography-root MuiBreadcrumbs-root MuiTypography-body1 MuiTypography-colorTextSecondary"
@@ -22,7 +22,7 @@ Object {
                 class="MuiBreadcrumbs-li"
               >
                 <a
-                  class="sc-eCssSg"
+                  class="sc-gKsewC"
                   href="/kustomizations?context=my-context&namespace=all"
                 >
                   <h2>
@@ -40,7 +40,7 @@ Object {
                 class="MuiBreadcrumbs-li"
               >
                 <div
-                  class="sc-bdfBwQ jANNfu"
+                  class="sc-dlfnbm eIFobp"
                 >
                   <h2>
                     my-kustomization
@@ -68,13 +68,13 @@ Object {
           class="MuiBox-root MuiBox-root-1"
         >
           <div
-            class="sc-iBPRYJ"
+            class="sc-pFZIQ"
           >
             <div
               class="MuiPaper-root MuiCard-root MuiPaper-outlined MuiPaper-rounded"
             >
               <div
-                class="sc-gKsewC ejJyga"
+                class="sc-fubCfw eQvqYT"
               >
                 <h3>
                   Info
@@ -85,7 +85,7 @@ Object {
               >
                 <div>
                   <div
-                    class="sc-hKgILt emSDXW"
+                    class="sc-jSgupP crqFgI"
                     role="list"
                   >
                     <table>
@@ -96,15 +96,15 @@ Object {
                           >
                             <div
                               aria-label="Source"
-                              class="sc-gsTCUz bCQwq"
+                              class="sc-hKgILt ctfbPn"
                             >
                               Source
                             </div>
                             <div
-                              class="sc-dlfnbm"
+                              class="sc-eCssSg"
                             >
                               <a
-                                class="sc-eCssSg"
+                                class="sc-gKsewC"
                                 href="/sources_detail?context=my-context&namespace=all&sourceId=my-source&sourceType=git"
                               >
                                 my-source
@@ -116,12 +116,12 @@ Object {
                           >
                             <div
                               aria-label="Namespace"
-                              class="sc-gsTCUz bCQwq"
+                              class="sc-hKgILt ctfbPn"
                             >
                               Namespace
                             </div>
                             <div
-                              class="sc-dlfnbm"
+                              class="sc-eCssSg"
                             >
                               default
                             </div>
@@ -130,28 +130,13 @@ Object {
                             role="listitem"
                           >
                             <div
-                              aria-label="Last reconcile"
-                              class="sc-gsTCUz bCQwq"
-                            >
-                              Last reconcile
-                            </div>
-                            <div
-                              class="sc-dlfnbm"
-                            >
-                               Invalid Date Invalid Date
-                            </div>
-                          </td>
-                          <td
-                            role="listitem"
-                          >
-                            <div
                               aria-label="Path"
-                              class="sc-gsTCUz bCQwq"
+                              class="sc-hKgILt ctfbPn"
                             >
                               Path
                             </div>
                             <div
-                              class="sc-dlfnbm"
+                              class="sc-eCssSg"
                             >
                               /k8s
                             </div>
@@ -163,12 +148,12 @@ Object {
                           >
                             <div
                               aria-label="Interval"
-                              class="sc-gsTCUz bCQwq"
+                              class="sc-hKgILt ctfbPn"
                             >
                               Interval
                             </div>
                             <div
-                              class="sc-dlfnbm"
+                              class="sc-eCssSg"
                             >
                               1m
                             </div>
@@ -178,29 +163,14 @@ Object {
                           >
                             <div
                               aria-label="Prune"
-                              class="sc-gsTCUz bCQwq"
+                              class="sc-hKgILt ctfbPn"
                             >
                               Prune
                             </div>
                             <div
-                              class="sc-dlfnbm"
+                              class="sc-eCssSg"
                             >
                               false
-                            </div>
-                          </td>
-                          <td
-                            role="listitem"
-                          >
-                            <div
-                              aria-label="Last reconcile request"
-                              class="sc-gsTCUz bCQwq"
-                            >
-                              Last reconcile request
-                            </div>
-                            <div
-                              class="sc-dlfnbm"
-                            >
-                               Invalid Date Invalid Date
                             </div>
                           </td>
                         </tr>
@@ -216,13 +186,13 @@ Object {
           class="MuiBox-root MuiBox-root-2"
         >
           <div
-            class="sc-iBPRYJ"
+            class="sc-pFZIQ"
           >
             <div
               class="MuiPaper-root MuiCard-root MuiPaper-outlined MuiPaper-rounded"
             >
               <div
-                class="sc-gKsewC ejJyga"
+                class="sc-fubCfw eQvqYT"
               >
                 <h3>
                   Conditions
@@ -286,15 +256,137 @@ Object {
             </div>
           </div>
         </div>
+        <div
+          class="MuiBox-root MuiBox-root-3"
+        >
+          <div
+            class="sc-pFZIQ"
+          >
+            <div
+              class="MuiPaper-root MuiCard-root MuiPaper-outlined MuiPaper-rounded"
+            >
+              <div
+                class="sc-fubCfw eQvqYT"
+              >
+                <h3>
+                  Reconciled Objects
+                </h3>
+              </div>
+              <div
+                class="MuiCardContent-root"
+              >
+                <div>
+                  <div
+                    class="sc-gsTCUz"
+                  >
+                    <div
+                      class="MuiTableContainer-root"
+                    >
+                      <table
+                        aria-label="simple table"
+                        class="MuiTable-root"
+                      >
+                        <thead
+                          class="MuiTableHead-root"
+                        >
+                          <tr
+                            class="MuiTableRow-root MuiTableRow-head"
+                          >
+                            <th
+                              class="MuiTableCell-root MuiTableCell-head"
+                              scope="col"
+                            >
+                              Kind
+                            </th>
+                            <th
+                              class="MuiTableCell-root MuiTableCell-head"
+                              scope="col"
+                            >
+                              Name
+                            </th>
+                            <th
+                              class="MuiTableCell-root MuiTableCell-head"
+                              scope="col"
+                            >
+                              Namespace
+                            </th>
+                            <th
+                              class="MuiTableCell-root MuiTableCell-head"
+                              scope="col"
+                            >
+                              Status
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody
+                          class="MuiTableBody-root"
+                        >
+                          <tr
+                            class="MuiTableRow-root"
+                          >
+                            <td
+                              class="MuiTableCell-root MuiTableCell-body"
+                            >
+                              Deployment
+                            </td>
+                            <td
+                              class="MuiTableCell-root MuiTableCell-body"
+                            >
+                              reconciled-deployment
+                            </td>
+                            <td
+                              class="MuiTableCell-root MuiTableCell-body"
+                            >
+                              default
+                            </td>
+                            <td
+                              class="MuiTableCell-root MuiTableCell-body"
+                            >
+                              Current
+                            </td>
+                          </tr>
+                          <tr
+                            class="MuiTableRow-root"
+                          >
+                            <td
+                              class="MuiTableCell-root MuiTableCell-body"
+                            >
+                              Pod
+                            </td>
+                            <td
+                              class="MuiTableCell-root MuiTableCell-body"
+                            >
+                              reconciled-deployment-abc
+                            </td>
+                            <td
+                              class="MuiTableCell-root MuiTableCell-body"
+                            >
+                              default
+                            </td>
+                            <td
+                              class="MuiTableCell-root MuiTableCell-body"
+                            >
+                              Current
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </body>,
   "container": <div>
     <div
-      class="sc-jSgupP sc-fubCfw ERjJi"
+      class="sc-iBPRYJ sc-jrAGrp dzRsDN"
     >
       <div
-        class="sc-bdfBwQ kLrCXV"
+        class="sc-dlfnbm emcvKi"
       >
         <nav
           class="MuiTypography-root MuiBreadcrumbs-root MuiTypography-body1 MuiTypography-colorTextSecondary"
@@ -306,7 +398,7 @@ Object {
               class="MuiBreadcrumbs-li"
             >
               <a
-                class="sc-eCssSg"
+                class="sc-gKsewC"
                 href="/kustomizations?context=my-context&namespace=all"
               >
                 <h2>
@@ -324,7 +416,7 @@ Object {
               class="MuiBreadcrumbs-li"
             >
               <div
-                class="sc-bdfBwQ jANNfu"
+                class="sc-dlfnbm eIFobp"
               >
                 <h2>
                   my-kustomization
@@ -352,13 +444,13 @@ Object {
         class="MuiBox-root MuiBox-root-1"
       >
         <div
-          class="sc-iBPRYJ"
+          class="sc-pFZIQ"
         >
           <div
             class="MuiPaper-root MuiCard-root MuiPaper-outlined MuiPaper-rounded"
           >
             <div
-              class="sc-gKsewC ejJyga"
+              class="sc-fubCfw eQvqYT"
             >
               <h3>
                 Info
@@ -369,7 +461,7 @@ Object {
             >
               <div>
                 <div
-                  class="sc-hKgILt emSDXW"
+                  class="sc-jSgupP crqFgI"
                   role="list"
                 >
                   <table>
@@ -380,15 +472,15 @@ Object {
                         >
                           <div
                             aria-label="Source"
-                            class="sc-gsTCUz bCQwq"
+                            class="sc-hKgILt ctfbPn"
                           >
                             Source
                           </div>
                           <div
-                            class="sc-dlfnbm"
+                            class="sc-eCssSg"
                           >
                             <a
-                              class="sc-eCssSg"
+                              class="sc-gKsewC"
                               href="/sources_detail?context=my-context&namespace=all&sourceId=my-source&sourceType=git"
                             >
                               my-source
@@ -400,12 +492,12 @@ Object {
                         >
                           <div
                             aria-label="Namespace"
-                            class="sc-gsTCUz bCQwq"
+                            class="sc-hKgILt ctfbPn"
                           >
                             Namespace
                           </div>
                           <div
-                            class="sc-dlfnbm"
+                            class="sc-eCssSg"
                           >
                             default
                           </div>
@@ -414,28 +506,13 @@ Object {
                           role="listitem"
                         >
                           <div
-                            aria-label="Last reconcile"
-                            class="sc-gsTCUz bCQwq"
-                          >
-                            Last reconcile
-                          </div>
-                          <div
-                            class="sc-dlfnbm"
-                          >
-                             Invalid Date Invalid Date
-                          </div>
-                        </td>
-                        <td
-                          role="listitem"
-                        >
-                          <div
                             aria-label="Path"
-                            class="sc-gsTCUz bCQwq"
+                            class="sc-hKgILt ctfbPn"
                           >
                             Path
                           </div>
                           <div
-                            class="sc-dlfnbm"
+                            class="sc-eCssSg"
                           >
                             /k8s
                           </div>
@@ -447,12 +524,12 @@ Object {
                         >
                           <div
                             aria-label="Interval"
-                            class="sc-gsTCUz bCQwq"
+                            class="sc-hKgILt ctfbPn"
                           >
                             Interval
                           </div>
                           <div
-                            class="sc-dlfnbm"
+                            class="sc-eCssSg"
                           >
                             1m
                           </div>
@@ -462,29 +539,14 @@ Object {
                         >
                           <div
                             aria-label="Prune"
-                            class="sc-gsTCUz bCQwq"
+                            class="sc-hKgILt ctfbPn"
                           >
                             Prune
                           </div>
                           <div
-                            class="sc-dlfnbm"
+                            class="sc-eCssSg"
                           >
                             false
-                          </div>
-                        </td>
-                        <td
-                          role="listitem"
-                        >
-                          <div
-                            aria-label="Last reconcile request"
-                            class="sc-gsTCUz bCQwq"
-                          >
-                            Last reconcile request
-                          </div>
-                          <div
-                            class="sc-dlfnbm"
-                          >
-                             Invalid Date Invalid Date
                           </div>
                         </td>
                       </tr>
@@ -500,13 +562,13 @@ Object {
         class="MuiBox-root MuiBox-root-2"
       >
         <div
-          class="sc-iBPRYJ"
+          class="sc-pFZIQ"
         >
           <div
             class="MuiPaper-root MuiCard-root MuiPaper-outlined MuiPaper-rounded"
           >
             <div
-              class="sc-gKsewC ejJyga"
+              class="sc-fubCfw eQvqYT"
             >
               <h3>
                 Conditions
@@ -564,6 +626,128 @@ Object {
                       class="MuiTableBody-root"
                     />
                   </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="MuiBox-root MuiBox-root-3"
+      >
+        <div
+          class="sc-pFZIQ"
+        >
+          <div
+            class="MuiPaper-root MuiCard-root MuiPaper-outlined MuiPaper-rounded"
+          >
+            <div
+              class="sc-fubCfw eQvqYT"
+            >
+              <h3>
+                Reconciled Objects
+              </h3>
+            </div>
+            <div
+              class="MuiCardContent-root"
+            >
+              <div>
+                <div
+                  class="sc-gsTCUz"
+                >
+                  <div
+                    class="MuiTableContainer-root"
+                  >
+                    <table
+                      aria-label="simple table"
+                      class="MuiTable-root"
+                    >
+                      <thead
+                        class="MuiTableHead-root"
+                      >
+                        <tr
+                          class="MuiTableRow-root MuiTableRow-head"
+                        >
+                          <th
+                            class="MuiTableCell-root MuiTableCell-head"
+                            scope="col"
+                          >
+                            Kind
+                          </th>
+                          <th
+                            class="MuiTableCell-root MuiTableCell-head"
+                            scope="col"
+                          >
+                            Name
+                          </th>
+                          <th
+                            class="MuiTableCell-root MuiTableCell-head"
+                            scope="col"
+                          >
+                            Namespace
+                          </th>
+                          <th
+                            class="MuiTableCell-root MuiTableCell-head"
+                            scope="col"
+                          >
+                            Status
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody
+                        class="MuiTableBody-root"
+                      >
+                        <tr
+                          class="MuiTableRow-root"
+                        >
+                          <td
+                            class="MuiTableCell-root MuiTableCell-body"
+                          >
+                            Deployment
+                          </td>
+                          <td
+                            class="MuiTableCell-root MuiTableCell-body"
+                          >
+                            reconciled-deployment
+                          </td>
+                          <td
+                            class="MuiTableCell-root MuiTableCell-body"
+                          >
+                            default
+                          </td>
+                          <td
+                            class="MuiTableCell-root MuiTableCell-body"
+                          >
+                            Current
+                          </td>
+                        </tr>
+                        <tr
+                          class="MuiTableRow-root"
+                        >
+                          <td
+                            class="MuiTableCell-root MuiTableCell-body"
+                          >
+                            Pod
+                          </td>
+                          <td
+                            class="MuiTableCell-root MuiTableCell-body"
+                          >
+                            reconciled-deployment-abc
+                          </td>
+                          <td
+                            class="MuiTableCell-root MuiTableCell-body"
+                          >
+                            default
+                          </td>
+                          <td
+                            class="MuiTableCell-root MuiTableCell-body"
+                          >
+                            Current
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>

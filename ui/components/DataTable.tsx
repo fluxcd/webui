@@ -14,6 +14,7 @@ type Props = {
   className?: string;
   fields: { label: string; value: string | ((k: any) => string) }[];
   rows: any[];
+  sortFields: string[];
 };
 
 const EmptyRow = styled(TableRow)<{ colSpan: number }>`
@@ -25,8 +26,10 @@ const EmptyRow = styled(TableRow)<{ colSpan: number }>`
 `;
 const Styled = (c) => styled(c)``;
 
-function DataTable({ className, fields, rows }: Props) {
-  const r = _.map(rows, (r, i) => (
+function DataTable({ className, fields, rows, sortFields }: Props) {
+  const sorted = _.sortBy(rows, sortFields, "asc");
+
+  const r = _.map(sorted, (r, i) => (
     <TableRow key={i}>
       {_.map(fields, (f) => (
         <TableCell key={f.label}>
