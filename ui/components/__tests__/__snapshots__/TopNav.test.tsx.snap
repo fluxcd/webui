@@ -1,0 +1,458 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TopNav snapshots renders 1`] = `
+Object {
+  "asFragment": [Function],
+  "baseElement": .c1 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-align-items: start;
+  -webkit-box-align: start;
+  -ms-flex-align: start;
+  align-items: start;
+}
+
+.c3 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-align-items: start;
+  -webkit-box-align: start;
+  -ms-flex-align: start;
+  align-items: start;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.c5 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-align-items: start;
+  -webkit-box-align: start;
+  -ms-flex-align: start;
+  align-items: start;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c2 {
+  padding: 8px;
+}
+
+.c2 img {
+  max-height: 40px;
+}
+
+.c4 {
+  height: 60px;
+  -webkit-align-items: flex-end;
+  -webkit-box-align: flex-end;
+  -ms-flex-align: flex-end;
+  align-items: flex-end;
+}
+
+.c0 {
+  padding: 8px 0;
+  background-color: #3570e3;
+  width: 100%;
+}
+
+.c0 .MuiSelect-outlined {
+  border-color: white !important;
+}
+
+.c0 .MuiSelect-outlined input {
+  border-color: white !important;
+}
+
+.c0 .MuiFormControl-root {
+  border-color: white !important;
+  margin-right: 16px;
+}
+
+.c0 .MuiSelect-outlined,
+.c0 label {
+  color: white !important;
+}
+
+.c0 fieldset,
+.c0 fieldset:hover {
+  border-color: #ffffff !important;
+}
+
+.c0 svg {
+  color: white;
+}
+
+.c0 .MuiSelect-select {
+  min-width: 120px;
+}
+
+.c0 label {
+  height: 42px !important;
+  -webkit-transform: translate(14px,14px) scale(1);
+  -ms-transform: translate(14px,14px) scale(1);
+  transform: translate(14px,14px) scale(1);
+}
+
+.c0 .MuiOutlinedInput-root {
+  height: 40px;
+}
+
+<body>
+    <div />
+    <div>
+      <header
+        class="c0"
+      >
+        <div
+          class="c1"
+        >
+          <div>
+            <a
+              class=""
+              href="/sources?context=my-context&namespace=default"
+            >
+              <div
+                class="c2"
+              >
+                <img
+                  src=""
+                />
+              </div>
+            </a>
+          </div>
+          <div
+            class="c3 c4"
+          >
+            <div
+              class="c5"
+            >
+              <div
+                class="MuiFormControl-root"
+              >
+                <label
+                  class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined MuiFormLabel-filled"
+                  data-shrink="true"
+                  for="context-select"
+                  id="context-select-label"
+                >
+                  Context
+                </label>
+                <div
+                  class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-formControl"
+                >
+                  <div
+                    aria-haspopup="listbox"
+                    aria-labelledby="context-select-label context-select"
+                    class="MuiSelect-root MuiSelect-select MuiSelect-selectMenu MuiSelect-outlined MuiInputBase-input MuiOutlinedInput-input"
+                    id="context-select"
+                    role="button"
+                    tabindex="0"
+                  >
+                    my-context
+                  </div>
+                  <input
+                    aria-hidden="true"
+                    class="MuiSelect-nativeInput"
+                    tabindex="-1"
+                    value="my-context"
+                  />
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSelect-icon MuiSelect-iconOutlined"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M7 10l5 5 5-5z"
+                    />
+                  </svg>
+                  <fieldset
+                    aria-hidden="true"
+                    class="PrivateNotchedOutline-root-1 MuiOutlinedInput-notchedOutline"
+                    style="padding-left: 8px;"
+                  >
+                    <legend
+                      class="PrivateNotchedOutline-legend-2"
+                      style="width: 0.01px;"
+                    >
+                      <span>
+                        ​
+                      </span>
+                    </legend>
+                  </fieldset>
+                </div>
+              </div>
+              <div
+                class="MuiFormControl-root"
+              >
+                <label
+                  class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined MuiFormLabel-filled"
+                  data-shrink="true"
+                  id="namespaces-selector"
+                >
+                  Namespace
+                </label>
+                <div
+                  class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-formControl"
+                >
+                  <div
+                    aria-haspopup="listbox"
+                    aria-labelledby="namespaces-selector"
+                    class="MuiSelect-root MuiSelect-select MuiSelect-selectMenu MuiSelect-outlined MuiInputBase-input MuiOutlinedInput-input"
+                    id="namespaces-selector"
+                    role="button"
+                    tabindex="0"
+                  >
+                    default
+                  </div>
+                  <input
+                    aria-hidden="true"
+                    class="MuiSelect-nativeInput"
+                    tabindex="-1"
+                    value="default"
+                  />
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSelect-icon MuiSelect-iconOutlined"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M7 10l5 5 5-5z"
+                    />
+                  </svg>
+                  <fieldset
+                    aria-hidden="true"
+                    class="PrivateNotchedOutline-root-1 MuiOutlinedInput-notchedOutline"
+                  >
+                    <legend
+                      class="PrivateNotchedOutline-legendLabelled-3 PrivateNotchedOutline-legendNotched-4"
+                    >
+                      <span>
+                        Namespace
+                      </span>
+                    </legend>
+                  </fieldset>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+    </div>
+  </body>,
+  "container": <div>
+    <header
+      class="sc-eCssSg ICqmJ"
+    >
+      <div
+        class="sc-bdfBwQ jpNQmq"
+      >
+        <div>
+          <a
+            class="sc-gsTCUz"
+            href="/sources?context=my-context&namespace=default"
+          >
+            <div
+              class="sc-dlfnbm jiaSBd"
+            >
+              <img
+                src=""
+              />
+            </div>
+          </a>
+        </div>
+        <div
+          class="sc-bdfBwQ sc-hKgILt eAcQvl bIjoZh"
+        >
+          <div
+            class="sc-bdfBwQ dKXRSB"
+          >
+            <div
+              class="MuiFormControl-root"
+            >
+              <label
+                class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined MuiFormLabel-filled"
+                data-shrink="true"
+                for="context-select"
+                id="context-select-label"
+              >
+                Context
+              </label>
+              <div
+                class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-formControl"
+              >
+                <div
+                  aria-haspopup="listbox"
+                  aria-labelledby="context-select-label context-select"
+                  class="MuiSelect-root MuiSelect-select MuiSelect-selectMenu MuiSelect-outlined MuiInputBase-input MuiOutlinedInput-input"
+                  id="context-select"
+                  role="button"
+                  tabindex="0"
+                >
+                  my-context
+                </div>
+                <input
+                  aria-hidden="true"
+                  class="MuiSelect-nativeInput"
+                  tabindex="-1"
+                  value="my-context"
+                />
+                <svg
+                  aria-hidden="true"
+                  class="MuiSvgIcon-root MuiSelect-icon MuiSelect-iconOutlined"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M7 10l5 5 5-5z"
+                  />
+                </svg>
+                <fieldset
+                  aria-hidden="true"
+                  class="PrivateNotchedOutline-root-1 MuiOutlinedInput-notchedOutline"
+                  style="padding-left: 8px;"
+                >
+                  <legend
+                    class="PrivateNotchedOutline-legend-2"
+                    style="width: 0.01px;"
+                  >
+                    <span>
+                      ​
+                    </span>
+                  </legend>
+                </fieldset>
+              </div>
+            </div>
+            <div
+              class="MuiFormControl-root"
+            >
+              <label
+                class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined MuiFormLabel-filled"
+                data-shrink="true"
+                id="namespaces-selector"
+              >
+                Namespace
+              </label>
+              <div
+                class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-formControl"
+              >
+                <div
+                  aria-haspopup="listbox"
+                  aria-labelledby="namespaces-selector"
+                  class="MuiSelect-root MuiSelect-select MuiSelect-selectMenu MuiSelect-outlined MuiInputBase-input MuiOutlinedInput-input"
+                  id="namespaces-selector"
+                  role="button"
+                  tabindex="0"
+                >
+                  default
+                </div>
+                <input
+                  aria-hidden="true"
+                  class="MuiSelect-nativeInput"
+                  tabindex="-1"
+                  value="default"
+                />
+                <svg
+                  aria-hidden="true"
+                  class="MuiSvgIcon-root MuiSelect-icon MuiSelect-iconOutlined"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M7 10l5 5 5-5z"
+                  />
+                </svg>
+                <fieldset
+                  aria-hidden="true"
+                  class="PrivateNotchedOutline-root-1 MuiOutlinedInput-notchedOutline"
+                >
+                  <legend
+                    class="PrivateNotchedOutline-legendLabelled-3 PrivateNotchedOutline-legendNotched-4"
+                  >
+                    <span>
+                      Namespace
+                    </span>
+                  </legend>
+                </fieldset>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+  </div>,
+  "debug": [Function],
+  "findAllByAltText": [Function],
+  "findAllByDisplayValue": [Function],
+  "findAllByLabelText": [Function],
+  "findAllByPlaceholderText": [Function],
+  "findAllByRole": [Function],
+  "findAllByTestId": [Function],
+  "findAllByText": [Function],
+  "findAllByTitle": [Function],
+  "findByAltText": [Function],
+  "findByDisplayValue": [Function],
+  "findByLabelText": [Function],
+  "findByPlaceholderText": [Function],
+  "findByRole": [Function],
+  "findByTestId": [Function],
+  "findByText": [Function],
+  "findByTitle": [Function],
+  "getAllByAltText": [Function],
+  "getAllByDisplayValue": [Function],
+  "getAllByLabelText": [Function],
+  "getAllByPlaceholderText": [Function],
+  "getAllByRole": [Function],
+  "getAllByTestId": [Function],
+  "getAllByText": [Function],
+  "getAllByTitle": [Function],
+  "getByAltText": [Function],
+  "getByDisplayValue": [Function],
+  "getByLabelText": [Function],
+  "getByPlaceholderText": [Function],
+  "getByRole": [Function],
+  "getByTestId": [Function],
+  "getByText": [Function],
+  "getByTitle": [Function],
+  "queryAllByAltText": [Function],
+  "queryAllByDisplayValue": [Function],
+  "queryAllByLabelText": [Function],
+  "queryAllByPlaceholderText": [Function],
+  "queryAllByRole": [Function],
+  "queryAllByTestId": [Function],
+  "queryAllByText": [Function],
+  "queryAllByTitle": [Function],
+  "queryByAltText": [Function],
+  "queryByDisplayValue": [Function],
+  "queryByLabelText": [Function],
+  "queryByPlaceholderText": [Function],
+  "queryByRole": [Function],
+  "queryByTestId": [Function],
+  "queryByText": [Function],
+  "queryByTitle": [Function],
+  "rerender": [Function],
+  "unmount": [Function],
+}
+`;

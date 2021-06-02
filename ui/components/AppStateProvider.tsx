@@ -45,7 +45,7 @@ export default function AppStateProvider({ clustersClient, ...props }) {
     });
   };
 
-  const query = qs.parse(location.pathname);
+  const query = qs.parse(location.search);
 
   const getNamespaces = (ctx) => {
     clustersClient.listNamespacesForContext({ contextname: ctx }).then(

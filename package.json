@@ -13,7 +13,11 @@
     "watch": "jest --runInBand --watch"
   },
   "jest": {
-    "preset": "ts-jest"
+    "preset": "ts-jest",
+    "moduleNameMapper": {
+      "\\.(jpg|ico|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/ui/lib/fileMock.js",
+      "\\.(css|less)$": "<rootDir>/ui/lib/fileMock.js"
+    }
   },
   "dependencies": {
     "@babel/preset-env": "^7.13.8",

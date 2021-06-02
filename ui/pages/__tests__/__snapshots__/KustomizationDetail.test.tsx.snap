@@ -23,7 +23,7 @@ Object {
               >
                 <a
                   class="sc-gKsewC"
-                  href="/kustomizations?context=my-context&namespace=all"
+                  href="/kustomizations?context=my-context&namespace=default"
                 >
                   <h2>
                     Kustomizations
@@ -65,7 +65,7 @@ Object {
           </button>
         </div>
         <div
-          class="MuiBox-root MuiBox-root-1"
+          class="MuiBox-root MuiBox-root-4"
         >
           <div
             class="sc-pFZIQ"
@@ -105,7 +105,7 @@ Object {
                             >
                               <a
                                 class="sc-gKsewC"
-                                href="/sources_detail?context=my-context&namespace=all&sourceId=my-source&sourceType=git"
+                                href="/sources_detail?context=my-context&namespace=default&sourceId=my-source&sourceType=git"
                               >
                                 my-source
                               </a>
@@ -183,7 +183,7 @@ Object {
           </div>
         </div>
         <div
-          class="MuiBox-root MuiBox-root-2"
+          class="MuiBox-root MuiBox-root-5"
         >
           <div
             class="sc-pFZIQ"
@@ -257,7 +257,7 @@ Object {
           </div>
         </div>
         <div
-          class="MuiBox-root MuiBox-root-3"
+          class="MuiBox-root MuiBox-root-6"
         >
           <div
             class="sc-pFZIQ"
@@ -399,7 +399,7 @@ Object {
             >
               <a
                 class="sc-gKsewC"
-                href="/kustomizations?context=my-context&namespace=all"
+                href="/kustomizations?context=my-context&namespace=default"
               >
                 <h2>
                   Kustomizations
@@ -441,7 +441,7 @@ Object {
         </button>
       </div>
       <div
-        class="MuiBox-root MuiBox-root-1"
+        class="MuiBox-root MuiBox-root-4"
       >
         <div
           class="sc-pFZIQ"
@@ -481,7 +481,7 @@ Object {
                           >
                             <a
                               class="sc-gKsewC"
-                              href="/sources_detail?context=my-context&namespace=all&sourceId=my-source&sourceType=git"
+                              href="/sources_detail?context=my-context&namespace=default&sourceId=my-source&sourceType=git"
                             >
                               my-source
                             </a>
@@ -559,7 +559,7 @@ Object {
         </div>
       </div>
       <div
-        class="MuiBox-root MuiBox-root-2"
+        class="MuiBox-root MuiBox-root-5"
       >
         <div
           class="sc-pFZIQ"
@@ -633,7 +633,7 @@ Object {
         </div>
       </div>
       <div
-        class="MuiBox-root MuiBox-root-3"
+        class="MuiBox-root MuiBox-root-6"
       >
         <div
           class="sc-pFZIQ"

@@ -90,9 +90,13 @@ function TopNav({ className }: Props) {
         <NavWrapper column center wide>
           <Flex center>
             <FormControl variant="outlined">
-              <InputLabel id="context-selector">Context</InputLabel>
+              <InputLabel htmlFor="context-select" id="context-select-label">
+                Context
+              </InputLabel>
               {currentContext && contexts.length > 0 && (
                 <Select
+                  labelId="context-select-label"
+                  id="context-select"
                   onChange={(ev) => {
                     const nextCtx = ev.target.value as string;
                     // setCurrentContext(nextCtx);
@@ -103,8 +107,6 @@ function TopNav({ className }: Props) {
                     );
                   }}
                   value={currentContext}
-                  id="context-selector"
-                  label="Contexts"
                 >
                   {_.map(contexts, (c) => (
                     <MenuItem value={c.name || ""} key={c.name}>
@@ -116,7 +118,7 @@ function TopNav({ className }: Props) {
             </FormControl>
             <FormControl variant="outlined">
               <InputLabel id="namespaces-selector">Namespace</InputLabel>
-              {currentNamespace && namespaces && (
+              {currentNamespace && namespaces && namespaces.length > 0 && (
                 <Select
                   onChange={(ev) => {
                     const nextNs = (ev.target.value === allNamespaces
