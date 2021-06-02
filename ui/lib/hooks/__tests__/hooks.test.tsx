@@ -67,5 +67,23 @@ describe("app hooks", () => {
 
       expect((await screen.findByText("default")).textContent).toBeTruthy();
     });
+    it("sets the current namespace", async () => {
+      const ns = "my-ns";
+      const TestComponent = () => {
+        const { currentNamespace } = useKubernetesContexts();
+
+        return <p>{currentNamespace}</p>;
+      };
+
+      render(
+        withContext(TestComponent, `/?context=my-context&namespace=${ns}`, {
+          listContexts: { contexts: [{ name: "my-context" }] },
+          listNamespacesForContext: { namespaces: [ns] },
+        }),
+        container
+      );
+
+      expect((await screen.findByText(ns)).textContent).toBeTruthy();
+    });
   });
 });

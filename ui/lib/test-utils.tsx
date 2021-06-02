@@ -25,7 +25,7 @@ type ClientOverrides = {
 export function withContext(
   TestComponent,
   simulatedUrl: string,
-  clientOverrides: ClientOverrides
+  clientOverrides?: ClientOverrides
 ) {
   // Don't make the user wire up all the promise stuff to be interface-compliant
   const promisified = _.reduce(
