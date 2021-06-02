@@ -38,6 +38,7 @@
     "@types/styled-components": "^5.1.4",
     "babel-jest": "^26.6.3",
     "d3": "^6.6.0",
+    "d3-selection": "^2.0.0",
     "dagre": "^0.8.5",
     "dagre-d3": "^0.6.4",
     "jest": "^26.6.3",

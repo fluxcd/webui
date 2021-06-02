@@ -7,7 +7,7 @@ Object {
     <div />
     <div>
       <div
-        class="sc-iBPRYJ sc-jrAGrp dzRsDN"
+        class="sc-iBPRYJ sc-iqHYGH rMTDD"
       >
         <div
           class="sc-dlfnbm emcvKi"
@@ -65,7 +65,7 @@ Object {
           </button>
         </div>
         <div
-          class="MuiBox-root MuiBox-root-4"
+          class="MuiBox-root MuiBox-root-8"
         >
           <div
             class="sc-pFZIQ"
@@ -183,7 +183,7 @@ Object {
           </div>
         </div>
         <div
-          class="MuiBox-root MuiBox-root-5"
+          class="MuiBox-root MuiBox-root-9"
         >
           <div
             class="sc-pFZIQ"
@@ -257,7 +257,7 @@ Object {
           </div>
         </div>
         <div
-          class="MuiBox-root MuiBox-root-6"
+          class="MuiBox-root MuiBox-root-10"
         >
           <div
             class="sc-pFZIQ"
@@ -277,102 +277,85 @@ Object {
               >
                 <div>
                   <div
-                    class="sc-gsTCUz"
+                    class="MuiTabs-root"
                   >
                     <div
-                      class="MuiTableContainer-root"
+                      class="MuiTabs-scroller MuiTabs-fixed"
+                      style="overflow: hidden;"
                     >
-                      <table
-                        aria-label="simple table"
-                        class="MuiTable-root"
+                      <div
+                        class="MuiTabs-flexContainer"
+                        role="tablist"
                       >
-                        <thead
-                          class="MuiTableHead-root"
+                        <button
+                          aria-controls="mui-p-50000-P-graph"
+                          aria-selected="true"
+                          class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit Mui-selected"
+                          id="mui-p-50000-T-graph"
+                          role="tab"
+                          tabindex="0"
+                          type="button"
                         >
-                          <tr
-                            class="MuiTableRow-root MuiTableRow-head"
+                          <span
+                            class="MuiTab-wrapper"
                           >
-                            <th
-                              class="MuiTableCell-root MuiTableCell-head"
-                              scope="col"
-                            >
-                              Kind
-                            </th>
-                            <th
-                              class="MuiTableCell-root MuiTableCell-head"
-                              scope="col"
-                            >
-                              Name
-                            </th>
-                            <th
-                              class="MuiTableCell-root MuiTableCell-head"
-                              scope="col"
-                            >
-                              Namespace
-                            </th>
-                            <th
-                              class="MuiTableCell-root MuiTableCell-head"
-                              scope="col"
-                            >
-                              Status
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody
-                          class="MuiTableBody-root"
+                            Graph
+                          </span>
+                          <span
+                            class="MuiTouchRipple-root"
+                          />
+                        </button>
+                        <button
+                          aria-controls="mui-p-50000-P-table"
+                          aria-selected="false"
+                          class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit"
+                          id="mui-p-50000-T-table"
+                          role="tab"
+                          tabindex="-1"
+                          type="button"
                         >
-                          <tr
-                            class="MuiTableRow-root"
+                          <span
+                            class="MuiTab-wrapper"
                           >
-                            <td
-                              class="MuiTableCell-root MuiTableCell-body"
-                            >
-                              Deployment
-                            </td>
-                            <td
-                              class="MuiTableCell-root MuiTableCell-body"
-                            >
-                              reconciled-deployment
-                            </td>
-                            <td
-                              class="MuiTableCell-root MuiTableCell-body"
-                            >
-                              default
-                            </td>
-                            <td
-                              class="MuiTableCell-root MuiTableCell-body"
-                            >
-                              Current
-                            </td>
-                          </tr>
-                          <tr
-                            class="MuiTableRow-root"
-                          >
-                            <td
-                              class="MuiTableCell-root MuiTableCell-body"
-                            >
-                              Pod
-                            </td>
-                            <td
-                              class="MuiTableCell-root MuiTableCell-body"
-                            >
-                              reconciled-deployment-abc
-                            </td>
-                            <td
-                              class="MuiTableCell-root MuiTableCell-body"
-                            >
-                              default
-                            </td>
-                            <td
-                              class="MuiTableCell-root MuiTableCell-body"
-                            >
-                              Current
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
+                            Table
+                          </span>
+                          <span
+                            class="MuiTouchRipple-root"
+                          />
+                        </button>
+                      </div>
+                      <span
+                        class="PrivateTabIndicator-root-11 PrivateTabIndicator-colorSecondary-13 MuiTabs-indicator"
+                        style="left: 0px; width: 0px;"
+                      />
                     </div>
                   </div>
+                  <div
+                    aria-labelledby="mui-p-50000-T-graph"
+                    class="MuiTabPanel-root"
+                    id="mui-p-50000-P-graph"
+                    role="tabpanel"
+                  >
+                    <div
+                      class="sc-kEjbxe fvZZpi"
+                    >
+                      <div
+                        class="sc-jrAGrp dTbqnH"
+                      >
+                        <svg
+                          height="960"
+                          width="960"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    aria-labelledby="mui-p-50000-T-table"
+                    class="MuiTabPanel-root"
+                    hidden=""
+                    id="mui-p-50000-P-table"
+                    role="tabpanel"
+                  />
                 </div>
               </div>
             </div>
@@ -383,7 +366,7 @@ Object {
   </body>,
   "container": <div>
     <div
-      class="sc-iBPRYJ sc-jrAGrp dzRsDN"
+      class="sc-iBPRYJ sc-iqHYGH rMTDD"
     >
       <div
         class="sc-dlfnbm emcvKi"
@@ -441,7 +424,7 @@ Object {
         </button>
       </div>
       <div
-        class="MuiBox-root MuiBox-root-4"
+        class="MuiBox-root MuiBox-root-8"
       >
         <div
           class="sc-pFZIQ"
@@ -559,7 +542,7 @@ Object {
         </div>
       </div>
       <div
-        class="MuiBox-root MuiBox-root-5"
+        class="MuiBox-root MuiBox-root-9"
       >
         <div
           class="sc-pFZIQ"
@@ -633,7 +616,7 @@ Object {
         </div>
       </div>
       <div
-        class="MuiBox-root MuiBox-root-6"
+        class="MuiBox-root MuiBox-root-10"
       >
         <div
           class="sc-pFZIQ"
@@ -653,102 +636,85 @@ Object {
             >
               <div>
                 <div
-                  class="sc-gsTCUz"
+                  class="MuiTabs-root"
                 >
                   <div
-                    class="MuiTableContainer-root"
+                    class="MuiTabs-scroller MuiTabs-fixed"
+                    style="overflow: hidden;"
                   >
-                    <table
-                      aria-label="simple table"
-                      class="MuiTable-root"
+                    <div
+                      class="MuiTabs-flexContainer"
+                      role="tablist"
                     >
-                      <thead
-                        class="MuiTableHead-root"
+                      <button
+                        aria-controls="mui-p-50000-P-graph"
+                        aria-selected="true"
+                        class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit Mui-selected"
+                        id="mui-p-50000-T-graph"
+                        role="tab"
+                        tabindex="0"
+                        type="button"
                       >
-                        <tr
-                          class="MuiTableRow-root MuiTableRow-head"
+                        <span
+                          class="MuiTab-wrapper"
                         >
-                          <th
-                            class="MuiTableCell-root MuiTableCell-head"
-                            scope="col"
-                          >
-                            Kind
-                          </th>
-                          <th
-                            class="MuiTableCell-root MuiTableCell-head"
-                            scope="col"
-                          >
-                            Name
-                          </th>
-                          <th
-                            class="MuiTableCell-root MuiTableCell-head"
-                            scope="col"
-                          >
-                            Namespace
-                          </th>
-                          <th
-                            class="MuiTableCell-root MuiTableCell-head"
-                            scope="col"
-                          >
-                            Status
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody
-                        class="MuiTableBody-root"
+                          Graph
+                        </span>
+                        <span
+                          class="MuiTouchRipple-root"
+                        />
+                      </button>
+                      <button
+                        aria-controls="mui-p-50000-P-table"
+                        aria-selected="false"
+                        class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit"
+                        id="mui-p-50000-T-table"
+                        role="tab"
+                        tabindex="-1"
+                        type="button"
                       >
-                        <tr
-                          class="MuiTableRow-root"
+                        <span
+                          class="MuiTab-wrapper"
                         >
-                          <td
-                            class="MuiTableCell-root MuiTableCell-body"
-                          >
-                            Deployment
-                          </td>
-                          <td
-                            class="MuiTableCell-root MuiTableCell-body"
-                          >
-                            reconciled-deployment
-                          </td>
-                          <td
-                            class="MuiTableCell-root MuiTableCell-body"
-                          >
-                            default
-                          </td>
-                          <td
-                            class="MuiTableCell-root MuiTableCell-body"
-                          >
-                            Current
-                          </td>
-                        </tr>
-                        <tr
-                          class="MuiTableRow-root"
-                        >
-                          <td
-                            class="MuiTableCell-root MuiTableCell-body"
-                          >
-                            Pod
-                          </td>
-                          <td
-                            class="MuiTableCell-root MuiTableCell-body"
-                          >
-                            reconciled-deployment-abc
-                          </td>
-                          <td
-                            class="MuiTableCell-root MuiTableCell-body"
-                          >
-                            default
-                          </td>
-                          <td
-                            class="MuiTableCell-root MuiTableCell-body"
-                          >
-                            Current
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                          Table
+                        </span>
+                        <span
+                          class="MuiTouchRipple-root"
+                        />
+                      </button>
+                    </div>
+                    <span
+                      class="PrivateTabIndicator-root-11 PrivateTabIndicator-colorSecondary-13 MuiTabs-indicator"
+                      style="left: 0px; width: 0px;"
+                    />
                   </div>
                 </div>
+                <div
+                  aria-labelledby="mui-p-50000-T-graph"
+                  class="MuiTabPanel-root"
+                  id="mui-p-50000-P-graph"
+                  role="tabpanel"
+                >
+                  <div
+                    class="sc-kEjbxe fvZZpi"
+                  >
+                    <div
+                      class="sc-jrAGrp dTbqnH"
+                    >
+                      <svg
+                        height="960"
+                        width="960"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  aria-labelledby="mui-p-50000-T-table"
+                  class="MuiTabPanel-root"
+                  hidden=""
+                  id="mui-p-50000-P-table"
+                  role="tabpanel"
+                />
               </div>
             </div>
           </div>
