@@ -107,14 +107,14 @@ function KustomizationDetail({ className }: Props) {
     };
 
     let timeout;
-    function poll() {
-      timeout = setTimeout(async () => {
-        // Polling will stop if this errors.
-        // Also prevents sending a request before the previous request finishes.
-        await getChildren();
-        poll();
-      }, 5000);
-    }
+    // function poll() {
+    //   timeout = setTimeout(async () => {
+    //     // Polling will stop if this errors.
+    //     // Also prevents sending a request before the previous request finishes.
+    //     await getChildren();
+    //     poll();
+    //   }, 5000);
+    // }
 
     // Get children now, to avoid waiting for the first poll() setTimeout.
     getChildren();
