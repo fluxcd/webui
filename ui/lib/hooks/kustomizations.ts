@@ -31,6 +31,10 @@ export const PARENT_CHILD_LOOKUP = {
   },
 };
 
+export type UnstructuredObjectWithParent = UnstructuredObject & {
+  parentUid?: string;
+};
+
 export function useKustomizations(
   currentContext: string,
   currentNamespace: string
@@ -110,7 +114,7 @@ export function useKustomizations(
   // in order to build the whole reconciliation "tree".
   const getChildrenRecursive = async (
     result: any,
-    object: UnstructuredObject,
+    object: UnstructuredObjectWithParent,
     lookup: any
   ) => {
     result.push(object);
@@ -127,9 +131,13 @@ export function useKustomizations(
           const c = res.objects[q];
 
           // Dive down one level and update the lookup accordingly.
-          await getChildrenRecursive(result, c, {
-            [child.kind]: child,
-          });
+          await getChildrenRecursive(
+            result,
+            { ...c, parentUid: object.uid },
+            {
+              [child.kind]: child,
+            }
+          );
         }
       }
     }
