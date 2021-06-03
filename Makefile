@@ -1,7 +1,7 @@
 .PHONY: clean all test assets dev proto download-crd-deps
-SOURCE_VERSION := v0.11.0
-KUSTOMIZE_VERSION := v0.11.0
-HELM_CRD_VERSION := v0.9.0
+SOURCE_VERSION := v0.13.2
+KUSTOMIZE_VERSION := v0.12.2
+HELM_CRD_VERSION := v0.10.1
 
 all: test build
 
