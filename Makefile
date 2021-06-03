@@ -14,7 +14,7 @@ test:
 build: dist/index.html
 	CGO_ENABLED=0 go build -o ./bin/webui .
 
-dev:
+dev: dist/index.html
 	reflex -r '.go' -s -- sh -c 'go run main.go'
 
 proto: pkg/rpc/clusters/clusters.proto
