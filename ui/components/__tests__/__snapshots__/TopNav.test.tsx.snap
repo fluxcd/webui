@@ -153,8 +153,6 @@ Object {
                 <label
                   class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined MuiFormLabel-filled"
                   data-shrink="true"
-                  for="context-select"
-                  id="context-select-label"
                 >
                   Context
                 </label>
@@ -163,7 +161,7 @@ Object {
                 >
                   <div
                     aria-haspopup="listbox"
-                    aria-labelledby="context-select-label context-select"
+                    aria-labelledby="context-select"
                     class="MuiSelect-root MuiSelect-select MuiSelect-selectMenu MuiSelect-outlined MuiInputBase-input MuiOutlinedInput-input"
                     id="context-select"
                     role="button"
@@ -295,8 +293,6 @@ Object {
               <label
                 class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined MuiFormLabel-filled"
                 data-shrink="true"
-                for="context-select"
-                id="context-select-label"
               >
                 Context
               </label>
@@ -305,7 +301,7 @@ Object {
               >
                 <div
                   aria-haspopup="listbox"
-                  aria-labelledby="context-select-label context-select"
+                  aria-labelledby="context-select"
                   class="MuiSelect-root MuiSelect-select MuiSelect-selectMenu MuiSelect-outlined MuiInputBase-input MuiOutlinedInput-input"
                   id="context-select"
                   role="button"
