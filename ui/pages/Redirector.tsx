@@ -15,8 +15,6 @@ export default function Redirector() {
       return;
     }
 
-    console.log("doing redirector things");
-
     // Runs once on app startup.
     clustersClient.listContexts({}).then(
       (res) => {

@@ -90,12 +90,10 @@ function TopNav({ className }: Props) {
         <NavWrapper column center wide>
           <Flex center>
             <FormControl variant="outlined">
-              <InputLabel htmlFor="context-select" id="context-select-label">
-                Context
-              </InputLabel>
+              <InputLabel>Context</InputLabel>
               {currentContext && contexts.length > 0 && (
                 <Select
-                  labelId="context-select-label"
+                  // labelId="context-select-label"
                   id="context-select"
                   onChange={(ev) => {
                     const nextCtx = ev.target.value as string;

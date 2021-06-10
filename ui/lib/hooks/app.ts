@@ -48,9 +48,12 @@ export function useNavigation() {
   const [currentPage, setCurrentPage] = useState("");
 
   useEffect(() => {
+    if (!location.pathname) {
+      console.log(location);
+    }
     const [pageName] = normalizePath(location.pathname);
     setCurrentPage(pageName as string);
-  }, [location.pathname]);
+  }, [location]);
 
   return {
     currentPage,

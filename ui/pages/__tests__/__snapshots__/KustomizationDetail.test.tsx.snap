@@ -65,7 +65,7 @@ Object {
           </button>
         </div>
         <div
-          class="MuiBox-root MuiBox-root-8"
+          class="MuiBox-root MuiBox-root-1"
         >
           <div
             class="sc-pFZIQ"
@@ -183,7 +183,7 @@ Object {
           </div>
         </div>
         <div
-          class="MuiBox-root MuiBox-root-9"
+          class="MuiBox-root MuiBox-root-2"
         >
           <div
             class="sc-pFZIQ"
@@ -257,7 +257,7 @@ Object {
           </div>
         </div>
         <div
-          class="MuiBox-root MuiBox-root-10"
+          class="MuiBox-root MuiBox-root-3"
         >
           <div
             class="sc-pFZIQ"
@@ -325,7 +325,7 @@ Object {
                         </button>
                       </div>
                       <span
-                        class="PrivateTabIndicator-root-11 PrivateTabIndicator-colorSecondary-13 MuiTabs-indicator"
+                        class="PrivateTabIndicator-root-4 PrivateTabIndicator-colorSecondary-6 MuiTabs-indicator"
                         style="left: 0px; width: 0px;"
                       />
                     </div>
@@ -424,7 +424,7 @@ Object {
         </button>
       </div>
       <div
-        class="MuiBox-root MuiBox-root-8"
+        class="MuiBox-root MuiBox-root-1"
       >
         <div
           class="sc-pFZIQ"
@@ -542,7 +542,7 @@ Object {
         </div>
       </div>
       <div
-        class="MuiBox-root MuiBox-root-9"
+        class="MuiBox-root MuiBox-root-2"
       >
         <div
           class="sc-pFZIQ"
@@ -616,7 +616,7 @@ Object {
         </div>
       </div>
       <div
-        class="MuiBox-root MuiBox-root-10"
+        class="MuiBox-root MuiBox-root-3"
       >
         <div
           class="sc-pFZIQ"
@@ -684,7 +684,7 @@ Object {
                       </button>
                     </div>
                     <span
-                      class="PrivateTabIndicator-root-11 PrivateTabIndicator-colorSecondary-13 MuiTabs-indicator"
+                      class="PrivateTabIndicator-root-4 PrivateTabIndicator-colorSecondary-6 MuiTabs-indicator"
                       style="left: 0px; width: 0px;"
                     />
                   </div>

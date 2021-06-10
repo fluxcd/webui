@@ -98,6 +98,10 @@ export default function AppStateProvider({ clustersClient, ...props }) {
     });
   }, [context, currentNamespace, location]);
 
+  React.useEffect(() => {
+    setCurrentNamespace(query.namespace as string);
+  }, [location]);
+
   const value: AppContextType = {
     contexts,
     namespaces,

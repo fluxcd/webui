@@ -22,14 +22,10 @@ type ClientOverrides = {
   getChildObjects?: GetChildObjectsRes;
 };
 
-export function withContext(
-  TestComponent,
-  simulatedUrl: string,
-  clientOverrides?: ClientOverrides
-) {
+export const createMockClient = (ovr: ClientOverrides) => {
   // Don't make the user wire up all the promise stuff to be interface-compliant
   const promisified = _.reduce(
-    clientOverrides,
+    ovr,
     (result, desiredResponse, method) => {
       result[method] = () =>
         new Promise((accept) => accept(desiredResponse as any));
@@ -39,11 +35,19 @@ export function withContext(
     {}
   );
 
+  return promisified;
+};
+
+export function withContext(
+  TestComponent,
+  simulatedUrl: string,
+  clientOverrides?: ClientOverrides
+) {
   return (
     <MuiThemeProvider theme={theme}>
       <ThemeProvider theme={theme}>
         <MemoryRouter initialEntries={[simulatedUrl]}>
-          <AppStateProvider clustersClient={promisified}>
+          <AppStateProvider clustersClient={createMockClient(clientOverrides)}>
             <TestComponent />
           </AppStateProvider>
         </MemoryRouter>
