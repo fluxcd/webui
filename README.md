@@ -10,7 +10,7 @@ To install the Flux Web UI:
 
 1. Download the latest release from the [releases page](https://github.com/fluxcd/webui/releases)
 2. Extract the binary from the downloaded archive
-3. Run the server in your terminal: `./flux_webui`
+3. Run the server in your terminal: `./flux-webui`
 4. You will see a log message letting you know startup was successful: `2021-06-03T13:26:37.552-0700 INFO Serving on port 9000`
 5. Navigate to [http://localhost:9000](http://localhost:9000)
 
