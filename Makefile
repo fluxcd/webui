@@ -3,10 +3,19 @@ SOURCE_CONTROLLER_VERSION := v0.15.4
 KUSTOMIZE_CONTROLLER_VERSION := v0.14.0
 HELM_CONTROLLER_VERSION := v0.11.2
 
-all: test build
+all: dist/index.html fmt vet test build
 
 dist/index.html:
 	npm run build
+
+fmt:
+	go fmt ./...
+	npx prettier --write 'ui/**/*.ts(x)?'
+	npx eslint ui/ --ext .ts --ext .tsx --fix
+
+vet:
+	go vet ./...
+	npx eslint ui/ --ext .ts --ext .tsx
 
 test:
 	go test ./...
