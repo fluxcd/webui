@@ -35,8 +35,8 @@ func initialContexts() (contexts []string, currentCtx string, err error) {
 		return contexts, currentCtx, err
 	}
 
-	for _, c := range rules.Contexts {
-		contexts = append(contexts, c.Cluster)
+	for contextName := range rules.Contexts {
+		contexts = append(contexts, contextName)
 	}
 
 	return contexts, rules.CurrentContext, nil
