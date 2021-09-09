@@ -72,7 +72,6 @@ message Kustomization {
     repeated SnapshotEntry snapshots = 12;
     string lastAppliedRevision = 13;
     string lastAttemptedRevision = 14;
-
 }
 
 message ListKustomizationsReq {

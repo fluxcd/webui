@@ -22,18 +22,25 @@ export const throwTwirpError = (resp: Response) => {
   });
 };
 
-export const createTwirpRequest = (url: string, body: object, headersOverride: HeadersInit = {}): Request => {
-    const headers = {
-        ...{
-            "Content-Type": "application/json"
-        },
-        ...headersOverride
-    };
-    return new Request(url, {
-        method: "POST",
-        headers,
-        body: JSON.stringify(body)
-    });
+export const createTwirpRequest = (
+  url: string,
+  body: object,
+  headersOverride: HeadersInit = {}
+): Request => {
+  const headers = {
+    ...{
+      "Content-Type": "application/json",
+    },
+    ...headersOverride,
+  };
+  return new Request(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+  });
 };
 
-export type Fetch = (input: RequestInfo, init?: RequestInit) => Promise<Response>;
+export type Fetch = (
+  input: RequestInfo,
+  init?: RequestInit
+) => Promise<Response>;
