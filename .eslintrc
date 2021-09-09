@@ -4,7 +4,8 @@
         "plugin:import/errors",
         "plugin:import/warnings",
         "plugin:@typescript-eslint/recommended",
-        "plugin:import/typescript"
+        "plugin:import/typescript",
+        "plugin:prettier/recommended" // eslint shows prettier formatting warnings. Must be always the last configuration.
     ],
     "rules": {
         "import/default": 0,
