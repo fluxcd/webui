@@ -2,7 +2,12 @@
 
 ## Project Status
 
-This project is currently in the "experimental" phase of development. It is not part of official Flux releases. Please file any bugs or feature requests in this repository's issues using a provided issue template.
+:warning: This project is currently **on hold**, because the maintainers do not have capacity to
+develop it further at present. Please get in touch in [#flux-contributors](https://slack.cncf.io/)
+if you are interested in helping to restart this project.
+
+See [the monitoring section of the Flux documentation](https://fluxcd.io/docs/guides/monitoring/)
+for how to install Flux's Grafana dashboards.
 
 ## Installation
 
