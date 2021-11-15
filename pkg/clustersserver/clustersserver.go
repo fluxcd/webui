@@ -373,7 +373,7 @@ func kindToSourceType(kind string) pb.Source_Type {
 func getSourceType(sourceType pb.Source_Type) (client.ObjectList, *reconcileWrapper, error) {
 	switch sourceType {
 	case pb.Source_Git:
-		return &sourcev1.GitRepositoryList{}, &reconcileWrapper{object: gitRepositoryAdapter{&sourcev1.GitRepository{}}}, nil
+		return &sourcev1.GitRepositoryList{}, &reconcileWrapper{object: gitAdapter{&sourcev1.GitRepository{}}}, nil
 
 	case pb.Source_Bucket:
 		return &sourcev1.BucketList{}, &reconcileWrapper{object: bucketAdapter{&sourcev1.Bucket{}}}, nil
