@@ -14,6 +14,12 @@ const navItems = [
   { value: PageRoute.Sources, label: "Sources" },
   { value: PageRoute.Kustomizations, label: "Kustomizations" },
   { value: PageRoute.HelmReleases, label: "Helm Releases" },
+  { value: PageRoute.ImagePolicies, label: "Image Policies" },
+  { value: PageRoute.ImageRepositories, label: "Image Repositories" },
+  { value: PageRoute.ImageUpdateAutomations, label: "Image Update Automations" },
+  { value: PageRoute.Alerts, label: "Alerts" },
+  { value: PageRoute.Providers, label: "Providers" },
+  { value: PageRoute.Receivers, label: "Receivers" },
   { value: PageRoute.Events, label: "Events" },
 ];
 

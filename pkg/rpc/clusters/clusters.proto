@@ -13,6 +13,14 @@ service Clusters {
     rpc ListEvents (ListEventsReq) returns (ListEventsRes);
     rpc SyncSource (SyncSourceReq) returns (SyncSourceRes);
     rpc SyncHelmRelease (SyncHelmReleaseReq) returns (SyncHelmReleaseRes);
+    rpc ListAlerts (ListAlertsReq) returns (ListAlertsRes);
+    rpc ListImagePolicies (ListImagePoliciesReq) returns (ListImagePoliciesRes);
+    rpc ListImageRepositories (ListImageRepositoriesReq) returns (ListImageRepositoriesRes);
+    rpc ListImageUpdateAutomations (ListImageUpdateAutomationsReq) returns (ListImageUpdateAutomationsRes);
+    rpc ListProviders (ListProvidersReq) returns (ListProvidersRes);
+    rpc ListReceivers (ListReceiversReq) returns (ListReceiversRes);
+    rpc SyncImageRepository (SyncImageRepositoryReq) returns (SyncImageRepositoryRes);
+    rpc SyncImageUpdateAutomation (SyncImageUpdateAutomationReq) returns (SyncImageUpdateAutomationRes);
     rpc GetReconciledObjects(GetReconciledObjectsReq) returns (GetReconciledObjectsRes);
     rpc GetChildObjects(GetChildObjectsReq) returns (GetChildObjectsRes);
 }
@@ -36,6 +44,13 @@ message ListNamespacesForContextReq {
 
 message ListNamespacesForContextRes {
     repeated string namespaces = 1;
+}
+
+message CrossNamespaceObjectReference {
+    string apiVersion = 1;
+    string kind = 2;
+    string name = 3;
+    string namespace = 4;
 }
 
 message Condition {
@@ -183,6 +198,162 @@ message SyncHelmReleaseReq {
 
 message SyncHelmReleaseRes {
     HelmRelease helmrelease = 1;
+}
+
+message ImagePolicy {
+    string name = 1;
+    string namespace = 2;
+    string imageRepositoryRef = 3;
+    string policyKind = 4;
+    string policy = 5;
+    string filterTagsPattern = 6;
+    string filterTagsExtract = 7;
+    string latestImage = 8;
+    repeated Condition conditions = 9;
+}
+
+message ListImagePoliciesReq {
+    string contextName = 1;
+    string namespace = 2;
+}
+
+message ListImagePoliciesRes {
+    repeated ImagePolicy image_policies = 1;
+}
+
+message ImageRepository {
+    string name = 1;
+    string namespace = 2;
+    string image = 3;
+    string secretRef = 4;
+    repeated Condition conditions = 5;
+    string interval = 6;
+    string timeout = 7;
+    string certSecretRef = 8;
+    bool suspend = 9;
+    string reconcileRequestAt = 10;
+    string reconcileAt = 11;
+    int32 lastScanResultTagCount = 12;
+    int32 lastScanResultScanTime = 13;
+}
+
+message ListImageRepositoriesReq {
+    string contextName = 1;
+    string namespace = 2;
+}
+
+message ListImageRepositoriesRes {
+    repeated ImageRepository image_repositories = 1;
+}
+
+message SyncImageRepositoryReq {
+    string contextName = 1;
+    string namespace = 2;
+    string imageRepositoryName = 3;
+}
+
+message SyncImageRepositoryRes {
+    ImageRepository imagerepository = 1;
+}
+
+message ImageUpdateAutomation {
+    string name = 1;
+    string namespace = 2;
+    string sourceRef = 3;
+    repeated Condition conditions = 4;
+    string interval = 5;
+    string updatePath = 6;
+    string updateStrategy = 7;
+    bool suspend = 8;
+    string reconcileRequestAt = 9;
+    string reconcileAt = 10;
+    Source.Type sourceRefKind = 11;
+    int32 lastAutomationRunTime = 12;
+    string lastPushCommit = 13;
+    int32 lastPushTime = 14;
+}
+
+message ListImageUpdateAutomationsReq {
+    string contextName = 1;
+    string namespace = 2;
+}
+
+message ListImageUpdateAutomationsRes {
+    repeated ImageUpdateAutomation image_update_automations = 1;
+}
+
+message SyncImageUpdateAutomationReq {
+    string contextName = 1;
+    string namespace = 2;
+    string imageUpdateAutomationName = 3;
+}
+
+message SyncImageUpdateAutomationRes {
+    ImageUpdateAutomation imageupdateautomation = 1;
+}
+
+message Alert {
+    string name = 1;
+    string namespace = 2;
+    string providerRef = 3;
+    string eventSeverity = 4;
+    repeated CrossNamespaceObjectReference eventSources = 5;
+    repeated string exclusionList = 6;
+    string summary = 7;
+    bool suspend = 8;
+    repeated Condition conditions = 9;
+}
+
+message ListAlertsReq {
+    string contextName = 1;
+    string namespace = 2;
+}
+
+message ListAlertsRes {
+    repeated Alert alerts = 1;
+}
+
+message Provider {
+    string name = 1;
+    string namespace = 2;
+    string type = 3;
+    string channel = 4;
+    string username = 5;
+    string address = 6;
+    string proxy = 7;
+    string secretRef = 8;
+    string certSecretRef = 9;
+    repeated Condition conditions = 10;
+}
+
+message ListProvidersReq {
+    string contextName = 1;
+    string namespace = 2;
+}
+
+message ListProvidersRes {
+    repeated Provider providers = 1;
+}
+
+message Receiver {
+    string name = 1;
+    string namespace = 2;
+    string type = 3;
+    repeated string events = 4;
+    repeated CrossNamespaceObjectReference resources = 5;
+    string secretRef = 6;
+    bool suspend = 7;
+    string url = 8;
+    repeated Condition conditions = 9;
+}
+
+message ListReceiversReq {
+    string contextName = 1;
+    string namespace = 2;
+}
+
+message ListReceiversRes {
+    repeated Receiver receivers = 1;
 }
 
 message Container {

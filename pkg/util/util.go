@@ -7,6 +7,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	helmv2 "github.com/fluxcd/helm-controller/api/v2beta1"
+	imageautomationv1 "github.com/fluxcd/image-automation-controller/api/v1beta1"
+	imagereflectorv1 "github.com/fluxcd/image-reflector-controller/api/v1beta1"
 	kustomizev1 "github.com/fluxcd/kustomize-controller/api/v1beta1"
 	notificationv1 "github.com/fluxcd/notification-controller/api/v1beta1"
 	sourcev1 "github.com/fluxcd/source-controller/api/v1beta1"
@@ -25,6 +27,8 @@ func CreateScheme() *apiruntime.Scheme {
 	_ = kustomizev1.AddToScheme(scheme)
 	_ = helmv2.AddToScheme(scheme)
 	_ = notificationv1.AddToScheme(scheme)
+	_ = imageautomationv1.AddToScheme(scheme)
+	_ = imagereflectorv1.AddToScheme(scheme)
 
 	return scheme
 }
