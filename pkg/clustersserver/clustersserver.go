@@ -9,7 +9,10 @@ import (
 	"time"
 
 	helmv2 "github.com/fluxcd/helm-controller/api/v2beta1"
+	imageautomationv1 "github.com/fluxcd/image-automation-controller/api/v1beta1"
+	imagereflectorv1 "github.com/fluxcd/image-reflector-controller/api/v1beta1"
 	kustomizev1 "github.com/fluxcd/kustomize-controller/api/v1beta1"
+	notificationv1 "github.com/fluxcd/notification-controller/api/v1beta1"
 	"github.com/fluxcd/pkg/apis/meta"
 	sourcev1 "github.com/fluxcd/source-controller/api/v1beta1"
 	pb "github.com/fluxcd/webui/pkg/rpc/clusters"
@@ -126,6 +129,21 @@ func getSourceTypeEnum(kind string) pb.Source_Type {
 	}
 
 	return pb.Source_Git
+}
+
+func mapCrossNamespaceObjectReference(conditions []notificationv1.CrossNamespaceObjectReference) []*pb.CrossNamespaceObjectReference {
+	out := []*pb.CrossNamespaceObjectReference{}
+
+	for _, cnor := range conditions {
+		out = append(out, &pb.CrossNamespaceObjectReference{
+			ApiVersion: cnor.APIVersion,
+			Kind:       cnor.Kind,
+			Name:       cnor.Name,
+			Namespace:  cnor.Namespace,
+		})
+	}
+
+	return out
 }
 
 func mapConditions(conditions []metav1.Condition) []*pb.Condition {
@@ -686,8 +704,396 @@ func (s *Server) SyncHelmRelease(ctx context.Context, msg *pb.SyncHelmReleaseReq
 
 }
 
-const KustomizationNameLabelKey string = "kustomize.toolkit.fluxcd.io/name"
-const KustomizationNamespaceLabelKey string = "kustomize.toolkit.fluxcd.io/namespace"
+func convertImagePolicy(ip imagereflectorv1.ImagePolicy) *pb.ImagePolicy {
+	var p, pk string
+	if ip.Spec.Policy.Alphabetical != nil {
+		pk = "Alphabetical"
+		p = ip.Spec.Policy.Alphabetical.Order
+	} else if ip.Spec.Policy.Numerical != nil {
+		pk = "Numerical"
+		p = ip.Spec.Policy.Numerical.Order
+	} else if ip.Spec.Policy.SemVer != nil {
+		pk = "SemVer"
+		p = ip.Spec.Policy.SemVer.Range
+	}
+
+	var ftp, fte string = "-", "-"
+	if ip.Spec.FilterTags != nil {
+		if ip.Spec.FilterTags.Pattern != "" {
+			ftp = ip.Spec.FilterTags.Pattern
+		}
+		if ip.Spec.FilterTags.Extract != "" {
+			fte = ip.Spec.FilterTags.Extract
+		}
+	}
+
+	return &pb.ImagePolicy{
+		Name:               ip.Name,
+		Namespace:          ip.Namespace,
+		ImageRepositoryRef: ip.Spec.ImageRepositoryRef.Name,
+		PolicyKind:         pk,
+		Policy:             p,
+		FilterTagsPattern:  ftp,
+		FilterTagsExtract:  fte,
+		LatestImage:        ip.Status.LatestImage,
+		Conditions:         mapConditions(ip.Status.Conditions),
+	}
+}
+
+func (s *Server) ListImagePolicies(ctx context.Context, msg *pb.ListImagePoliciesReq) (*pb.ListImagePoliciesRes, error) {
+	c, err := s.getClient(msg.ContextName)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not create client: %w", err)
+	}
+
+	res := &pb.ListImagePoliciesRes{ImagePolicies: []*pb.ImagePolicy{}}
+
+	list := imagereflectorv1.ImagePolicyList{}
+
+	if err := c.List(ctx, &list, &client.ListOptions{Namespace: msg.Namespace}); err != nil {
+		if apierrors.IsNotFound(err) {
+			return res, nil
+		}
+
+		return nil, fmt.Errorf("could not list image policies: %w", err)
+	}
+
+	for _, r := range list.Items {
+		res.ImagePolicies = append(res.ImagePolicies, convertImagePolicy(r))
+	}
+
+	return res, nil
+}
+
+func convertImageRepository(ir imagereflectorv1.ImageRepository) *pb.ImageRepository {
+	var t string
+	if ir.Spec.Timeout == nil {
+		t = "-"
+	}
+	var sr string
+	if ir.Spec.SecretRef != nil {
+		sr = ir.Spec.SecretRef.Name
+	} else {
+		sr = "-"
+	}
+	var csr string
+	if ir.Spec.CertSecretRef != nil {
+		csr = ir.Spec.CertSecretRef.Name
+	} else {
+		csr = "-"
+	}
+	var tc, st int32
+	if ir.Status.LastScanResult != nil {
+		tc = int32(ir.Status.LastScanResult.TagCount)
+		st = int32(ir.Status.LastScanResult.ScanTime.Unix())
+	} else {
+		tc, st = 0, 0
+	}
+
+	return &pb.ImageRepository{
+		Name:                   ir.Name,
+		Namespace:              ir.Namespace,
+		Image:                  ir.Spec.Image,
+		SecretRef:              sr,
+		Conditions:             mapConditions(ir.Status.Conditions),
+		Interval:               ir.Spec.Interval.Duration.String(),
+		Timeout:                t,
+		CertSecretRef:          csr,
+		Suspend:                ir.Spec.Suspend,
+		ReconcileRequestAt:     ir.Annotations[meta.ReconcileRequestAnnotation],
+		ReconcileAt:            ir.Annotations[meta.ReconcileAtAnnotation],
+		LastScanResultTagCount: tc,
+		LastScanResultScanTime: st,
+	}
+}
+
+func (s *Server) ListImageRepositories(ctx context.Context, msg *pb.ListImageRepositoriesReq) (*pb.ListImageRepositoriesRes, error) {
+	c, err := s.getClient(msg.ContextName)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not create client: %w", err)
+	}
+
+	res := &pb.ListImageRepositoriesRes{ImageRepositories: []*pb.ImageRepository{}}
+
+	list := imagereflectorv1.ImageRepositoryList{}
+
+	if err := c.List(ctx, &list, &client.ListOptions{Namespace: msg.Namespace}); err != nil {
+		if apierrors.IsNotFound(err) {
+			return res, nil
+		}
+
+		return nil, fmt.Errorf("could not list image repositories: %w", err)
+	}
+
+	for _, r := range list.Items {
+		res.ImageRepositories = append(res.ImageRepositories, convertImageRepository(r))
+	}
+
+	return res, nil
+}
+
+func (s *Server) SyncImageRepository(ctx context.Context, msg *pb.SyncImageRepositoryReq) (*pb.SyncImageRepositoryRes, error) {
+	client, err := s.getClient(msg.ContextName)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not create client: %w", err)
+	}
+
+	name := types.NamespacedName{
+		Name:      msg.ImageRepositoryName,
+		Namespace: msg.Namespace,
+	}
+	ir := imagereflectorv1.ImageRepository{}
+
+	if err := client.Get(ctx, name, &ir); err != nil {
+		return nil, fmt.Errorf("could not get image repository: %w", err)
+	}
+
+	doReconcileAnnotations(ir.Annotations)
+
+	if err := client.Update(ctx, &ir); err != nil {
+		return nil, fmt.Errorf("could not update image repository: %w", err)
+	}
+
+	if err := wait.PollImmediate(
+		k8sPollInterval,
+		k8sTimeout,
+		checkResourceSync(ctx, client, name, imageRepositoryAdapter{&imagereflectorv1.ImageRepository{}}, ir.Status.LastHandledReconcileAt),
+	); err != nil {
+		return nil, err
+	}
+
+	return &pb.SyncImageRepositoryRes{Imagerepository: convertImageRepository(ir)}, nil
+
+}
+
+func convertImageUpdateAutomation(iua imageautomationv1.ImageUpdateAutomation) *pb.ImageUpdateAutomation {
+	var lart, lpt int32
+	if iua.Status.LastAutomationRunTime != nil {
+		lart = int32(iua.Status.LastAutomationRunTime.Unix())
+	} else {
+		lart = 0
+	}
+	if iua.Status.LastPushTime != nil {
+		lpt = int32(iua.Status.LastPushTime.Unix())
+	} else {
+		lpt = 0
+	}
+
+	return &pb.ImageUpdateAutomation{
+		Name:                  iua.Name,
+		Namespace:             iua.Namespace,
+		SourceRef:             iua.Spec.SourceRef.Name,
+		SourceRefKind:         getSourceTypeEnum(iua.Spec.SourceRef.Kind),
+		Conditions:            mapConditions(iua.Status.Conditions),
+		Interval:              iua.Spec.Interval.Duration.String(),
+		UpdatePath:            iua.Spec.Update.Path,
+		UpdateStrategy:        string(iua.Spec.Update.Strategy),
+		Suspend:               iua.Spec.Suspend,
+		ReconcileRequestAt:    iua.Annotations[meta.ReconcileRequestAnnotation],
+		ReconcileAt:           iua.Annotations[meta.ReconcileAtAnnotation],
+		LastAutomationRunTime: lart,
+		LastPushCommit:        iua.Status.LastPushCommit,
+		LastPushTime:          lpt,
+	}
+}
+
+func (s *Server) ListImageUpdateAutomations(ctx context.Context, msg *pb.ListImageUpdateAutomationsReq) (*pb.ListImageUpdateAutomationsRes, error) {
+	c, err := s.getClient(msg.ContextName)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not create client: %w", err)
+	}
+
+	res := &pb.ListImageUpdateAutomationsRes{ImageUpdateAutomations: []*pb.ImageUpdateAutomation{}}
+
+	list := imageautomationv1.ImageUpdateAutomationList{}
+
+	if err := c.List(ctx, &list, &client.ListOptions{Namespace: msg.Namespace}); err != nil {
+		if apierrors.IsNotFound(err) {
+			return res, nil
+		}
+
+		return nil, fmt.Errorf("could not list image update automations: %w", err)
+	}
+
+	for _, r := range list.Items {
+		res.ImageUpdateAutomations = append(res.ImageUpdateAutomations, convertImageUpdateAutomation(r))
+	}
+
+	return res, nil
+}
+
+func (s *Server) SyncImageUpdateAutomation(ctx context.Context, msg *pb.SyncImageUpdateAutomationReq) (*pb.SyncImageUpdateAutomationRes, error) {
+	client, err := s.getClient(msg.ContextName)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not create client: %w", err)
+	}
+
+	name := types.NamespacedName{
+		Name:      msg.ImageUpdateAutomationName,
+		Namespace: msg.Namespace,
+	}
+	iua := imageautomationv1.ImageUpdateAutomation{}
+
+	if err := client.Get(ctx, name, &iua); err != nil {
+		return nil, fmt.Errorf("could not get image update automation: %w", err)
+	}
+
+	doReconcileAnnotations(iua.Annotations)
+
+	if err := client.Update(ctx, &iua); err != nil {
+		return nil, fmt.Errorf("could not update image update automation: %w", err)
+	}
+
+	if err := wait.PollImmediate(
+		k8sPollInterval,
+		k8sTimeout,
+		checkResourceSync(ctx, client, name, imageUpdateAutomationAdapter{&imageautomationv1.ImageUpdateAutomation{}}, iua.Status.LastHandledReconcileAt),
+	); err != nil {
+		return nil, err
+	}
+
+	return &pb.SyncImageUpdateAutomationRes{Imageupdateautomation: convertImageUpdateAutomation(iua)}, nil
+
+}
+
+func convertAlert(p notificationv1.Alert) *pb.Alert {
+	return &pb.Alert{
+		Name:          p.Name,
+		Namespace:     p.Namespace,
+		ProviderRef:   p.Spec.ProviderRef.Name,
+		EventSeverity: p.Spec.EventSeverity,
+		EventSources:  mapCrossNamespaceObjectReference(p.Spec.EventSources),
+		ExclusionList: p.Spec.ExclusionList,
+		Summary:       p.Spec.Summary,
+		Suspend:       p.Spec.Suspend,
+		Conditions:    mapConditions(p.Status.Conditions),
+	}
+}
+
+func (s *Server) ListAlerts(ctx context.Context, msg *pb.ListAlertsReq) (*pb.ListAlertsRes, error) {
+	c, err := s.getClient(msg.ContextName)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not create client: %w", err)
+	}
+
+	res := &pb.ListAlertsRes{Alerts: []*pb.Alert{}}
+
+	list := notificationv1.AlertList{}
+
+	if err := c.List(ctx, &list, &client.ListOptions{Namespace: msg.Namespace}); err != nil {
+		if apierrors.IsNotFound(err) {
+			return res, nil
+		}
+
+		return nil, fmt.Errorf("could not list alerts: %w", err)
+	}
+
+	for _, r := range list.Items {
+		res.Alerts = append(res.Alerts, convertAlert(r))
+	}
+
+	return res, nil
+}
+
+func convertProvider(p notificationv1.Provider) *pb.Provider {
+	var sr string
+	if p.Spec.SecretRef != nil {
+		sr = p.Spec.SecretRef.Name
+	} else {
+		sr = "-"
+	}
+	var csr string
+	if p.Spec.CertSecretRef != nil {
+		csr = p.Spec.CertSecretRef.Name
+	} else {
+		csr = "-"
+	}
+
+	return &pb.Provider{
+		Name:          p.Name,
+		Namespace:     p.Namespace,
+		Type:          p.Spec.Type,
+		Channel:       p.Spec.Channel,
+		Username:      p.Spec.Username,
+		Address:       p.Spec.Address,
+		Proxy:         p.Spec.Proxy,
+		SecretRef:     sr,
+		CertSecretRef: csr,
+		Conditions:    mapConditions(p.Status.Conditions),
+	}
+}
+
+func (s *Server) ListProviders(ctx context.Context, msg *pb.ListProvidersReq) (*pb.ListProvidersRes, error) {
+	c, err := s.getClient(msg.ContextName)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not create client: %w", err)
+	}
+
+	res := &pb.ListProvidersRes{Providers: []*pb.Provider{}}
+
+	list := notificationv1.ProviderList{}
+
+	if err := c.List(ctx, &list, &client.ListOptions{Namespace: msg.Namespace}); err != nil {
+		if apierrors.IsNotFound(err) {
+			return res, nil
+		}
+
+		return nil, fmt.Errorf("could not list providers: %w", err)
+	}
+
+	for _, r := range list.Items {
+		res.Providers = append(res.Providers, convertProvider(r))
+	}
+
+	return res, nil
+}
+
+func convertReceiver(r notificationv1.Receiver) *pb.Receiver {
+	return &pb.Receiver{
+		Name:       r.Name,
+		Namespace:  r.Namespace,
+		Type:       r.Spec.Type,
+		Events:     r.Spec.Events,
+		Resources:  mapCrossNamespaceObjectReference(r.Spec.Resources),
+		SecretRef:  r.Spec.SecretRef.Name,
+		Suspend:    r.Spec.Suspend,
+		Url:        r.Status.URL,
+		Conditions: mapConditions(r.Status.Conditions),
+	}
+}
+
+func (s *Server) ListReceivers(ctx context.Context, msg *pb.ListReceiversReq) (*pb.ListReceiversRes, error) {
+	c, err := s.getClient(msg.ContextName)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not create client: %w", err)
+	}
+
+	res := &pb.ListReceiversRes{Receivers: []*pb.Receiver{}}
+
+	list := notificationv1.ReceiverList{}
+
+	if err := c.List(ctx, &list, &client.ListOptions{Namespace: msg.Namespace}); err != nil {
+		if apierrors.IsNotFound(err) {
+			return res, nil
+		}
+
+		return nil, fmt.Errorf("could not list receivers: %w", err)
+	}
+
+	for _, r := range list.Items {
+		res.Receivers = append(res.Receivers, convertReceiver(r))
+	}
+
+	return res, nil
+}
 
 func (s *Server) ListEvents(ctx context.Context, msg *pb.ListEventsReq) (*pb.ListEventsRes, error) {
 	c, err := s.getClient(msg.ContextName)

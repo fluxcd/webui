@@ -51,6 +51,18 @@ export enum PageRoute {
   KustomizationDetail = "/kustomizations_detail",
   HelmReleases = "/helmreleases",
   HelmReleaseDetail = "/helmreleases_detail",
+  ImagePolicies = "/imagepolicies",
+  ImagePolicyDetail = "/imagepolicies_detail",
+  ImageRepositories = "/imagerepositories",
+  ImageRepositoryDetail = "/imagerepositories_detail",
+  ImageUpdateAutomations = "/imageupdateautomations",
+  ImageUpdateAutomationDetail = "/imageupdateautomations_detail",
+  Alerts = "/alerts",
+  AlertDetail = "/alerts_detail",
+  Providers = "/providers",
+  ProviderDetail = "/providers_detail",
+  Receivers = "/receivers",
+  ReceiverDetail = "/receivers_detail",
   Events = "/events",
   Error = "/error",
 }
@@ -60,6 +72,7 @@ export const getNavValue = (currentPage: any): PageRoute | boolean => {
     case "kustomizations":
     case "kustomizations_detail":
       return PageRoute.Kustomizations;
+
     case "sources":
     case "sources_detail":
       return PageRoute.Sources;
@@ -67,6 +80,30 @@ export const getNavValue = (currentPage: any): PageRoute | boolean => {
     case "helmreleases":
     case "helmreleases_detail":
       return PageRoute.HelmReleases;
+
+    case "imagepolicies":
+    case "imagepolicies_detail":
+      return PageRoute.ImagePolicies;
+
+    case "imagerepositories":
+    case "imagerepositories_detail":
+      return PageRoute.ImageRepositories;
+
+    case "imageupdateautomations":
+    case "imageupdateautomations_detail":
+      return PageRoute.ImageUpdateAutomations;
+
+    case "alerts":
+    case "alerts_detail":
+      return PageRoute.Alerts;
+
+    case "providers":
+    case "providers_detail":
+      return PageRoute.Providers;
+
+    case "receivers":
+    case "receivers_detail":
+      return PageRoute.Receivers;
 
     case "events":
       return PageRoute.Events;
