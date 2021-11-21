@@ -29,9 +29,9 @@ const Styled = (c) => styled(c)`
 `;
 
 const sections = [
-  { value: SourceType.Git, label: "Git Repos" },
+  { value: SourceType.Git, label: "Git Repositories" },
   { value: SourceType.Bucket, label: "Buckets" },
-  { value: SourceType.Helm, label: "Helm Repos" },
+  { value: SourceType.Helm, label: "Helm Repositories" },
 ];
 
 function Sources({ className }: Props) {

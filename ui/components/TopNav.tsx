@@ -69,13 +69,28 @@ const Styled = (c) => styled(c)`
 `;
 
 function TopNav({ className }: Props) {
-  const {
-    contexts,
-    namespaces,
-    currentContext,
-    currentNamespace,
-  } = useKubernetesContexts();
+  const { contexts, namespaces, currentContext, currentNamespace } =
+    useKubernetesContexts();
+
   const { navigate, currentPage } = useNavigation();
+
+  const contextSelectChanged = (ev) => {
+    const nextCtx = ev.target.value as string;
+    // setCurrentContext(nextCtx);
+    navigate(getNavValue(currentPage) as PageRoute, nextCtx, currentNamespace);
+  };
+
+  const namespaceSelectChanged = (ev) => {
+    const nextNs = (
+      ev.target.value === allNamespaces ? AllNamespacesOption : ev.target.value
+    ) as string;
+
+    navigate(
+      getNavValue(currentPage) as PageRoute,
+      currentContext,
+      (nextNs || AllNamespacesOption) as string
+    );
+  };
 
   return (
     <header className={className}>
@@ -90,21 +105,13 @@ function TopNav({ className }: Props) {
         <NavWrapper column center wide>
           <Flex center>
             <FormControl variant="outlined">
-              <InputLabel>Context</InputLabel>
+              <InputLabel id="context-selector">Context</InputLabel>
               {currentContext && contexts.length > 0 && (
                 <Select
-                  // labelId="context-select-label"
                   id="context-select"
-                  onChange={(ev) => {
-                    const nextCtx = ev.target.value as string;
-                    // setCurrentContext(nextCtx);
-                    navigate(
-                      getNavValue(currentPage) as PageRoute,
-                      nextCtx,
-                      currentNamespace
-                    );
-                  }}
+                  onChange={contextSelectChanged}
                   value={currentContext}
+                  label="Context"
                 >
                   {_.map(contexts, (c) => (
                     <MenuItem value={c.name || ""} key={c.name}>
@@ -118,17 +125,7 @@ function TopNav({ className }: Props) {
               <InputLabel id="namespaces-selector">Namespace</InputLabel>
               {currentNamespace && namespaces && namespaces.length > 0 && (
                 <Select
-                  onChange={(ev) => {
-                    const nextNs = (ev.target.value === allNamespaces
-                      ? AllNamespacesOption
-                      : ev.target.value) as string;
-
-                    navigate(
-                      getNavValue(currentPage) as PageRoute,
-                      currentContext,
-                      (nextNs || AllNamespacesOption) as string
-                    );
-                  }}
+                  onChange={namespaceSelectChanged}
                   // Avoid a material-ui warning
                   value={
                     currentNamespace === "all"

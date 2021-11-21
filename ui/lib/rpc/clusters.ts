@@ -1,4 +1,4 @@
-import { createTwirpRequest, Fetch, throwTwirpError } from "./twirp";
+import { createTwirpRequest, throwTwirpError, Fetch } from "./twirp";
 
 export interface Context {
   name?: string;
@@ -292,10 +292,9 @@ const JSONToListKustomizationsRes = (
     return null;
   }
   return {
-    kustomizations: (m.kustomizations as (
-      | Kustomization
-      | KustomizationJSON
-    )[]).map(JSONToKustomization),
+    kustomizations: (
+      m.kustomizations as (Kustomization | KustomizationJSON)[]
+    ).map(JSONToKustomization),
   };
 };
 
@@ -639,12 +638,14 @@ const JSONToListHelmReleasesRes = (
     return null;
   }
   return {
-    helmReleases: (((m as ListHelmReleasesRes).helmReleases
-      ? (m as ListHelmReleasesRes).helmReleases
-      : (m as ListHelmReleasesResJSON).helm_releases) as (
-      | HelmRelease
-      | HelmReleaseJSON
-    )[]).map(JSONToHelmRelease),
+    helmReleases: (
+      ((m as ListHelmReleasesRes).helmReleases
+        ? (m as ListHelmReleasesRes).helmReleases
+        : (m as ListHelmReleasesResJSON).helm_releases) as (
+        | HelmRelease
+        | HelmReleaseJSON
+      )[]
+    ).map(JSONToHelmRelease),
   };
 };
 
@@ -871,10 +872,6 @@ export interface UnstructuredObject {
   status?: string;
 }
 
-export type UnstructuredObjectWithParent = UnstructuredObject & {
-  parentUid: string;
-};
-
 interface UnstructuredObjectJSON {
   groupVersionKind?: GroupVersionKindJSON;
   name?: string;
@@ -1047,9 +1044,8 @@ export class DefaultClusters implements Clusters {
     listNamespacesForContextReq: ListNamespacesForContextReq
   ): Promise<ListNamespacesForContextRes> {
     const url = this.hostname + this.pathPrefix + "ListNamespacesForContext";
-    let body:
-      | ListNamespacesForContextReq
-      | ListNamespacesForContextReqJSON = listNamespacesForContextReq;
+    let body: ListNamespacesForContextReq | ListNamespacesForContextReqJSON =
+      listNamespacesForContextReq;
     if (!this.writeCamelCase) {
       body = ListNamespacesForContextReqToJSON(listNamespacesForContextReq);
     }
@@ -1068,9 +1064,8 @@ export class DefaultClusters implements Clusters {
     listKustomizationsReq: ListKustomizationsReq
   ): Promise<ListKustomizationsRes> {
     const url = this.hostname + this.pathPrefix + "ListKustomizations";
-    let body:
-      | ListKustomizationsReq
-      | ListKustomizationsReqJSON = listKustomizationsReq;
+    let body: ListKustomizationsReq | ListKustomizationsReqJSON =
+      listKustomizationsReq;
     if (!this.writeCamelCase) {
       body = ListKustomizationsReqToJSON(listKustomizationsReq);
     }
@@ -1106,9 +1101,8 @@ export class DefaultClusters implements Clusters {
     syncKustomizationReq: SyncKustomizationReq
   ): Promise<SyncKustomizationRes> {
     const url = this.hostname + this.pathPrefix + "SyncKustomization";
-    let body:
-      | SyncKustomizationReq
-      | SyncKustomizationReqJSON = syncKustomizationReq;
+    let body: SyncKustomizationReq | SyncKustomizationReqJSON =
+      syncKustomizationReq;
     if (!this.writeCamelCase) {
       body = SyncKustomizationReqToJSON(syncKustomizationReq);
     }
@@ -1127,9 +1121,8 @@ export class DefaultClusters implements Clusters {
     listHelmReleasesReq: ListHelmReleasesReq
   ): Promise<ListHelmReleasesRes> {
     const url = this.hostname + this.pathPrefix + "ListHelmReleases";
-    let body:
-      | ListHelmReleasesReq
-      | ListHelmReleasesReqJSON = listHelmReleasesReq;
+    let body: ListHelmReleasesReq | ListHelmReleasesReqJSON =
+      listHelmReleasesReq;
     if (!this.writeCamelCase) {
       body = ListHelmReleasesReqToJSON(listHelmReleasesReq);
     }
@@ -1201,9 +1194,8 @@ export class DefaultClusters implements Clusters {
     getReconciledObjectsReq: GetReconciledObjectsReq
   ): Promise<GetReconciledObjectsRes> {
     const url = this.hostname + this.pathPrefix + "GetReconciledObjects";
-    let body:
-      | GetReconciledObjectsReq
-      | GetReconciledObjectsReqJSON = getReconciledObjectsReq;
+    let body: GetReconciledObjectsReq | GetReconciledObjectsReqJSON =
+      getReconciledObjectsReq;
     if (!this.writeCamelCase) {
       body = GetReconciledObjectsReqToJSON(getReconciledObjectsReq);
     }

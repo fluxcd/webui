@@ -5,6 +5,7 @@ import { AppContext } from "../../components/AppStateProvider";
 import { Context } from "../rpc/clusters";
 import { AllNamespacesOption } from "../types";
 import { formatURL, normalizePath, PageRoute } from "../util";
+
 // The backend doesn't like the word "all". Instead, it wants an empty string.
 // Navigation might get weird if we use an empty string on the front-end.
 // There may also be a naming collision with a namespace named "all".
@@ -19,9 +20,8 @@ export function useKubernetesContexts(): {
 } {
   const { navigate } = useNavigation();
 
-  const { contexts, namespaces, currentContext, currentNamespace } = useContext(
-    AppContext
-  );
+  const { contexts, namespaces, currentContext, currentNamespace } =
+    useContext(AppContext);
 
   useEffect(() => {
     if (!currentContext) {

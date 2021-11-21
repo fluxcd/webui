@@ -29,9 +29,8 @@ export default function AppStateProvider({ clustersClient, ...props }) {
   const { context } = qs.parse(location.search);
   const [contexts, setContexts] = React.useState([]);
   const [namespaces, setNamespaces] = React.useState({});
-  const [currentNamespace, setCurrentNamespace] = React.useState(
-    AllNamespacesOption
-  );
+  const [currentNamespace, setCurrentNamespace] =
+    React.useState(AllNamespacesOption);
   const [appState, setAppState] = React.useState({
     error: null,
     loading: false,
