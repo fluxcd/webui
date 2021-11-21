@@ -28,7 +28,7 @@ To install the Flux Web UI:
 To set up a development environment
 
 1. Install `go` v1.16
-2. Install Node.js version 14.15.1
+2. Install `Node.js v16.x.x`
 3. Install `reflex` for automated server builds: `go get github.com/cespare/reflex`
 4. [Install `kubebuilder`](https://book.kubebuilder.io/quick-start.html#installation)
 5. `npm install` to install UI dependencies
