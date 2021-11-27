@@ -25,6 +25,13 @@ service Clusters {
     rpc GetChildObjects(GetChildObjectsReq) returns (GetChildObjectsRes);
 }
 
+enum Type {
+    Git = 0;
+    Bucket = 1;
+    Helm = 2;
+    Chart = 3;
+};
+
 message Context {
     string name = 1;
 }
@@ -83,7 +90,7 @@ message Kustomization {
     bool prune = 8;
     string reconcileRequestAt = 9;
     string reconcileAt = 10;
-    Source.Type sourceRefKind = 11;
+    Type sourceRefKind = 11;
     repeated SnapshotEntry snapshots = 12;
     string lastAppliedRevision = 13;
     string lastAttemptedRevision = 14;
@@ -119,12 +126,6 @@ message Source {
     string name = 1;
     string url = 2;
     GitRepositoryRef reference = 3;
-    enum Type {
-        Git = 0;
-        Bucket = 1;
-        Helm = 2;
-        Chart = 3;
-    };
     Type type = 4;
     string provider = 5;
     string bucketname = 6;
@@ -140,7 +141,7 @@ message Source {
 message ListSourcesReq {
     string contextName = 1;
     string namespace = 2;
-    Source.Type sourceType = 3;
+    Type sourceType = 3;
 }
 
 message ListSourcesRes {
@@ -151,7 +152,7 @@ message SyncSourceReq {
     string contextName = 1;
     string namespace = 2;
     string sourceName = 3;
-    Source.Type sourceType = 4;
+    Type sourceType = 4;
 }
 
 message SyncSourceRes {
@@ -267,7 +268,7 @@ message ImageUpdateAutomation {
     bool suspend = 8;
     string reconcileRequestAt = 9;
     string reconcileAt = 10;
-    Source.Type sourceRefKind = 11;
+    Type sourceRefKind = 11;
     int32 lastAutomationRunTime = 12;
     string lastPushCommit = 13;
     int32 lastPushTime = 14;

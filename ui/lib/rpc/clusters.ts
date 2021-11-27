@@ -2,6 +2,13 @@
 import {createTwirpRequest, throwTwirpError, Fetch} from './twirp';
 
 
+export enum Type {
+    Git = 0,
+    Bucket = 1,
+    Helm = 2,
+    Chart = 3,
+}
+
 export interface Context {
     name?: string;
 }
