@@ -72,7 +72,6 @@ message Kustomization {
     repeated SnapshotEntry snapshots = 12;
     string lastAppliedRevision = 13;
     string lastAttemptedRevision = 14;
-
 }
 
 message ListKustomizationsReq {
@@ -83,7 +82,6 @@ message ListKustomizationsReq {
 message ListKustomizationsRes {
     repeated Kustomization kustomizations = 1;
 }
-
 
 message GitRepositoryRef {
     string branch = 1;
@@ -237,7 +235,6 @@ message ListEventsReq {
 message ListEventsRes {
     repeated Event events = 1;
 }
-
 
 message GetReconciledObjectsReq {
     string contextName = 1;

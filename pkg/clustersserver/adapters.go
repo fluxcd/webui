@@ -26,15 +26,15 @@ type reconcileWrapper struct {
 	object reconcilable
 }
 
-type gitRepositoryAdapter struct {
+type gitAdapter struct {
 	*sourcev1.GitRepository
 }
 
-func (o gitRepositoryAdapter) GetLastHandledReconcileRequest() string {
+func (o gitAdapter) GetLastHandledReconcileRequest() string {
 	return o.Status.GetLastHandledReconcileRequest()
 }
 
-func (o gitRepositoryAdapter) asClientObject() client.Object {
+func (o gitAdapter) asClientObject() client.Object {
 	return o.GitRepository
 }
 

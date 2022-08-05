@@ -3,7 +3,6 @@ import _ from "lodash";
 import * as React from "react";
 import styled from "styled-components";
 import Link from "../components/Link";
-import LoadingPage from "../components/LoadingPage";
 import Page from "../components/Page";
 import Panel from "../components/Panel";
 import { useKubernetesContexts } from "../lib/hooks/app";
@@ -29,21 +28,17 @@ const Styled = (c) => styled(c)`
 `;
 
 const sections = [
-  { value: SourceType.Git, label: "Git Repos" },
+  { value: SourceType.Git, label: "Git Repositories" },
   { value: SourceType.Bucket, label: "Buckets" },
-  { value: SourceType.Helm, label: "Helm Repos" },
+  { value: SourceType.Helm, label: "Helm Repositories" },
 ];
 
 function Sources({ className }: Props) {
   const { currentContext, currentNamespace } = useKubernetesContexts();
   const { sources, loading } = useSources(currentContext, currentNamespace);
 
-  if (loading) {
-    return <LoadingPage />;
-  }
-
   return (
-    <Page className={className}>
+    <Page loading={loading} className={className}>
       <h2>Sources</h2>
       <div>
         {_.map(sections, (t) => (

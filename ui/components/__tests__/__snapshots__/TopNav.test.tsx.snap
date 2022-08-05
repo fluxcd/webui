@@ -153,6 +153,7 @@ Object {
                 <label
                   class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined MuiFormLabel-filled"
                   data-shrink="true"
+                  id="context-selector"
                 >
                   Context
                 </label>
@@ -188,14 +189,12 @@ Object {
                   <fieldset
                     aria-hidden="true"
                     class="PrivateNotchedOutline-root-1 MuiOutlinedInput-notchedOutline"
-                    style="padding-left: 8px;"
                   >
                     <legend
-                      class="PrivateNotchedOutline-legend-2"
-                      style="width: 0.01px;"
+                      class="PrivateNotchedOutline-legendLabelled-3 PrivateNotchedOutline-legendNotched-4"
                     >
                       <span>
-                        ​
+                        Context
                       </span>
                     </legend>
                   </fieldset>
@@ -293,6 +292,7 @@ Object {
               <label
                 class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined MuiFormLabel-filled"
                 data-shrink="true"
+                id="context-selector"
               >
                 Context
               </label>
@@ -328,14 +328,12 @@ Object {
                 <fieldset
                   aria-hidden="true"
                   class="PrivateNotchedOutline-root-1 MuiOutlinedInput-notchedOutline"
-                  style="padding-left: 8px;"
                 >
                   <legend
-                    class="PrivateNotchedOutline-legend-2"
-                    style="width: 0.01px;"
+                    class="PrivateNotchedOutline-legendLabelled-3 PrivateNotchedOutline-legendNotched-4"
                   >
                     <span>
-                      ​
+                      Context
                     </span>
                   </legend>
                 </fieldset>
